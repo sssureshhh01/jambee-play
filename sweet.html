@@ -667,7 +667,7 @@ const Kit = {
   const K = Kit.create('ss_save', { hammer: 2, shuffle: 2 });
   const S = K.S;
   const N = 8;
-  // six real Indian sweets, each with its own colour and shape
+  // six sweets to start, each with its own colour and shape
   // 12 sweets in 6 colour families. Each level picks one sweet per family, so colours never clash,
   // and new sweets unlock as you progress: the further you go, the more different mithai you meet.
   const POOL_COL = [
@@ -683,14 +683,21 @@ const Kit = {
     { c: '#5ab84a', d: '#246a1a', l: '#d8ffc8' }, { c: '#f8f4ec', d: '#a89878', l: '#ffffff' }, { c: '#8a4a28', d: '#3a1a0a', l: '#d8a078' },
     { c: '#f0c050', d: '#a87010', l: '#fff4c0' }, { c: '#e8303a', d: '#8a0a14', l: '#ffb0b8' }, { c: '#6ac85a', d: '#2a7a1a', l: '#e0ffd0' },
     { c: '#fff2b0', d: '#c8a040', l: '#ffffff' },
+    { c: '#5a2a14', d: '#2a1006', l: '#c89070' }, { c: '#f0a830', d: '#a86010', l: '#ffe0a0' }, { c: '#7a4422', d: '#3a1a08', l: '#d8a078' },
+    { c: '#ffd23f', d: '#b8860a', l: '#fff4b0' }, { c: '#fff0a0', d: '#c8a040', l: '#ffffff' }, { c: '#f8d070', d: '#b8882a', l: '#fff4c8' },
+    { c: '#fbf6ec', d: '#b8a888', l: '#ffffff' }, { c: '#d8a060', d: '#8a5a20', l: '#ffe0b0' }, { c: '#c88a4a', d: '#7a4a18', l: '#f0c890' },
+    { c: '#f6d890', d: '#b89040', l: '#fff6d0' }, { c: '#fff4e0', d: '#c8b090', l: '#ffffff' }, { c: '#fffaf2', d: '#c8b8a0', l: '#ffffff' },
+    { c: '#7ad46a', d: '#2a7a1a', l: '#e0ffd0' }, { c: '#ff6a8a', d: '#b8203a', l: '#ffd0da' },
   ];
   const POOL_NAMES = ['Gulab Jamun', 'Jalebi', 'Kaju Katli', 'Pista Barfi', 'Kesar Peda', 'Rose Sandesh', 'Rasgulla', 'Mysore Pak', 'Imarti', 'Kalakand', 'Chum Chum', 'Kaju Pista Roll',
     'Besan Ladoo', 'Motichoor Ladoo', 'Ondeh Ondeh', 'Kueh Lapis', 'Pineapple Tart', 'Kulfi', 'Chocolate Barfi', 'Rasmalai', 'Gajar Halwa',
-    'Soan Papdi', 'Modak', 'Coconut Barfi', 'Mango Barfi', 'Kesari', 'Badusha', 'Kuih Seri Muka', 'Putu Piring', 'Dharwad Peda', 'Ghevar', 'Ang Ku Kueh', 'Kueh Dadar', 'Milk Peda'];
-  const POOL_TAG = ['Indian', 'Indian', 'Indian', 'Indian', 'Indian', 'Bengali', 'Bengali', 'South Indian', 'North Indian', 'Indian', 'Bengali', 'Indian', 'Indian', 'Indian', 'Singapore kuih', 'Singapore kuih', 'Singapore', 'Indian', 'Indian', 'Bengali', 'North Indian', 'Indian', 'Maharashtrian', 'Indian', 'Indian', 'South Indian', 'South Indian', 'Singapore kuih', 'Singapore', 'Karnataka', 'Rajasthani', 'Singapore kuih', 'Singapore kuih', 'Indian'];
+    'Soan Papdi', 'Modak', 'Coconut Barfi', 'Mango Barfi', 'Kesari', 'Badusha', 'Kuih Seri Muka', 'Putu Piring', 'Dharwad Peda', 'Ghevar', 'Ang Ku Kueh', 'Kueh Dadar', 'Milk Peda',
+    'Nutella Tart', 'Cornflake Tart', 'Almond London', 'Egg Tart', 'Cheese Tart', 'Love Letters', 'Kueh Bangkit', 'Choc Chip Cookie', 'Peanut Cookie', 'Butter Cookie', 'Sugee Cookie', 'Kuih Makmur', 'Pandan Swiss Roll', 'Strawberry Tart'];
   // families: [brown], [orange], [white], [green], [yellow], [pink]; later sweets unlock at these levels
-  const FAMILY = [[0, 18, 29], [1, 8, 13, 20, 24, 25], [2, 6, 9, 17, 19, 22, 28], [3, 11, 14, 27, 32], [4, 7, 12, 16, 21, 26, 30, 33], [5, 10, 15, 23, 31]];
-  const UNLOCK = { 6: 4, 8: 7, 7: 10, 10: 13, 11: 16, 9: 19, 13: 22, 14: 25, 16: 28, 15: 31, 18: 34, 17: 37, 12: 40, 19: 43, 20: 46, 21: 50, 22: 54, 23: 58, 24: 62, 25: 66, 26: 70, 27: 74, 28: 78, 29: 82, 30: 86, 31: 90, 32: 95, 33: 100 };
+  const FAMILY = [[0, 18, 29, 34, 36], [1, 8, 13, 20, 24, 25, 35, 41, 42], [2, 6, 9, 17, 19, 22, 28, 40, 44, 45], [3, 11, 14, 27, 32, 46], [4, 7, 12, 16, 21, 26, 30, 33, 37, 38, 39, 43], [5, 10, 15, 23, 31, 47]];
+  // unlock order: a new sweet joins every 2–3 levels (tarts and cookies come early!)
+  const ORDER = [6, 34, 8, 16, 35, 7, 36, 10, 37, 11, 14, 38, 9, 39, 13, 15, 40, 47, 18, 41, 17, 42, 12, 43, 19, 20, 44, 21, 45, 22, 46, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33];
+  const UNLOCK = {}; ORDER.forEach((ci, k) => UNLOCK[ci] = 4 + Math.round(k * 2.5));
   let SET = [0, 1, 2, 3, 4, 5], COL = SET.map(i => POOL_COL[i]), NAMES = SET.map(i => POOL_NAMES[i]);
   function sweetSet(n) {
     const rng = Kit.rng(n * 911 + 5), fams = FAMILY.map(f => f.filter(i => (UNLOCK[i] || 0) <= n));
@@ -1052,6 +1059,8 @@ const Kit = {
     else if (ci === 29) c.arc(0, 0, R * 0.84, 0, 7);
     else if (ci === 31) c.ellipse(0, 0, R * 0.92, R * 0.78, 0, 0, 7);
     else if (ci === 32) Kit.rr(c, -R * 0.95, -R * 0.42, R * 1.9, R * 0.84, R * 0.42);
+    else if (ci >= 34 && ci !== 39 && ci !== 46) c.arc(0, R * 0.02, R * (ci === 40 || ci === 45 ? 0.8 : 0.88), 0, 7);
+    else if (ci === 39 || ci === 46) Kit.rr(c, -R * 0.95, -R * 0.42, R * 1.9, R * 0.84, R * 0.42);
     else if (ci === 20) { c.moveTo(-R * 0.95, R * 0.6); c.bezierCurveTo(-R * 0.9, -R * 0.4, -R * 0.3, -R * 0.85, 0, -R * 0.85); c.bezierCurveTo(R * 0.3, -R * 0.85, R * 0.9, -R * 0.4, R * 0.95, R * 0.6); c.closePath(); }
     else { c.moveTo(0, R * 0.9); c.bezierCurveTo(-R * 1.25, R * 0.05, -R * 0.75, -R * 1.05, 0, -R * 0.42); c.bezierCurveTo(R * 0.75, -R * 1.05, R * 1.25, R * 0.05, 0, R * 0.9); c.closePath(); }
   }
@@ -1161,6 +1170,37 @@ const Kit = {
       c.fillStyle = rad(-R * 0.2, -R * 0.4, R * 0.05, R * 1.0, [[0, '#ffc090'], [0.5, '#ff6a2a'], [1, '#a8300a']]); candyPath(c, 20, R); c.fill();
       c.save(); candyPath(c, 20, R); c.clip(); const rg = Kit.rng(71); c.strokeStyle = 'rgba(255,190,120,.6)'; c.lineWidth = R * 0.04; for (let i = 0; i < 26; i++) { const x = (rg() - 0.5) * R * 1.8, y = (rg() - 0.5) * R * 1.4; c.beginPath(); c.moveTo(x, y); c.lineTo(x + R * 0.2, y + (rg() - 0.5) * R * 0.15); c.stroke(); } c.restore();
       c.fillStyle = '#f6e6c0'; c.beginPath(); c.ellipse(-R * 0.25, -R * 0.35, R * 0.16, R * 0.08, 0.4, 0, 7); c.fill(); c.fillStyle = '#4a1a20'; c.beginPath(); c.arc(R * 0.3, -R * 0.2, R * 0.07, 0, 7); c.fill(); c.fillStyle = '#7ccf4a'; c.beginPath(); c.ellipse(R * 0.05, -R * 0.55, R * 0.1, R * 0.04, -0.3, 0, 7); c.fill();
+    } else if (ci >= 34) { // festive tarts & cookies
+      const fill = { 34: ['#8a4a28', '#4a1a08'], 35: ['#ffd070', '#e89020'], 37: ['#fff27a', '#f0b020'], 38: ['#fff6c0', '#f0d070'], 47: ['#ff6a8a', '#c81a3a'] }[ci];
+      shadow(R * 0.85, R * 0.86);
+      if (fill) { // tart: fluted golden crust with a filling
+        c.fillStyle = '#b8701a'; c.beginPath(); for (let i = 0; i <= 40; i++) { const a = i / 40 * 6.283, rr = R * (0.88 + 0.06 * Math.cos(a * 14)); i ? c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr + R * 0.04) : c.moveTo(Math.cos(a) * rr, Math.sin(a) * rr + R * 0.04); } c.fill();
+        c.fillStyle = rad(-R * 0.3, -R * 0.35, R * 0.05, R * 1.0, [[0, '#fff0c0'], [0.6, '#e8b05a'], [1, '#b8701a']]); c.beginPath(); c.arc(0, 0, R * 0.86, 0, 7); c.fill();
+        c.fillStyle = rad(-R * 0.15, -R * 0.2, R * 0.03, R * 0.62, [[0, fill[0]], [1, fill[1]]]); c.beginPath(); c.arc(0, 0, R * 0.6, 0, 7); c.fill();
+        if (ci === 34) { c.fillStyle = '#d8a870'; for (let i = 0; i < 5; i++) { const a = i * 1.26; c.beginPath(); c.ellipse(Math.cos(a) * R * 0.3, Math.sin(a) * R * 0.3, R * 0.08, R * 0.05, a, 0, 7); c.fill(); } }
+        if (ci === 35) { const rg = Kit.rng(35); for (let i = 0; i < 14; i++) { c.fillStyle = i % 2 ? '#ffe08a' : '#d88a20'; c.save(); c.translate((rg() - 0.5) * R * 0.9, (rg() - 0.5) * R * 0.9); c.rotate(rg() * 3); c.beginPath(); c.ellipse(0, 0, R * 0.16, R * 0.1, 0, 0, 7); c.fill(); c.restore(); } c.fillStyle = '#e8303a'; c.beginPath(); c.arc(0, -R * 0.05, R * 0.08, 0, 7); c.fill(); }
+        if (ci === 37) { c.fillStyle = 'rgba(200,120,10,.45)'; c.beginPath(); c.ellipse(R * 0.15, R * 0.1, R * 0.2, R * 0.12, 0.4, 0, 7); c.fill(); }
+        if (ci === 38) { c.fillStyle = 'rgba(200,120,20,.5)'; c.beginPath(); c.ellipse(0, 0, R * 0.5, R * 0.5, 0, 0, 7); c.lineWidth = R * 0.06; c.strokeStyle = 'rgba(200,130,30,.5)'; c.stroke(); }
+        if (ci === 47) { c.fillStyle = '#e8203a'; [[-0.2, -0.15], [0.22, -0.05], [0, 0.22]].forEach(([x, y]) => { c.beginPath(); c.moveTo(x * R, y * R + R * 0.18); c.bezierCurveTo(x * R - R * 0.2, y * R, x * R - R * 0.14, y * R - R * 0.18, x * R, y * R - R * 0.14); c.bezierCurveTo(x * R + R * 0.14, y * R - R * 0.18, x * R + R * 0.2, y * R, x * R, y * R + R * 0.18); c.fill(); c.fillStyle = '#3a9a3a'; c.fillRect(x * R - R * 0.05, y * R - R * 0.2, R * 0.1, R * 0.05); c.fillStyle = '#e8203a'; }); }
+      } else if (ci === 39) { // love letters: rolled wafer
+        c.fillStyle = rad(-R * 0.3, -R * 0.2, R * 0.05, R * 1.1, [[0, '#fff4c8'], [0.6, '#f8d070'], [1, '#b8882a']]); candyPath(c, 39, R); c.fill();
+        c.strokeStyle = 'rgba(184,136,42,.6)'; c.lineWidth = R * 0.04; for (let i = -3; i <= 3; i++) { c.beginPath(); c.moveTo(i * R * 0.25, -R * 0.4); c.lineTo(i * R * 0.25 + R * 0.12, R * 0.4); c.stroke(); }
+        c.fillStyle = '#e8c060'; c.beginPath(); c.ellipse(R * 0.85, 0, R * 0.12, R * 0.38, 0, 0, 7); c.fill(); c.strokeStyle = '#b8882a'; c.beginPath(); c.arc(R * 0.85, 0, R * 0.22, 0, 5); c.stroke();
+      } else if (ci === 46) { // pandan swiss roll
+        c.fillStyle = rad(-R * 0.3, -R * 0.2, R * 0.05, R * 1.1, [[0, '#e0ffd0'], [0.6, '#7ad46a'], [1, '#2a7a1a']]); candyPath(c, 46, R); c.fill();
+        c.fillStyle = '#fffbea'; c.beginPath(); c.ellipse(R * 0.62, 0, R * 0.3, R * 0.4, 0, 0, 7); c.fill(); c.strokeStyle = '#5ab84a'; c.lineWidth = R * 0.07; c.beginPath(); for (let t = 0; t < 1; t += 0.02) { const a = t * 12, d = R * (0.04 + t * 0.3); c.lineTo(R * 0.62 + Math.cos(a) * d * 0.75, Math.sin(a) * d); } c.stroke();
+      } else { // cookies
+        const base = { 36: ['#d8a078', '#7a4422'], 40: ['#ffffff', '#e8e0d0'], 41: ['#ffe0b0', '#c8904a'], 42: ['#f0c890', '#a86a28'], 43: ['#fff6d0', '#e0b050'], 44: ['#fffaf0', '#e8d8b8'], 45: ['#ffffff', '#f0e8dc'] }[ci];
+        c.fillStyle = rad(-R * 0.3, -R * 0.35, R * 0.05, R * 1.0, [[0, base[0]], [1, base[1]]]); candyPath(c, ci, R); c.fill();
+        const rg = Kit.rng(ci * 5);
+        if (ci === 36) { c.fillStyle = '#4a2410'; c.beginPath(); c.arc(0, 0, R * 0.84, Math.PI * 1.05, Math.PI * 2.0); c.fill(); c.fillStyle = '#f6e6c0'; c.beginPath(); c.ellipse(0, -R * 0.2, R * 0.3, R * 0.2, 0.3, 0, 7); c.fill(); c.fillStyle = '#ffe8a0'; for (let i = 0; i < 12; i++) c.fillRect((rg() - 0.5) * R * 1.2, -R * 0.1 + rg() * R * 0.5, R * 0.06, R * 0.06); }
+        if (ci === 40) { for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; c.strokeStyle = 'rgba(200,180,150,.7)'; c.lineWidth = R * 0.05; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(a) * R * 0.7, Math.sin(a) * R * 0.7); c.stroke(); } c.fillStyle = '#e8303a'; c.beginPath(); c.arc(0, 0, R * 0.08, 0, 7); c.fill(); }
+        if (ci === 41) { c.fillStyle = '#4a2410'; for (let i = 0; i < 9; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.2, (rg() - 0.5) * R * 1.2, R * 0.1, 0, 7); c.fill(); } }
+        if (ci === 42) { c.strokeStyle = 'rgba(120,60,10,.45)'; c.lineWidth = R * 0.05; c.beginPath(); c.moveTo(-R * 0.5, -R * 0.2); c.lineTo(R * 0.5, -R * 0.2); c.moveTo(-R * 0.5, R * 0.2); c.lineTo(R * 0.5, R * 0.2); c.stroke(); c.fillStyle = 'rgba(255,240,200,.6)'; c.beginPath(); c.arc(0, 0, R * 0.18, 0, 7); c.fill(); }
+        if (ci === 43) { c.strokeStyle = 'rgba(184,136,42,.6)'; c.lineWidth = R * 0.06; for (let i = 0; i < 10; i++) { const a = i / 10 * 6.283; c.beginPath(); c.arc(Math.cos(a) * R * 0.55, Math.sin(a) * R * 0.55, R * 0.16, 0, 7); c.stroke(); } c.fillStyle = '#e8303a'; c.beginPath(); c.arc(0, 0, R * 0.14, 0, 7); c.fill(); }
+        if (ci === 44) { c.fillStyle = 'rgba(200,170,120,.35)'; for (let i = 0; i < 20; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.3, (rg() - 0.5) * R * 1.3, R * 0.03, 0, 7); c.fill(); } }
+        if (ci === 45) { c.fillStyle = 'rgba(255,255,255,.95)'; for (let i = 0; i < 40; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.4, (rg() - 0.5) * R * 1.4, R * 0.045, 0, 7); c.fill(); } c.fillStyle = 'rgba(200,160,100,.4)'; c.beginPath(); c.arc(0, 0, R * 0.25, 0, 7); c.fill(); }
+      }
     } else if (ci >= 21) { // the newest sweets share a few simple builders
       const spec = {
         21: ['#fff6c8', '#f6d878', '#b89030'], 22: ['#ffffff', '#fbf4ea', '#b8a888'], 23: ['#fff0f4', '#ffc0d4', '#c86a8a'], 24: ['#ffe0a0', '#ffa830', '#b8600a'],
@@ -1395,8 +1435,6 @@ const Kit = {
       // a little pile of sweets
       const R = pw * 0.36, spr = candySprite(ci, null, Math.round(R)), sz = spr.width / SPR_DPR, pile = [[-0.75, 0], [0, 0], [0.75, 0], [-0.38, -0.7], [0.38, -0.7], [0, -1.35]];
       for (const [dx, dy] of pile) c.drawImage(spr, x + dx * R * 1.15 - sz / 2, y - R * 0.55 + dy * R * 0.95 - sz / 2, sz, sz);
-      // name tag
-      c.font = `800 ${Math.round(Math.max(9, pw * 0.22))}px system-ui,sans-serif`; const nm = POOL_NAMES[ci], tw = c.measureText(nm).width + 10; c.fillStyle = 'rgba(255,255,255,.92)'; Kit.rr(c, x - tw / 2, y + pw * 0.34, tw, pw * 0.36, 6); c.fill(); c.fillStyle = '#5a1478'; c.fillText(nm, x, y + pw * 0.6);
       if (st.deco === 'diya' && p < nP - 1) { const dx2 = (p + 1) / nP * w; c.fillStyle = 'rgba(255,200,90,.35)'; c.beginPath(); c.arc(dx2, y - 6, 16, 0, 7); c.fill(); c.fillStyle = '#b8501e'; c.beginPath(); c.ellipse(dx2, y + 4, 9, 4, 0, 0, Math.PI); c.fill(); c.fillStyle = '#ffb020'; c.beginPath(); c.ellipse(dx2, y - 4, 3, 7, 0, 0, 7); c.fill(); }
     }
   }
@@ -1412,7 +1450,7 @@ const Kit = {
     ov.appendChild(box); document.body.appendChild(ov); const grid = box.querySelector('#albGrid');
     for (const a of all) { const got = a.at <= lv, cell = document.createElement('div'); cell.style.cssText = `background:${got ? '#fff' : '#f2e8f0'};border-radius:14px;padding:6px 4px 7px;box-shadow:0 2px 0 rgba(90,20,120,.12);position:relative`;
       const cv = document.createElement('canvas'), spr = candySprite(a.i, null, 26); cv.width = spr.width; cv.height = spr.height; cv.style.cssText = `width:62px;height:62px;${got || first ? '' : 'filter:grayscale(.85) opacity(.55)'}`; cv.getContext('2d').drawImage(spr, 0, 0);
-      cell.appendChild(cv); cell.insertAdjacentHTML('beforeend', `<div style="font:800 11px system-ui;color:#4a1060;line-height:1.15">${a.nm}</div><div style="font:600 9.5px system-ui;color:#9a7aa8">${POOL_TAG[a.i]}</div><div style="font:800 10px system-ui;color:${got ? '#1a9a4a' : '#c8508a'};margin-top:2px">${got ? '✓ Unlocked' : '🔒 Level ' + a.at}</div>`);
+      cell.appendChild(cv); cell.insertAdjacentHTML('beforeend', `<div style="font:800 11px system-ui;color:#4a1060;line-height:1.15">${a.nm}</div><div style="font:800 10px system-ui;color:${got ? '#1a9a4a' : '#c8508a'};margin-top:2px">${got ? '✓ Unlocked' : '🔒 Level ' + a.at}</div>`);
       grid.appendChild(cell); }
     box.querySelector('#albClose').onclick = () => { ov.remove(); if (first) { S.albumSeen = 1; K.persist(); } K.tone(880, 0.08, { type: 'triangle', vol: 0.06 }); };
     ov.addEventListener('pointerdown', e => e.stopPropagation());
