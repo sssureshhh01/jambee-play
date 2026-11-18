@@ -95,7 +95,7 @@
   <div class="tag">FILL · THINK · BLOOM</div>
   <div class="minigrid" id="mini"></div>
   <button class="cta main" id="playBtn">Play<span class="sub" id="playSub">Level 1 · Easy</span></button>
-  <div class="rowbtn"><button class="cta gold" id="dailyBtn">📅 Daily<span class="sub" id="dailySub">Today's puzzle</span></button><button class="cta soft" id="howBtn">❓ How to play</button></div>
+  <div class="rowbtn"><button class="cta gold" id="dailyBtn">👹 Daily Boss<span class="sub" id="dailySub">Today's puzzle</span></button><button class="cta soft" id="howBtn">❓ How to play</button></div>
 </div></div>
 
 <div class="overlay" id="winOv"><div class="card">
@@ -879,10 +879,11 @@ window.BoardFX = (() => {
 
   function newPuzzle(m) {
     mode = m;
-    const lvl = S.level, dIdx = m === 'daily' ? 2 : diffOf(lvl), seed = m === 'daily' ? parseInt(todayStr().replace(/-/g, ''), 10) * 31 : lvl * 7919 + 13;
+    const lvl = S.level, dIdx = m === 'daily' ? 3 : diffOf(lvl), seed = m === 'daily' ? parseInt(todayStr().replace(/-/g, ''), 10) * 31 : lvl * 7919 + 13;
     P = makePuzzle(seed, DIFF[dIdx].clues); P.d = dIdx; P.mode = m; P.lvl = lvl;
     grid = P.puz.slice(); given = P.puz.map(v => v > 0); notes = Array.from({ length: 81 }, () => 0); wrong = Array(81).fill(false);
-    hearts = 3; mistakes = 0; elapsed = 0; history = []; combo = 0; score = 0; hintsUsed = 0; won = false; sel = -1; notesMode = false;
+    hearts = m === 'daily' ? 2 : 3; mistakes = 0; elapsed = 0; history = []; combo = 0; score = 0; hintsUsed = 0; won = false; sel = -1; notesMode = false;
+    if (m === 'daily') setTimeout(() => K.toast('👹 DAILY BOSS: Expert puzzle, only 2 hearts · double coins!'), 700);
     fx.done = new Set(); fx.boxT.fill(-1); fx.flies.length = 0; fx.petals.length = 0; fx.bloom = []; fx.sweeps = []; fx.parts = []; fx.floats = []; fx.wave = -1; checkGroups(true);
     if (bg && typeof IBG_SCENES !== 'undefined') { const ns = m === 'daily' ? 'aurora' : IBG_SCENES.forLevel('sudoku', lvl); if (bg._scene && bg._scene !== ns) setTimeout(() => K.toast('New world: ' + IBG_SCENES.title(ns) + ' ✨'), 600); bg.setTheme({ scene: ns }); bg._scene = ns; }
     running = true; t0 = performance.now(); save(); syncHud(); buildPad();
@@ -923,6 +924,7 @@ window.BoardFX = (() => {
       for (const p of PEERS[i]) notes[p] &= ~(1 << d); // auto-clear that candidate from neighbours
       const now = performance.now() / 1000; combo = now - lastPlaceT < 5 ? combo + 1 : 1; lastPlaceT = now;
       const pts = 10 * Math.min(5, combo); score += pts; addFloat('+' + pts, i, combo >= 3 ? '#ffb000' : '#16a37f');
+      if (combo === 3) K.toast('🔥 ON FIRE! Keep placing fast for bigger points'); if (combo === 5) { K.toast('💙 BLUE FLAME! +5 🪙'); S.coins += 5; K.tone(1568, 0.2, { type: 'triangle', vol: 0.08 }); }
       K.tone(K.PENT[(d - 1) % 12] * (combo >= 3 ? 2 : 1), 0.18, { vol: 0.09, type: 'triangle' }); K.buzz(12);
       for (let k = 0; k < 6; k++) spark(i, '#ffffff');
       const fresh = checkGroups(false);
@@ -954,14 +956,14 @@ window.BoardFX = (() => {
     won = true; running = false; elapsed += (performance.now() - t0) / 1000; fx.wave = 0; tilt.spin = 0.0001; for (let k = 0; k < 81; k++) fx.hop[k] = 0.5 + (rowOf(k) + colOf(k)) * 0.03;
     const par = [300, 480, 720, 960, 1200][P.d];
     const stars = mistakes === 0 && elapsed <= par ? 3 : mistakes <= 1 ? 2 : 1;
-    const coins = 25 + stars * 10 + P.d * 10;
+    const coins = (25 + stars * 10 + P.d * 10) * (mode === 'daily' ? 2 : 1) + (mode === 'daily' ? 50 : 0);
     S.coins += coins;
     if (mode === 'daily') { S.daily[todayStr()] = stars; } else { S.best[P.lvl] = Math.max(S.best[P.lvl] || 0, stars); S.level++; }
     if (HAS_W) { Wallet.event('sd_level'); Wallet.addXp(15 + stars * 10 + P.d * 5); Wallet.setGameLevel('sd', S.level); if (stars === 3) Wallet.event('stars3'); }
     S.cur = null; K.persist(); lastReward = coins;
     [0, 2, 4, 7, 9].forEach((s2, j) => K.tone(K.PENT[s2], 0.4, { vol: 0.08, delay: j * 0.09 }));
     setTimeout(() => {
-      $('winTitle').textContent = ['Nice solve! 🌱', 'Lovely garden! 🌷', 'Garden in full bloom! 🌸'][stars - 1];
+      $('winTitle').textContent = mode === 'daily' ? '👑 DAILY BOSS BEATEN!' : ['Nice solve! 🌱', 'Lovely garden! 🌷', 'Garden in full bloom! 🌸'][stars - 1];
       $('winTxt').textContent = `Solved in ${fmt(elapsed)} · ${mistakes} mistake${mistakes === 1 ? '' : 's'} · ${score} pts`;
       $('winCoins').textContent = `+${coins} 🪙`; $('nextBtn').textContent = mode === 'daily' ? 'Back home' : 'Next puzzle';
       const st = $('winOv').querySelectorAll('.stars span'); st.forEach(s => s.classList.remove('on'));
@@ -983,7 +985,7 @@ window.BoardFX = (() => {
     $('hintBadge').textContent = S.hints > 0 ? S.hints : '40🪙';
     $('notesBtn').classList.toggle('on', notesMode);
     $('playSub').textContent = S.cur && S.cur.P ? `Continue ${S.cur.mode === 'daily' ? 'daily puzzle' : 'level ' + S.cur.P.lvl}` : `Level ${S.level} · ${DIFF[diffOf(S.level)].n[0] + DIFF[diffOf(S.level)].n.slice(1).toLowerCase()}`;
-    $('dailySub').textContent = S.daily[todayStr()] ? 'Done ' + '⭐'.repeat(S.daily[todayStr()]) : "Today's puzzle";
+    $('dailySub').textContent = S.daily[todayStr()] ? 'Done ' + '⭐'.repeat(S.daily[todayStr()]) : 'Expert · 2 hearts · 2× coins';
   }
   function buildPad() {
     const pad = $('pad'); if (!pad.children.length) for (let d = 1; d <= 9; d++) { const b = document.createElement('button'); b.className = 'num'; b.dataset.d = d; b.onpointerdown = e => { e.preventDefault(); K.ac(); place(d); }; pad.appendChild(b); }
@@ -1044,6 +1046,11 @@ window.BoardFX = (() => {
     { const t = now / 1600, rg = ctx.createLinearGradient(ox + Math.cos(t) * BW, oy + Math.sin(t) * BW, ox + BW - Math.cos(t) * BW, oy + BW - Math.sin(t) * BW); ['#ff2bd6', '#00d4ff', '#ffd400', '#39ff88', '#a26bff'].forEach((c, k) => rg.addColorStop(k / 4, c));
       ctx.save(); ctx.strokeStyle = rg; ctx.lineWidth = 3; ctx.shadowColor = '#ff2bd6'; ctx.shadowBlur = 16; rr(ox - F0 + 1.5, oy - F0 + 1.5, BW + F0 * 2 - 3, BW + F0 * 2 - 6, 21); ctx.stroke(); ctx.restore(); }
     drawVine(now, BW, F0);
+    if (combo >= 3 && running) { // combo fire: flames lick round the board, bigger the longer the streak
+      const k = Math.min(1, (combo - 2) / 3), X0 = ox - F0, Y0 = oy - F0, WW = BW + F0 * 2; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.5 + 0.4 * k;
+      const fl = (fx2, fy2, ang, hh, i) => { const f = hh * (0.7 + 0.3 * Math.sin(now / 70 + i * 1.7) + 0.15 * Math.sin(now / 37 + i)); ctx.save(); ctx.translate(fx2, fy2); ctx.rotate(ang); const g = ctx.createLinearGradient(0, 0, 0, -f); g.addColorStop(0, combo >= 5 ? 'rgba(120,80,255,.9)' : 'rgba(255,80,20,.9)'); g.addColorStop(0.5, combo >= 5 ? 'rgba(80,200,255,.6)' : 'rgba(255,170,40,.6)'); g.addColorStop(1, 'rgba(255,240,140,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-cs * 0.18, 0); ctx.quadraticCurveTo(-cs * 0.15, -f * 0.6, Math.sin(now / 90 + i) * cs * 0.08, -f); ctx.quadraticCurveTo(cs * 0.15, -f * 0.6, cs * 0.18, 0); ctx.fill(); ctx.restore(); };
+      const n = Math.round(WW / (cs * 0.4)); for (let i = 0; i <= n; i++) { const t = i / n; fl(X0 + t * WW, Y0 + WW - 3, 0, cs * (0.4 + 0.5 * k), i); fl(X0, Y0 + WW - t * WW, -Math.PI / 2, cs * (0.3 + 0.35 * k), i + 40); fl(X0 + WW, Y0 + WW - t * WW, Math.PI / 2, cs * (0.3 + 0.35 * k), i + 80); fl(X0 + t * WW, Y0, Math.PI, cs * (0.2 + 0.3 * k), i + 120); }
+      ctx.restore(); }
     for (let br = 0; br < 3; br++) for (let bc = 0; bc < 3; bc++) { ctx.fillStyle = (br + bc) % 2 ? 'rgba(160,130,255,0.06)' : 'rgba(160,130,255,0.12)'; rr(cx0(bc * 3) - GAP * 0.3, cy0(br * 3) - GAP * 0.3, cs * 3 + GAP * 0.6, cs * 3 + GAP * 0.6, cs * 0.25); ctx.fill(); }
     const sr = sel >= 0 ? rowOf(sel) : -1, sc = sel >= 0 ? colOf(sel) : -1, sb = sel >= 0 ? BOX(sel) : -1, sv = sel >= 0 ? grid[sel] : 0;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';

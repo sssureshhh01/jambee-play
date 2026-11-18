@@ -742,6 +742,9 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
   let drag = null, hint = null;
   const parts = [], floats = [], splats = [];
   let shake = 0, nowT = 0;
+  // thrill: rising lava on some levels, and a hungry pufferfish that sits on doors on others
+  let lava = false, mon = null;
+  function doorXY(d) { const t = cs * 0.24; if (d.side === 'L') return [ox - t, oy + (d.start + d.len / 2) * cs]; if (d.side === 'R') return [ox + C * cs + t, oy + (d.start + d.len / 2) * cs]; if (d.side === 'T') return [ox + (d.start + d.len / 2) * cs, oy - t]; return [ox + (d.start + d.len / 2) * cs, oy + R * cs + t]; }
 
   // ================= Canvas / layout =================
   const canvas = $('c'), ctx = canvas.getContext('2d'), stage = $('stage');
@@ -762,6 +765,8 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
     if (bg && typeof IBG_SCENES !== 'undefined') { const ns = IBG_SCENES.forLevel('jelly', S.level); if (bg._scene && bg._scene !== ns) setTimeout(() => toast('New world: ' + IBG_SCENES.title(ns) + ' ✨'), 500); bg.setTheme({ scene: ns }); bg._scene = ns; }
     occ = Array.from({ length: R }, () => Array(C).fill(-1)); stones.forEach(([r, c]) => occ[r][c] = -2);
     blocks = L.blocks.map(b => { const sh = JJ_SHAPES[b.shape]; const o = { id: b.id, sh, x: b.x, y: b.y, vx: b.x, vy: b.y, color: b.color, ice: b.ice, alive: true, exiting: null, sq: 0, jig: 0, look: [0, 0], blink: Math.random() * 4, ph: Math.random() * 6 }; o.pat = patternFor(o, S.level); sh.cells.forEach(([dr, dc]) => occ[b.y + dr][b.x + dc] = b.id); return o; });
+    lava = !!L.time && S.level >= 8 && S.level % 4 === 0;
+    mon = S.level >= 10 && S.level % 4 === 2 ? { x: W / 2, y: oy - cs, tx: W / 2, ty: oy - cs, state: 'roam', t: 4, door: null, a: 0, chomp: 0 } : null;
     timeMax = L.time; timeLeft = L.time; started = false; frozenT = 0; won = false; lost = false; toolsUsed = 0; drag = null; hint = null; streak = 0;
     parts.length = 0; floats.length = 0; layout(); syncHud();
     $('introTitle').textContent = 'Level ' + S.level;
@@ -770,6 +775,8 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
     else if (S.level === 6) note = 'New: 🪨 stones block the way.';
     else if (S.level === 12) note = 'New: ❄️ frozen jellies thaw after other jellies escape — watch the number!';
     else if (S.level > 3 && S.level % 25 === 0) note = '🔥 Boss level! More jellies, tighter time.';
+    else if (S.level >= 8 && S.level % 4 === 0 && L.time) note = '🌋 LAVA LEVEL! The lava rises as time runs out — get the jellies out fast!';
+    else if (S.level >= 10 && S.level % 4 === 2) note = '🐡 Watch out for Puffy! He sits on doors and blocks them — use another jelly while you wait.';
     $('introNote').textContent = note;
     $('introTime').textContent = timeMax ? `⏱ ${fmt(timeMax)} · ${blocks.length} jellies` : `${blocks.length} jellies · no timer`;
     $('introOv').classList.add('show'); paused = true;
@@ -783,6 +790,7 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
     if (b.ice > 0) return null;
     for (const d of doors) {
       if (d.color !== b.color) continue;
+      if (mon && mon.state === 'block' && mon.door === d) continue;
       const touch = b.sh.cells.filter(([dr, dc]) => d.side === 'L' ? x + dc === 0 : d.side === 'R' ? x + dc === C - 1 : d.side === 'T' ? y + dr === 0 : y + dr === R - 1);
       if (!touch.length) continue;
       const vert = d.side === 'L' || d.side === 'R';
@@ -940,6 +948,18 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
     }
     ctx.restore();
   }
+  function drawMon(now) {
+    const m = mon, r = cs * 0.48, sw = Math.sin(now / 160) * 0.12; ctx.save();
+    if (m.state === 'warn' && m.door) { const [dx, dy] = doorXY(m.door); ctx.globalAlpha = 0.5 + 0.5 * Math.sin(now / 70); ctx.strokeStyle = '#ff3040'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(dx, dy, cs * 0.7, 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+    ctx.translate(m.x, m.y); ctx.rotate(sw); const puff = m.state === 'block' ? 1.15 + 0.05 * Math.sin(now / 90) : 1; ctx.scale(puff, puff);
+    ctx.fillStyle = '#8a4dff'; for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283; ctx.beginPath(); ctx.moveTo(Math.cos(a - 0.15) * r * 0.95, Math.sin(a - 0.15) * r * 0.95); ctx.lineTo(Math.cos(a) * r * 1.3, Math.sin(a) * r * 1.3); ctx.lineTo(Math.cos(a + 0.15) * r * 0.95, Math.sin(a + 0.15) * r * 0.95); ctx.fill(); }
+    const g = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r); g.addColorStop(0, '#d0a8ff'); g.addColorStop(1, '#6a2ad8'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.fill();
+    [-1, 1].forEach(s2 => { ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(s2 * r * 0.35, -r * 0.2, r * 0.26, 0, 7); ctx.fill(); ctx.fillStyle = '#1a0a3a'; ctx.beginPath(); ctx.arc(s2 * r * 0.35 + r * 0.08 * Math.cos(now / 500), -r * 0.18, r * 0.12, 0, 7); ctx.fill(); });
+    const mo = m.state === 'block' ? 0.5 + 0.5 * Math.abs(Math.sin(now / 120)) : 0.25; ctx.fillStyle = '#2a0a3a'; ctx.beginPath(); ctx.ellipse(0, r * 0.35, r * 0.4, r * 0.22 * mo + 2, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff'; for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(i * r * 0.14 - r * 0.06, r * 0.35 - r * 0.22 * mo); ctx.lineTo(i * r * 0.14, r * 0.35 - r * 0.22 * mo + r * 0.12); ctx.lineTo(i * r * 0.14 + r * 0.06, r * 0.35 - r * 0.22 * mo); ctx.fill(); }
+    ctx.restore();
+    if (m.state === 'block') { ctx.save(); ctx.font = `900 ${cs * 0.3}px system-ui`; ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.strokeStyle = '#4a0a6a'; ctx.lineWidth = 4; ctx.strokeText('CHOMP! ⛔', m.x, m.y - r * 1.6); ctx.fillText('CHOMP! ⛔', m.x, m.y - r * 1.6); ctx.restore(); }
+  }
   function drawJelly(b, now) {
     const col = COL[b.color], pad = cs * 0.06;
     let px = ox + b.vx * cs, py = oy + b.vy * cs, alpha = 1, sx = 1, sy = 1;
@@ -1037,6 +1057,11 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
       for (let k = 0; k < 9; k++) { const cx = ox + C * cs * (0.5 + 0.45 * Math.sin(now / (2300 + k * 310) + k * 2)), cy = oy + R * cs * (0.5 + 0.45 * Math.cos(now / (2700 + k * 270) + k)), rad = cs * (1 + (k % 3) * 0.5);
         const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad); g.addColorStop(0, 'rgba(255,255,255,0.14)'); g.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.fillRect(cx - rad, cy - rad, rad * 2, rad * 2); }
       ctx.restore(); }
+    if (lava && timeMax) { const k = started ? Math.max(0, Math.min(1, 1 - timeLeft / timeMax)) : 0, hL = R * cs * k; if (hL > 1) { ctx.save(); rr(ox, oy, C * cs, R * cs, cs * 0.3); ctx.clip(); const top = oy + R * cs - hL;
+        const g = ctx.createLinearGradient(0, top, 0, oy + R * cs); g.addColorStop(0, 'rgba(255,220,80,.75)'); g.addColorStop(0.15, 'rgba(255,110,20,.6)'); g.addColorStop(1, 'rgba(170,20,0,.7)'); ctx.fillStyle = g;
+        ctx.beginPath(); ctx.moveTo(ox, oy + R * cs); for (let x = 0; x <= C * cs; x += cs / 6) ctx.lineTo(ox + x, top + Math.sin(x / cs * 2 + now / 400) * cs * 0.07 + Math.sin(x / cs * 5 - now / 260) * cs * 0.03); ctx.lineTo(ox + C * cs, oy + R * cs); ctx.fill();
+        ctx.globalCompositeOperation = 'lighter'; for (let i = 0; i < 10; i++) { const ph = (now / 1800 + i * 0.37) % 1, bx = ox + C * cs * ((i * 0.618) % 1), by = oy + R * cs - hL * ph; ctx.fillStyle = `rgba(255,200,80,${0.5 * (1 - ph)})`; ctx.beginPath(); ctx.arc(bx, by, cs * 0.06 * (1 + ph), 0, 7); ctx.fill(); }
+        ctx.restore(); ctx.save(); ctx.globalCompositeOperation = 'lighter'; const gl = ctx.createLinearGradient(0, top - cs, 0, top + cs * 0.3); gl.addColorStop(0, 'rgba(255,120,0,0)'); gl.addColorStop(1, `rgba(255,140,0,${0.25 + 0.1 * Math.sin(now / 200)})`); ctx.fillStyle = gl; ctx.fillRect(ox - 12, top - cs, C * cs + 24, cs * 1.3); ctx.restore(); } }
     // jelly splats left by escapes
     for (const sp of splats) { const a = Math.max(0, 1 - sp.age / 1.1), gr = Math.min(1, sp.age / 0.12); ctx.save(); ctx.globalAlpha = a * 0.75; ctx.fillStyle = sp.col; ctx.beginPath();
       for (let k = 0; k <= 12; k++) { const an = k / 12 * Math.PI * 2, rad = sp.r * gr * (0.75 + 0.25 * Math.sin(an * 3 + sp.seed)); k ? ctx.lineTo(sp.x + Math.cos(an) * rad, sp.y + Math.sin(an) * rad * 0.8) : ctx.moveTo(sp.x + Math.cos(an) * rad, sp.y + Math.sin(an) * rad * 0.8); }
@@ -1055,6 +1080,7 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
     }
     blocks.filter(b => b.alive && !(drag && drag.b === b)).forEach(b => drawJelly(b, now));
     if (drag) drawJelly(drag.b, now);
+    if (mon) drawMon(now);
     for (const p of parts) { ctx.globalAlpha = Math.max(0, 1 - p.age / p.life); ctx.fillStyle = p.col; ctx.beginPath(); if (p.drop) { ctx.ellipse(p.x, p.y, p.r, p.r * 1.5, Math.atan2(p.vy, p.vx) + Math.PI / 2, 0, 7); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(p.x - p.r * 0.3, p.y - p.r * 0.3, p.r * 0.35, 0, 7); } else ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); }
     ctx.globalAlpha = 1; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     for (const f of floats) { ctx.save(); ctx.globalAlpha = Math.max(0, 1 - Math.max(0, f.age - 0.5) / 0.6); ctx.translate(f.x, f.y - f.age * cs * 0.6); const sc = 0.6 + Math.min(1, f.age / 0.12) * 0.4; ctx.scale(sc, sc);
@@ -1078,6 +1104,13 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
       if (b.exiting) { b.exiting.t += dt; if (b.exiting.t >= 0.35) { b.alive = false; checkWin(); } }
     }
     doors.forEach(d => { if (d.flash) d.flash = Math.max(0, d.flash - dt * 2); });
+    if (mon && !paused && !won && !lost) { const m = mon; m.t -= dt;
+      if (m.state === 'roam') { m.a += dt * 0.6; const rx = C * cs / 2 + cs * 0.9, ry = R * cs / 2 + cs * 0.9; m.tx = ox + C * cs / 2 + Math.cos(m.a) * rx; m.ty = oy + R * cs / 2 + Math.sin(m.a) * ry;
+        if (m.t < 0) { const alive = new Set(blocks.filter(b => b.alive && !b.exiting).map(b => b.color)), opts = doors.filter(d => alive.has(d.color)); if (opts.length) { m.door = opts[Math.floor(Math.random() * opts.length)]; m.state = 'warn'; m.t = 1.4; tone(300, 0.2, { type: 'square', vol: 0.05, to: 600 }); addFloat('🐡 Puffy is coming!', W / 2, oy - cs * 0.5, '#e0c8ff', cs * 0.4); } else m.t = 3; } }
+      else if (m.state === 'warn') { [m.tx, m.ty] = doorXY(m.door); if (m.t < 0) { m.state = 'block'; m.t = 3.5; tone(120, 0.3, { type: 'sawtooth', vol: 0.06 }); shake = 0.3; } }
+      else if (m.state === 'block') { [m.tx, m.ty] = doorXY(m.door); if (m.t < 0) { m.state = 'roam'; m.door = null; m.t = 5 + Math.random() * 4; } }
+      m.x += (m.tx - m.x) * Math.min(1, dt * (m.state === 'warn' ? 4 : 2.5)); m.y += (m.ty - m.y) * Math.min(1, dt * (m.state === 'warn' ? 4 : 2.5)); }
+    if (lava && started && timeMax && !won && !lost && !paused) { const lvl = R * (1 - timeLeft / timeMax); for (const b of blocks) if (b.alive && !b.exiting && b.y + b.sh.h > R - lvl) { if (Math.random() < dt * 3) { b.jig = Math.max(b.jig, 0.35); parts.push({ x: ox + (b.x + Math.random() * b.sh.w) * cs, y: oy + (b.y + b.sh.h * 0.3) * cs, vx: (Math.random() - 0.5) * cs, vy: -cs * 3, age: 0, life: 0.6, r: cs * 0.08, col: 'rgba(255,255,255,.6)' }); } } }
     if (hint) { hint.t += dt; if (hint.t > 4) hint = null; }
     if (!paused && !won && !lost && started && timeMax) {
       if (frozenT > 0) frozenT = Math.max(0, frozenT - dt);
