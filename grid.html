@@ -381,6 +381,22 @@ function InteractiveBG(canvas, opts) {
       const s = starsArr[i]; const a = s.a * (0.45 + 0.55 * Math.sin(t * 0.0018 * s.sp + s.ph));
       ctx.fillStyle = `rgba(255,255,255,${Math.max(0, a)})`; ctx.beginPath(); ctx.arc(s.x * W - px * 10, s.y * H - py * 8, s.r, 0, Math.PI * 2); ctx.fill();
     }
+    { // level glow: the further you get, the more the background glows, shifts colour and strobes gently
+      const lv = (typeof IBG_SCENES !== 'undefined' && IBG_SCENES.lastLevel) || 1, gl = Math.min(1, (lv - 1) / 25);
+      if (gl > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        const hue = (t * 0.02 + lv * 37) % 360;
+        // colour-cycling glow from the corners
+        for (let k = 0; k < 2; k++) { const x = k ? W : 0, y = H * (0.25 + 0.5 * (0.5 + 0.5 * Math.sin(t * 0.0004 + k * 3))), R = Math.max(W, H) * 0.7;
+          const g = ctx.createRadialGradient(x, y, 0, x, y, R); g.addColorStop(0, `hsla(${(hue + k * 120) % 360},100%,60%,${0.07 + 0.12 * gl})`); g.addColorStop(1, 'hsla(0,0%,0%,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+        // sweeping light beams from the floor (from level 8)
+        if (lv >= 8) { const nb = 2 + Math.min(3, Math.floor(lv / 15));
+          for (let i = 0; i < nb; i++) { const bx = W * (i + 0.5) / nb, ang = -Math.PI / 2 + Math.sin(t * 0.0006 * (1 + i * 0.2) + i * 1.7) * 0.5, len = H * 1.2, wd = 0.07;
+            const gg = ctx.createLinearGradient(bx, H, bx + Math.cos(ang) * len, H + Math.sin(ang) * len); gg.addColorStop(0, `hsla(${(hue + i * 70) % 360},100%,65%,${0.1 + 0.1 * gl})`); gg.addColorStop(1, 'hsla(0,0%,0%,0)');
+            ctx.fillStyle = gg; ctx.beginPath(); ctx.moveTo(bx, H + 10); ctx.lineTo(bx + Math.cos(ang - wd) * len, H + Math.sin(ang - wd) * len); ctx.lineTo(bx + Math.cos(ang + wd) * len, H + Math.sin(ang + wd) * len); ctx.closePath(); ctx.fill(); } }
+        // soft colour strobe on a slow beat (from level 15): never fast or harsh
+        if (lv >= 15) { const beat = (t % 2400) / 2400, a = Math.max(0, 1 - beat * 4) * (0.05 + 0.05 * gl); if (a > 0) { ctx.fillStyle = `hsla(${(hue + 180) % 360},100%,70%,${a})`; ctx.fillRect(0, 0, W, H); } }
+        ctx.restore(); }
+    }
     const sorted = items.slice().sort((a, b) => a.layer - b.layer);
     for (const it of sorted) {
       if (it.dead > 0) continue;
@@ -521,10 +537,11 @@ const IBG_SCENES = (() => {
       [0.55, (g, w, h) => ridge(g, w, h, h * 0.9, h * 0.05, 2.3, 107, '#c9773a')]],
       live: (c, t, W, H) => { c.fillStyle = 'rgba(255,240,200,0.06)'; for (let k = 0; k < 4; k++) { c.beginPath(); c.ellipse(W / 2 + Math.sin(t / 1500 + k) * 80, H * (0.6 + k * 0.08), W * 0.6, 10, 0, 0, 7); c.fill(); } } },
   };
-  const ROT = { potion: ['lab', 'space', 'candy', 'forest', 'aurora', 'volcano', 'reef', 'city'], hive: ['meadow', 'sunset', 'candy', 'desert', 'forest', 'aurora', 'reef'], jelly: ['reef', 'candy', 'space', 'meadow', 'sunset', 'aurora', 'desert'], grid: ['city', 'space', 'aurora', 'volcano', 'sunset', 'forest'], mithai: ['palace', 'kites', 'holi', 'sunset', 'meadow'], sudoku: ['city', 'aurora', 'space', 'volcano', 'reef', 'candy'] };
-  function forLevel(game, level, every = 5) { const r = ROT[game] || ROT.potion; return r[Math.floor(Math.max(0, level - 1) / every) % r.length]; }
+  const ROT = { potion: ['lab', 'space', 'volcano', 'sunset', 'desert', 'meadow', 'candy', 'palace', 'reef', 'aurora', 'kites', 'city', 'forest', 'holi'], hive: ['meadow', 'space', 'aurora', 'desert', 'holi', 'reef', 'sunset', 'forest', 'palace', 'lab', 'city', 'candy', 'volcano', 'kites'], jelly: ['reef', 'candy', 'palace', 'aurora', 'kites', 'city', 'forest', 'holi', 'space', 'volcano', 'lab', 'sunset', 'desert', 'meadow'], grid: ['city', 'space', 'aurora', 'volcano', 'sunset', 'forest', 'lab', 'reef'], mithai: ['palace', 'kites', 'holi', 'sunset', 'forest', 'lab', 'city', 'candy', 'volcano', 'meadow', 'space', 'aurora', 'desert', 'reef'], sudoku: ['city', 'aurora', 'space', 'volcano', 'reef', 'forest', 'lab', 'sunset', 'candy'] };
+  const api = { lastLevel: 1 };
+  function forLevel(game, level, every = 1) { api.lastLevel = level; const r = ROT[game] || ROT.potion; return r[Math.floor(Math.max(0, level - 1) / every) % r.length]; }
   function title(name) { return { lab: 'Alchemy Lab', meadow: 'Sunny Meadow', reef: 'Coral Reef', city: 'Night City', space: 'Outer Space', sunset: 'Sunset Peaks', candy: 'Candy Land', aurora: 'Northern Lights', forest: 'Firefly Forest', volcano: 'Volcano', desert: 'Desert Dunes', palace: 'Palace Garden', kites: 'Kite Festival', holi: 'Holi Colours' }[name] || name; }
-  return { S, forLevel, title };
+  return Object.assign(api, { S, forLevel, title });
 })();
 
 </script>
@@ -551,7 +568,14 @@ const IBG_SCENES = (() => {
   const hexRGB = h => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
   const hexA = (h, a) => { const [r, g, b] = hexRGB(h); return `rgba(${r},${g},${b},${a})`; };
   const mixHex = (h1, h2, t) => { const a = hexRGB(h1), b = hexRGB(h2); return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+  // two bonus colours per theme unlock as you level up (7th at level 5, 8th at level 10)
+  const EXTRA = { midnight: [{base:'#f8f4ff',glow:'#ffffff',dark:'#9a90b8'},{base:'#ff4fa3',glow:'#ffa8d2',dark:'#a8185e'}],
+    neon: [{base:'#ffffff',glow:'#ffffff',dark:'#8a8aa0'},{base:'#3dff9a',glow:'#a8ffd0',dark:'#0a7a40'}],
+    candy: [{base:'#ff6a6a',glow:'#ffb8b8',dark:'#b83030'},{base:'#7affea',glow:'#c8fff6',dark:'#2ab8a0'}],
+    gems: [{base:'#e8eef8',glow:'#ffffff',dark:'#7e8aa0'},{base:'#ff5a1f',glow:'#ffb08a',dark:'#8a2a00'}] };
+  Object.entries(THEMES).forEach(([id, t]) => { if (t.colors.length === 6 && EXTRA[id]) t.colors.push(...EXTRA[id]); });
   Object.values(THEMES).forEach(t => t.colors.forEach(c => { c.mid = mixHex(c.base, c.dark, 0.5); }));
+  const colourCount = () => curLevel >= 10 ? 8 : curLevel >= 5 ? 7 : 6;
 
   // ================= Pieces =================
   const SHAPE_DEFS = [
@@ -568,11 +592,17 @@ const IBG_SCENES = (() => {
     ['XX\nX.\nX.',1.1],['XX\n.X\n.X',1.1],['X.\nX.\nXX',1.1],['.X\n.X\nXX',1.1],
     ['XXX\n.X.',1.2],['.X.\nXXX',1.2],['X.\nXX\nX.',1.2],['.X\nXX\n.X',1.2],
     ['XX.\n.XX',0.9],['.XX\nXX.',0.9],['X.\nXX\n.X',0.9],['.X\nXX\nX.',0.9],
+    // shapes that unlock as you level up
+    ['.X.\nXXX\n.X.',0.8,3],
+    ['XX\nXX\nXX',0.7,6],['XXX\nXXX',0.7,6],
+    ['X.X\nXXX',0.7,9],['XXX\nX.X',0.7,9],['XX\nX.\nXX',0.6,9],['XX\n.X\nXX',0.6,9],
+    ['X..\n.X.\n..X',0.5,12],['..X\n.X.\nX..',0.5,12],
+    ['XXXX\nX...',0.6,15],['XXXX\n...X',0.6,15],
   ];
-  const SHAPES = SHAPE_DEFS.map(([s, wt]) => {
+  const SHAPES = SHAPE_DEFS.map(([s, wt, lvl]) => {
     const rows = s.split('\n'); const cells = [];
     rows.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === 'X') cells.push([r, c]); }));
-    return { cells, h: rows.length, w: Math.max(...rows.map(x => x.length)), wt };
+    return { cells, h: rows.length, w: Math.max(...rows.map(x => x.length)), wt, lvl: lvl || 1 };
   });
   const TOTAL_WT = SHAPES.reduce((a, s) => a + s.wt, 0);
   const keyOf = cells => {
@@ -651,11 +681,12 @@ const IBG_SCENES = (() => {
     return false;
   }
   function randShapeIndex() {
-    let x = Math.random() * TOTAL_WT;
-    for (let i = 0; i < SHAPES.length; i++) { x -= SHAPES[i].wt; if (x <= 0) return i; }
+    const tot = SHAPES.reduce((a, s) => a + (s.lvl <= curLevel ? s.wt : 0), 0);
+    let x = Math.random() * tot;
+    for (let i = 0; i < SHAPES.length; i++) { if (SHAPES[i].lvl > curLevel) continue; x -= SHAPES[i].wt; if (x <= 0) return i; }
     return 0;
   }
-  const newPiece = () => ({ si: randShapeIndex(), ci: Math.floor(Math.random() * 6) });
+  const newPiece = () => ({ si: randShapeIndex(), ci: Math.floor(Math.random() * colourCount()) });
   function refillTray() {
     for (let tries = 0; tries < 40; tries++) {
       const t = [newPiece(), newPiece(), newPiece()];
@@ -690,9 +721,10 @@ const IBG_SCENES = (() => {
       for (let l = curLevel + 1; l <= L; l++) {
         const k = kinds[Math.floor(Math.random() * 3)]; PW[k]++;
         const unlocked = Object.values(THEMES).find(t => t.lvl === l);
-        toast(unlocked ? `Level ${l}! New theme unlocked: ${unlocked.name} 🎨` : `Level ${l}! +1 ${PW_NAME[k]}`);
+        const newShapes = SHAPES.filter(s => s.lvl === l).length, newCol = l === 5 || l === 10;
+        toast(unlocked ? `Level ${l}! New theme unlocked: ${unlocked.name} 🎨` : newCol ? `Level ${l}! A new block colour joins the grid 🌈` : newShapes ? `Level ${l}! ${newShapes} new block shapes unlocked ✨` : `Level ${l}! +1 ${PW_NAME[k]}`);
       }
-      { const prevScene = typeof IBG_SCENES !== 'undefined' ? IBG_SCENES.forLevel('grid', curLevel, 2) : null; curLevel = L; const ns = typeof IBG_SCENES !== 'undefined' ? IBG_SCENES.forLevel('grid', curLevel, 2) : null; if (ns && ns !== prevScene && IB) { IB.setTheme(bgOpts()); setTimeout(() => toast('New world: ' + IBG_SCENES.title(ns) + ' ✨'), 1600); } }
+      { const prevScene = typeof IBG_SCENES !== 'undefined' ? IBG_SCENES.forLevel('grid', curLevel) : null; curLevel = L; const ns = typeof IBG_SCENES !== 'undefined' ? IBG_SCENES.forLevel('grid', curLevel) : null; if (ns && ns !== prevScene && IB) { IB.setTheme(bgOpts()); setTimeout(() => toast('New world: ' + IBG_SCENES.title(ns) + ' ✨'), 1600); } }
       if (HAS_W) Wallet.setGameLevel('mg', curLevel);
       addFloat('LEVEL UP!', W / 2, by + boardSize * 0.22, '#ffd690', cell * 0.7, 0.4);
       sfx.levelup(); savePW(); syncPW(); renderThemes();
@@ -872,7 +904,7 @@ const IBG_SCENES = (() => {
   let hadSave = false;
   function load() {
     const s = store.get('mg_state', null);
-    const validTray = t => Array.isArray(t) && t.length === 3 && t.every(p => p === null || (p && SHAPES[p.si] && p.ci >= 0 && p.ci < 6));
+    const validTray = t => Array.isArray(t) && t.length === 3 && t.every(p => p === null || (p && SHAPES[p.si] && p.ci >= 0 && p.ci < 8));
     if (s && !s.over && Array.isArray(s.board) && s.board.length === N && validTray(s.tray)) {
       board = s.board; tray = s.tray; score = s.score | 0; displayScore = score;
       combo = s.combo | 0; movesSinceClear = s.movesSinceClear | 0; revived = !!s.revived;
@@ -1377,7 +1409,7 @@ const IBG_SCENES = (() => {
   function bgOpts() {
     const hot = isFever();
     return { bgA: theme.bgA, bgB: theme.bgB, aur: hot ? ['#ff3d6e', '#ffb547'] : theme.aur, palette: theme.colors.slice(0, 4).map(c => c.base),
-      shape: BG_SHAPE[themeId] || 'star', stars: 70, count: 20, scene: typeof IBG_SCENES !== 'undefined' ? IBG_SCENES.forLevel('grid', curLevel, 2) : null };
+      shape: BG_SHAPE[themeId] || 'star', stars: 70, count: 20, scene: typeof IBG_SCENES !== 'undefined' ? IBG_SCENES.forLevel('grid', curLevel) : null };
   }
   const IB = typeof InteractiveBG === 'function' ? InteractiveBG(bgCanvas, Object.assign(bgOpts(), {
     sound: (type, p) => { if (type === 'pop' && HAS_W) Wallet.event('bubbles'); if (type === 'pop') { const f = MPENT[Math.floor(p * 6) + 2]; tone(f, 0.25, { vol: 0.09 }); tone(f * 1.5, 0.18, { vol: 0.03, delay: 0.04 }); } else tone(MPENT[Math.floor(p * 4)], 0.25, { vol: 0.05 }); }
