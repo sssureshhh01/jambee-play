@@ -537,11 +537,50 @@ const IBG_SCENES = (() => {
       [0.3, (g, w, h) => { ridge(g, w, h, h * 0.76, h * 0.06, 1.6, 103, '#e89a4a'); const r = rnd(105); for (let i = 0; i < 7; i++) { const x = r() * w, y = h * (0.74 + r() * 0.04), s = 30 + r() * 25; g.fillStyle = '#3f8a4a'; g.fillRect(x - s * 0.1, y - s, s * 0.2, s); g.fillRect(x - s * 0.35, y - s * 0.65, s * 0.12, s * 0.35); g.fillRect(x - s * 0.35, y - s * 0.4, s * 0.3, s * 0.1); g.fillRect(x + s * 0.25, y - s * 0.75, s * 0.12, s * 0.4); g.fillRect(x + s * 0.05, y - s * 0.45, s * 0.3, s * 0.1); } }],
       [0.55, (g, w, h) => ridge(g, w, h, h * 0.9, h * 0.05, 2.3, 107, '#c9773a')]],
       live: (c, t, W, H) => { c.fillStyle = 'rgba(255,240,200,0.06)'; for (let k = 0; k < 4; k++) { c.beginPath(); c.ellipse(W / 2 + Math.sin(t / 1500 + k) * 80, H * (0.6 + k * 0.08), W * 0.6, 10, 0, 0, 7); c.fill(); } } },
+    diwali: { a: '#1a0a3a', b: '#06021a', aur: 0.45, layers: [
+      [0.1, (g, w, h) => { const r = rnd(141); g.fillStyle = 'rgba(255,255,255,.7)'; for (let i = 0; i < 60; i++) g.fillRect(r() * w, r() * h * 0.5, 1.5, 1.5); g.fillStyle = '#140a28'; for (let x = 0; x < w;) { const bw = 40 + r() * 60, bh = h * (0.12 + r() * 0.1); g.fillRect(x, h * 0.78 - bh, bw, bh + h); g.beginPath(); g.moveTo(x - 4, h * 0.78 - bh); g.lineTo(x + bw / 2, h * 0.78 - bh - 22); g.lineTo(x + bw + 4, h * 0.78 - bh); g.fill(); x += bw + 6; } }],
+      [0.35, (g, w, h) => { g.fillStyle = '#2a1238'; g.fillRect(0, h * 0.86, w, h * 0.14); const cx = w / 2, cy = h * 0.93, cols = ['#ff3c8c', '#ffc800', '#3cc8ff', '#ff7a1a', '#8cf21a'];
+        for (let k = 5; k > 0; k--) { g.fillStyle = cols[k % 5]; for (let i = 0; i < 8 * k; i++) { const a = i / (8 * k) * 6.283; g.beginPath(); g.ellipse(cx + Math.cos(a) * k * 22, cy + Math.sin(a) * k * 7, 9, 4, a, 0, 7); g.fill(); } } g.fillStyle = '#fff'; g.beginPath(); g.ellipse(cx, cy, 12, 5, 0, 0, 7); g.fill(); }]],
+      live: (c, t, W, H, px) => { for (let i = 0; i < 9; i++) { const x = W * (0.06 + i * 0.11) - px * 10, y = H * 0.86; const f = 0.8 + 0.2 * Math.sin(t / 90 + i * 2); const gr = c.createRadialGradient(x, y - 10, 0, x, y - 10, 34 * f); gr.addColorStop(0, 'rgba(255,200,90,.7)'); gr.addColorStop(1, 'rgba(255,120,30,0)'); c.fillStyle = gr; c.fillRect(x - 40, y - 50, 80, 80);
+          c.fillStyle = '#b8501e'; c.beginPath(); c.ellipse(x, y, 11, 5, 0, 0, Math.PI); c.fill(); c.fillStyle = '#ffd36a'; c.beginPath(); c.ellipse(x, y - 9 - f * 2, 3.5, 8 * f, 0, 0, 7); c.fill(); }
+        for (let k = 0; k < 3; k++) { const per = 2600, p = ((t + k * 870) % per) / per, n = Math.floor((t + k * 870) / per); const s1 = Math.sin(n * 91.7 + k) * 43758.5; const fx = W * (0.15 + (s1 - Math.floor(s1)) * 0.7), fy = H * (0.12 + k * 0.08), col = ['255,90,170', '255,210,60', '90,210,255'][(n + k) % 3];
+          if (p < 0.25) { c.fillStyle = `rgba(${col},.9)`; c.fillRect(fx - 1, H * 0.8 - (H * 0.8 - fy) * p * 4, 2, 10); } else { const q = (p - 0.25) / 0.75; c.fillStyle = `rgba(${col},${1 - q})`; for (let j = 0; j < 24; j++) { const a = j / 24 * 6.283; c.beginPath(); c.arc(fx + Math.cos(a) * q * 70, fy + Math.sin(a) * q * 70 + q * q * 20, 2.2, 0, 7); c.fill(); } } } } },
+    temple: { a: '#ff9a5a', b: '#7a2a5a', aur: 0.25, layers: [
+      [0.08, (g, w, h) => { const x = w * 0.7, y = h * 0.3, R = Math.min(w, h) * 0.1; const gr = g.createRadialGradient(x, y, R * 0.3, x, y, R * 3); gr.addColorStop(0, 'rgba(255,240,190,.95)'); gr.addColorStop(0.3, 'rgba(255,200,130,.4)'); gr.addColorStop(1, 'rgba(255,170,120,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }],
+      [0.22, (g, w, h) => { const tower = (cx, base, bw, th, col) => { g.fillStyle = col; const tiers = 7; for (let i = 0; i < tiers; i++) { const ww = bw * (1 - i * 0.11), y = base - th * i / tiers; g.fillRect(cx - ww / 2, y - th / tiers, ww, th / tiers + 1); g.fillStyle = 'rgba(0,0,0,.18)'; for (let k = 0; k < 6; k++) g.fillRect(cx - ww / 2 + k * ww / 6 + 2, y - th / tiers + 3, ww / 14, th / tiers - 6); g.fillStyle = col; }
+          g.beginPath(); g.moveTo(cx - bw * 0.25, base - th); g.quadraticCurveTo(cx, base - th - bw * 0.35, cx + bw * 0.25, base - th); g.fill(); g.fillStyle = '#ffd36a'; [-0.15, 0, 0.15].forEach(o => { g.beginPath(); g.arc(cx + o * bw, base - th - bw * 0.12, 3, 0, 7); g.fill(); }); };
+        tower(w * 0.5, h * 0.82, w * 0.26, h * 0.42, 'rgba(110,40,70,.85)'); tower(w * 0.16, h * 0.84, w * 0.13, h * 0.24, 'rgba(90,30,60,.8)'); tower(w * 0.84, h * 0.84, w * 0.13, h * 0.24, 'rgba(90,30,60,.8)'); }],
+      [0.45, (g, w, h) => { g.fillStyle = 'rgba(60,20,40,.9)'; g.fillRect(0, h * 0.84, w, h * 0.16); const r = rnd(151); for (let i = 0; i < 12; i++) { const x = i * w / 11; g.fillStyle = 'rgba(40,12,30,.95)'; g.fillRect(x - 6, h * 0.66, 12, h * 0.2); g.beginPath(); g.arc(x, h * 0.66, 9, Math.PI, 0); g.fill(); } }]],
+      live: (c, t, W, H, px) => { for (let i = 0; i < 7; i++) { const x = W * (0.1 + i * 0.13) - px * 20, sw = Math.sin(t / 700 + i) * 0.15; c.save(); c.translate(x, 0); c.rotate(sw); c.strokeStyle = 'rgba(255,190,60,.8)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(0, 0); c.lineTo(0, H * 0.1); c.stroke(); c.fillStyle = '#ffb030'; c.beginPath(); c.moveTo(-6, H * 0.1); c.quadraticCurveTo(0, H * 0.1 - 14, 6, H * 0.1); c.lineTo(-6, H * 0.1); c.fill(); c.restore(); }
+        for (let i = 0; i < 18; i++) { const x = ((i * 89.3) % W) + Math.sin(t / 900 + i) * 20, y = ((t * 0.02 * (1 + (i % 3) * 0.3) + i * 53) % (H + 20)) - 10; c.fillStyle = i % 2 ? 'rgba(255,140,40,.85)' : 'rgba(255,220,80,.85)'; c.beginPath(); c.ellipse(x, y, 4, 2.5, t / 500 + i, 0, 7); c.fill(); } } },
+    lotus: { a: '#9fe8d8', b: '#2a8a9a', aur: 0.2, layers: [
+      [0.1, (g, w, h) => { ridge(g, w, h, h * 0.5, h * 0.06, 1.3, 161, '#5fb8a0'); g.fillStyle = lin(g, h * 0.52, h, [[0, '#4ab8b8'], [1, '#1a6a7a']]); g.fillRect(0, h * 0.52, w, h); }],
+      [0.35, (g, w, h) => { const r = rnd(163); for (let i = 0; i < 16; i++) { const x = r() * w, y = h * (0.6 + r() * 0.38), R = 18 + r() * 26; g.fillStyle = i % 2 ? '#3f9a4a' : '#2f8a3a'; g.beginPath(); g.ellipse(x, y, R, R * 0.4, 0, 0.3, 6.0); g.lineTo(x, y); g.fill();
+          if (i % 3 === 0) { for (let k = 0; k < 7; k++) { const a = -Math.PI / 2 + (k - 3) * 0.32; g.fillStyle = k % 2 ? '#ff8fc4' : '#ffb8dc'; g.beginPath(); g.ellipse(x + Math.cos(a) * 9, y - 12 + Math.sin(a) * 9, 5, 13, a + Math.PI / 2, 0, 7); g.fill(); } g.fillStyle = '#ffd23f'; g.beginPath(); g.arc(x, y - 12, 4, 0, 7); g.fill(); } } }]],
+      live: (c, t, W, H, px) => { for (let k = 0; k < 4; k++) { const p = ((t * 0.00005 * (1 + k * 0.3)) + k * 0.25) % 1, x = W * (0.1 + p * 0.8) - px * 20, y = H * (0.68 + k * 0.07) + Math.sin(t / 600 + k) * 10, a = Math.sin(t / 400 + k) * 0.3;
+          c.save(); c.translate(x, y); c.rotate(a); c.fillStyle = k % 2 ? '#ff8a2a' : '#ffffff'; c.beginPath(); c.ellipse(0, 0, 16, 7, 0, 0, 7); c.fill(); c.beginPath(); c.moveTo(-14, 0); c.lineTo(-24, -7); c.lineTo(-24, 7); c.fill(); if (k % 2 === 0) { c.fillStyle = '#ff5a2a'; c.beginPath(); c.arc(4, -2, 4, 0, 7); c.fill(); } c.restore(); }
+        c.strokeStyle = 'rgba(255,255,255,.35)'; c.lineWidth = 1.5; for (let k = 0; k < 4; k++) { const p = ((t / 2200) + k / 4) % 1, x = W * (0.2 + k * 0.2), y = H * (0.62 + (k % 2) * 0.15); c.globalAlpha = 1 - p; c.beginPath(); c.ellipse(x, y, p * 50, p * 16, 0, 0, 7); c.stroke(); } c.globalAlpha = 1;
+        for (let i = 0; i < 6; i++) { const x = W * (0.15 + i * 0.15) + Math.sin(t / 500 + i * 2) * 30, y = H * (0.35 + Math.sin(t / 700 + i) * 0.08), f = Math.sin(t / 40 + i) * 6; c.fillStyle = ['#5fd4ff', '#ff6fb5', '#ffd23f'][i % 3]; c.beginPath(); c.ellipse(x - 4, y, 6, 3 + f * 0.3, 0.5, 0, 7); c.ellipse(x + 4, y, 6, 3 - f * 0.3, -0.5, 0, 7); c.fill(); } } },
+    street: { a: '#2a1050', b: '#0a0420', aur: 0.5, layers: [
+      [0.12, (g, w, h) => { const r = rnd(171); const cols = ['#ff7a9a', '#ffd23f', '#5fd4ff', '#8cf21a', '#ff9a3a', '#c08aff']; for (let x = 0; x < w;) { const bw = 70 + r() * 50, bh = h * (0.32 + r() * 0.1), col = cols[Math.floor(r() * 6)]; g.fillStyle = col; g.globalAlpha = 0.55; g.fillRect(x, h * 0.86 - bh, bw, bh + h); g.globalAlpha = 1;
+          g.fillStyle = 'rgba(20,10,40,.55)'; for (let fy = 0; fy < 2; fy++) for (let k = 0; k < 3; k++) { const wx = x + 8 + k * (bw - 16) / 3, wy = h * 0.86 - bh + 16 + fy * bh * 0.35; g.fillRect(wx, wy, (bw - 16) / 3 - 6, bh * 0.2); g.fillStyle = 'rgba(255,220,140,.6)'; g.fillRect(wx + 2, wy + 2, (bw - 16) / 3 - 10, bh * 0.2 - 4); g.fillStyle = 'rgba(20,10,40,.55)'; }
+          g.fillStyle = 'rgba(30,15,50,.8)'; g.fillRect(x, h * 0.86 - bh - 8, bw, 10); x += bw; } }],
+      [0.4, (g, w, h) => { g.fillStyle = '#1a0a30'; g.fillRect(0, h * 0.86, w, h * 0.14); }]],
+      live: (c, t, W, H, px) => { const cols = ['#ff3c8c', '#ffc800', '#3cc8ff', '#8cf21a', '#ff7a1a']; for (let row = 0; row < 3; row++) { const y0 = H * (0.12 + row * 0.12); for (let i = 0; i <= 18; i++) { const x = i / 18 * W - px * (10 + row * 8), y = y0 + Math.sin(i / 18 * Math.PI) * 40 + Math.sin(t / 900 + row) * 4, on = Math.sin(t / 220 + i * 0.9 + row * 2) > -0.2;
+          const col = cols[(i + row) % 5]; if (on) { const gr = c.createRadialGradient(x, y, 0, x, y, 14); gr.addColorStop(0, col + 'cc'); gr.addColorStop(1, col + '00'); c.fillStyle = gr; c.fillRect(x - 14, y - 14, 28, 28); } c.fillStyle = on ? '#fff' : col; c.beginPath(); c.arc(x, y, 3, 0, 7); c.fill(); } }
+        for (let i = 0; i < 4; i++) { const x = W * (0.12 + i * 0.25) - px * 25, y = H * 0.5 + Math.sin(t / 800 + i) * 6; c.fillStyle = cols[i]; c.beginPath(); c.moveTo(x, y - 18); c.lineTo(x + 14, y); c.lineTo(x, y + 18); c.lineTo(x - 14, y); c.fill(); c.fillStyle = 'rgba(255,255,255,.6)'; c.beginPath(); c.arc(x, y, 4, 0, 7); c.fill(); } } },
+    rain: { a: '#5a7a9a', b: '#2a3a5a', aur: 0.2, layers: [
+      [0.12, (g, w, h) => { ridge(g, w, h, h * 0.62, h * 0.08, 1.2, 181, '#4a6a5a'); }],
+      [0.3, (g, w, h) => { ridge(g, w, h, h * 0.76, h * 0.06, 1.8, 183, '#3a5a4a'); const r = rnd(185); for (let i = 0; i < 14; i++) { const x = r() * w, y = h * (0.72 + r() * 0.04); g.fillStyle = '#2a4a3a'; g.fillRect(x - 3, y - 50, 6, 50); g.beginPath(); g.arc(x, y - 55, 22 + r() * 10, 0, 7); g.fill(); } }],
+      [0.5, (g, w, h) => { g.fillStyle = '#3a4a5a'; g.fillRect(0, h * 0.86, w, h * 0.14); }]],
+      live: (c, t, W, H, px) => { c.strokeStyle = 'rgba(200,220,255,.5)'; c.lineWidth = 1.2; c.beginPath(); for (let i = 0; i < 120; i++) { const x = ((i * 37.7 + t * 0.15) % (W + 40)) - 20, y = ((i * 91.3 + t * 0.9) % (H + 40)) - 20; c.moveTo(x, y); c.lineTo(x - 4, y + 14); } c.stroke();
+        const cols = ['#ff4f7a', '#ffd23f', '#3fd6e8', '#8cf21a']; for (let k = 0; k < 4; k++) { const x = ((t * 0.02 * (k % 2 ? 1 : -1) + k * 260) % (W + 120) + W + 120) % (W + 120) - 60, y = H * 0.84; c.fillStyle = cols[k]; c.beginPath(); c.arc(x, y - 30, 26, Math.PI, 0); c.fill(); c.strokeStyle = '#333'; c.lineWidth = 2; c.beginPath(); c.moveTo(x, y - 30); c.lineTo(x, y + 4); c.stroke(); c.fillStyle = '#2a2a3a'; c.fillRect(x - 6, y - 4, 12, 18); }
+        c.strokeStyle = 'rgba(255,255,255,.3)'; for (let k = 0; k < 6; k++) { const p = ((t / 900) + k / 6) % 1; c.globalAlpha = 1 - p; c.beginPath(); c.ellipse(W * (0.1 + k * 0.16), H * 0.93, p * 22, p * 6, 0, 0, 7); c.stroke(); } c.globalAlpha = 1; } },
   };
-  const ROT = { potion: ['lab', 'space', 'volcano', 'sunset', 'desert', 'meadow', 'candy', 'palace', 'reef', 'aurora', 'kites', 'city', 'forest', 'holi'], hive: ['meadow', 'space', 'aurora', 'desert', 'holi', 'reef', 'sunset', 'forest', 'palace', 'lab', 'city', 'candy', 'volcano', 'kites'], jelly: ['reef', 'candy', 'palace', 'aurora', 'kites', 'city', 'forest', 'holi', 'space', 'volcano', 'lab', 'sunset', 'desert', 'meadow'], grid: ['city', 'space', 'aurora', 'volcano', 'sunset', 'forest', 'lab', 'reef'], mithai: ['palace', 'kites', 'holi', 'sunset', 'forest', 'lab', 'city', 'candy', 'volcano', 'meadow', 'space', 'aurora', 'desert', 'reef'], sudoku: ['city', 'aurora', 'space', 'volcano', 'reef', 'forest', 'lab', 'sunset', 'candy'] };
+  const ROT = { potion: ['lab', 'space', 'volcano', 'sunset', 'desert', 'meadow', 'candy', 'palace', 'reef', 'aurora', 'kites', 'city', 'forest', 'holi'], hive: ['meadow', 'space', 'aurora', 'desert', 'holi', 'reef', 'sunset', 'forest', 'palace', 'lab', 'city', 'candy', 'volcano', 'kites'], jelly: ['reef', 'candy', 'palace', 'aurora', 'kites', 'city', 'forest', 'holi', 'space', 'volcano', 'lab', 'sunset', 'desert', 'meadow'], grid: ['city', 'space', 'aurora', 'volcano', 'sunset', 'forest', 'lab', 'reef'], mithai: ['palace', 'diwali', 'kites', 'temple', 'holi', 'lotus', 'sunset', 'street', 'forest', 'rain', 'candy', 'diwali', 'city', 'temple', 'meadow', 'lotus', 'space', 'street', 'aurora', 'rain', 'desert', 'reef', 'lab', 'volcano'], sudoku: ['city', 'aurora', 'space', 'volcano', 'reef', 'forest', 'lab', 'sunset', 'candy'] };
   const api = { lastLevel: 1 };
   function forLevel(game, level, every = 1) { api.lastLevel = level; const r = ROT[game] || ROT.potion; return r[Math.floor(Math.max(0, level - 1) / every) % r.length]; }
-  function title(name) { return { lab: 'Alchemy Lab', meadow: 'Sunny Meadow', reef: 'Coral Reef', city: 'Night City', space: 'Outer Space', sunset: 'Sunset Peaks', candy: 'Candy Land', aurora: 'Northern Lights', forest: 'Firefly Forest', volcano: 'Volcano', desert: 'Desert Dunes', palace: 'Palace Garden', kites: 'Kite Festival', holi: 'Holi Colours' }[name] || name; }
+  function title(name) { return { lab: 'Alchemy Lab', meadow: 'Sunny Meadow', reef: 'Coral Reef', city: 'Night City', space: 'Outer Space', sunset: 'Sunset Peaks', candy: 'Candy Land', aurora: 'Northern Lights', forest: 'Firefly Forest', volcano: 'Volcano', desert: 'Desert Dunes', palace: 'Palace Garden', kites: 'Kite Festival', holi: 'Holi Colours', diwali: 'Diwali Night', temple: 'Temple Festival', lotus: 'Lotus Pond', street: 'Festive Street', rain: 'Monsoon Rain' }[name] || name; }
   return Object.assign(api, { S, forLevel, title });
 })();
 
@@ -636,11 +675,15 @@ const Kit = {
     { c: '#6cc04a', d: '#2f7a1a', l: '#d4ffb8' }, { c: '#ffc21a', d: '#b8860a', l: '#fff0a0' }, { c: '#ff5ca8', d: '#c0186a', l: '#ffd0e6' },
     { c: '#f3ecd8', d: '#a89a70', l: '#ffffff' }, { c: '#e8a030', d: '#9a5a10', l: '#ffe0a0' }, { c: '#e8302a', d: '#8a1010', l: '#ffb0a0' },
     { c: '#e9dcb0', d: '#9a8a5a', l: '#fffbe8' }, { c: '#ff86b6', d: '#c03a7a', l: '#ffe0ee' }, { c: '#8fd45a', d: '#3f8a24', l: '#e8ffd0' },
+    { c: '#f2b830', d: '#a86a10', l: '#ffe8a0' }, { c: '#ff8a1a', d: '#b84a00', l: '#ffd0a0' }, { c: '#4fb83a', d: '#1f6a14', l: '#c8ffb0' },
+    { c: '#e83a5a', d: '#8a1028', l: '#ffc0cc' }, { c: '#e8a83a', d: '#8a5a10', l: '#ffe0a0' }, { c: '#f6efe0', d: '#a8987a', l: '#ffffff' },
+    { c: '#6a3a1e', d: '#2a1206', l: '#c8906a' }, { c: '#fff4dc', d: '#c8a860', l: '#ffffff' }, { c: '#ff6a2a', d: '#a8300a', l: '#ffc0a0' },
   ];
-  const POOL_NAMES = ['Gulab Jamun', 'Jalebi', 'Kaju Katli', 'Pista Barfi', 'Kesar Peda', 'Rose Sandesh', 'Rasgulla', 'Mysore Pak', 'Imarti', 'Kalakand', 'Chum Chum', 'Kaju Pista Roll'];
+  const POOL_NAMES = ['Gulab Jamun', 'Jalebi', 'Kaju Katli', 'Pista Barfi', 'Kesar Peda', 'Rose Sandesh', 'Rasgulla', 'Mysore Pak', 'Imarti', 'Kalakand', 'Chum Chum', 'Kaju Pista Roll',
+    'Besan Ladoo', 'Motichoor Ladoo', 'Ondeh Ondeh', 'Kueh Lapis', 'Pineapple Tart', 'Kulfi', 'Chocolate Barfi', 'Rasmalai', 'Gajar Halwa'];
   // families: [brown], [orange], [white], [green], [yellow], [pink]; later sweets unlock at these levels
-  const FAMILY = [[0], [1, 8], [2, 6, 9], [3, 11], [4, 7], [5, 10]];
-  const UNLOCK = { 6: 6, 8: 10, 7: 14, 10: 18, 11: 24, 9: 30 };
+  const FAMILY = [[0, 18], [1, 8, 13, 20], [2, 6, 9, 17, 19], [3, 11, 14], [4, 7, 12, 16], [5, 10, 15]];
+  const UNLOCK = { 6: 6, 8: 10, 7: 14, 10: 18, 11: 24, 9: 30, 13: 34, 14: 38, 16: 42, 15: 46, 18: 50, 17: 55, 12: 60, 19: 65, 20: 70 };
   let SET = [0, 1, 2, 3, 4, 5], COL = SET.map(i => POOL_COL[i]), NAMES = SET.map(i => POOL_NAMES[i]);
   function sweetSet(n) {
     const rng = Kit.rng(n * 911 + 5), fams = FAMILY.map(f => f.filter(i => (UNLOCK[i] || 0) <= n));
@@ -652,7 +695,12 @@ const Kit = {
   }
   function newlyUnlocked(n) { return Object.keys(UNLOCK).filter(i => UNLOCK[i] === n).map(i => POOL_NAMES[i]); }
   // cascade praise: a different pool for each chain size, never the same line twice in a row
-  const PRAISE = [[], [], ['Wahhh!!', 'Shiok!', 'Nice lah!', 'Steady!', 'Sabash!', 'Best ah!', 'Fuyoh!'], ['Superruuuu!', 'Semma!', 'Power lah!', 'Mass da!', 'Solid bro!', 'Walao!'], ['Super Comboo!', 'Eppadi laaa!!', 'Kalakkal!', 'Steady pom pi pi!', 'Gempak!'], ['Thalaivaaa!', 'Ultimate lah!', 'Wah lau eh!!', 'Vera level!', 'Mithai mania!'], ['LEGENDARY LAH!', 'Eppadi laaa!! 🔥', 'Superruuuu MAX!', 'Kadavulae!! So sweet!']];
+  const PRAISE = [[], [],
+    ['Wahhh!!', 'Shiok!', 'Nice lah!', 'Steady!', 'Sabash!', 'Best ah!', 'Fuyoh!', 'Pooooduuuu!', 'Goyang goyang!', 'Tanku nakaa!', 'Sweet ah!'],
+    ['Superruuuu!', 'Semma!', 'Power lah!', 'Mass da!', 'Solid bro!', 'Walao!', 'Dhanana ka!', 'Kalakureenga!', 'Jolly ah!', 'Mantap!'],
+    ['Super Comboo!', 'Eppadi laaa!!', 'Kalakkal!', 'Steady pom pi pi!', 'Gempak!', 'Neegae vera level!', 'Yaaaru saamy ithu!', 'Sema mass!'],
+    ['Thalaivaaa!', 'Ultimate lah!', 'Wah lau eh!!', 'Vera level!', 'Mithai mania!', 'Oh my Kadavulae!', 'Aiyoo so sweet!', 'Boss level!'],
+    ['LEGENDARY LAH!', 'Eppadi laaa!! 🔥', 'Superruuuu MAX!', 'Kadavulae!! So sweet!', 'Yaaaru saamy ithu!! 😱', 'Neegae vera level!! 👑']];
   let lastPraise = '';
   const praise = n => { const pool = PRAISE[Math.min(6, n)].filter(x => x !== lastPraise); lastPraise = pool[Math.floor(Math.random() * pool.length)]; return lastPraise; };
 
@@ -948,7 +996,7 @@ const Kit = {
   const pick = a => a[Math.floor(Math.random() * a.length)];
   function addFloat(text, x, y, color, size) { floats.push({ text, x, y, color, size, age: 0, life: 1.1 }); }
   function announce(text) {
-    if (/Comboo|Eppadi|Superruuuu|LEGEND|Thalaiva|Kadavul|Wah lau|Ultimate/.test(text)) { for (let i = 0; i < 60; i++) parts.push({ x: Math.random() * W, y: -Math.random() * H * 0.3, vx: (Math.random() - 0.5) * cs, vy: cs * (3 + Math.random() * 4), age: 0, life: 1.6 + Math.random(), r: cs * (0.06 + Math.random() * 0.08), col: ['#ff5ca8', '#ffd60a', '#5ce1ff', '#b86bff', '#7dff9a'][i % 5], g: 0 }); flash = Math.max(flash, 0.18); }
+    if (/Comboo|Eppadi|Superruuuu|LEGEND|Thalaiva|Kadavul|Wah lau|Ultimate|vera level|saamy|Boss|Aiyoo/.test(text)) { for (let i = 0; i < 60; i++) parts.push({ x: Math.random() * W, y: -Math.random() * H * 0.3, vx: (Math.random() - 0.5) * cs, vy: cs * (3 + Math.random() * 4), age: 0, life: 1.6 + Math.random(), r: cs * (0.06 + Math.random() * 0.08), col: ['#ff5ca8', '#ffd60a', '#5ce1ff', '#b86bff', '#7dff9a'][i % 5], g: 0 }); flash = Math.max(flash, 0.18); }
     floats.push({ text, x: W / 2, y: oy + cs * N * 0.42, size: cs * 0.95, age: 0, life: 1.4, big: true, rot: (Math.random() - 0.5) * 0.16 });
     for (let i = 0; i < 26; i++) { const a = i / 26 * 6.28, v = cs * (4 + Math.random() * 4); stars.push({ x: W / 2, y: oy + cs * N * 0.42, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 0.7 + Math.random() * 0.4, r: cs * (0.1 + Math.random() * 0.1), col: COL[i % 6].l, spin: Math.random() * 6 }); }
   }
@@ -981,6 +1029,14 @@ const Kit = {
     else if (ci === 9) { c.moveTo(-R * 0.9, -R * 0.5); c.lineTo(R * 0.9, -R * 0.5); c.lineTo(R * 0.75, R * 0.75); c.lineTo(-R * 0.75, R * 0.75); c.closePath(); }
     else if (ci === 10) c.ellipse(0, 0, R * 0.95, R * 0.6, -0.35, 0, 7);
     else if (ci === 11) Kit.rr(c, -R * 0.95, -R * 0.45, R * 1.9, R * 0.9, R * 0.45);
+    else if (ci === 12 || ci === 13) c.arc(0, R * 0.04, R * 0.86, 0, 7);
+    else if (ci === 14) { [[-0.45, 0.3], [0.45, 0.3], [0, -0.35]].forEach(([x, y]) => { c.moveTo(x * R + R * 0.48, y * R); c.arc(x * R, y * R, R * 0.48, 0, 7); }); }
+    else if (ci === 15) Kit.rr(c, -R * 0.78, -R * 0.82, R * 1.56, R * 1.64, R * 0.1);
+    else if (ci === 16) { for (let i = 0; i <= 48; i++) { const a = i / 48 * 6.283, rr = R * (0.86 + 0.06 * Math.cos(a * 12)); i ? c.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : c.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); } c.closePath(); }
+    else if (ci === 17) { c.moveTo(-R * 0.5, -R * 0.75); c.quadraticCurveTo(0, -R * 1.05, R * 0.5, -R * 0.75); c.lineTo(R * 0.36, R * 0.45); c.quadraticCurveTo(0, R * 0.6, -R * 0.36, R * 0.45); c.closePath(); }
+    else if (ci === 18) Kit.rr(c, -R * 0.8, -R * 0.8, R * 1.6, R * 1.6, R * 0.18);
+    else if (ci === 19) c.ellipse(0, R * 0.05, R * 0.95, R * 0.72, 0, 0, 7);
+    else if (ci === 20) { c.moveTo(-R * 0.95, R * 0.6); c.bezierCurveTo(-R * 0.9, -R * 0.4, -R * 0.3, -R * 0.85, 0, -R * 0.85); c.bezierCurveTo(R * 0.3, -R * 0.85, R * 0.9, -R * 0.4, R * 0.95, R * 0.6); c.closePath(); }
     else { c.moveTo(0, R * 0.9); c.bezierCurveTo(-R * 1.25, R * 0.05, -R * 0.75, -R * 1.05, 0, -R * 0.42); c.bezierCurveTo(R * 0.75, -R * 1.05, R * 1.25, R * 0.05, 0, R * 0.9); c.closePath(); }
   }
   function candySprite(ci, sp, R) {
@@ -1048,6 +1104,47 @@ const Kit = {
       c.fillStyle = rad(-R * 0.3, -R * 0.3, R * 0.05, R * 1.1, [[0, '#ffffff'], [0.5, '#ece6d6'], [1, '#b8ae94']]); candyPath(c, 11, R); c.fill();
       c.fillStyle = rad(0, 0, R * 0.02, R * 0.45, [[0, '#d4ffb0'], [0.6, '#8fd45a'], [1, '#3f8a24']]); Kit.rr(c, -R * 0.75, -R * 0.2, R * 1.5, R * 0.4, R * 0.2); c.fill();
       c.fillStyle = 'rgba(255,255,255,.8)'; for (let i = 0; i < 6; i++) c.fillRect(-R * 0.7 + i * R * 0.26, -R * 0.4, R * 0.08, R * 0.08);
+    } else if (ci === 12 || ci === 13) { // ladoos: besan (golden, smooth with cashew) / motichoor (orange, tiny pearls)
+      shadow(R * 0.8, R * 0.88); const mot = ci === 13;
+      c.fillStyle = rad(-R * 0.3, -R * 0.35, R * 0.05, R * 0.95, mot ? [[0, '#ffd08a'], [0.5, '#ff8a1a'], [1, '#b84a00']] : [[0, '#fff0b0'], [0.5, '#f2b830'], [1, '#a86a10']]); candyPath(c, ci, R); c.fill();
+      c.save(); candyPath(c, ci, R); c.clip(); const rg = Kit.rng(ci * 7); c.fillStyle = mot ? 'rgba(255,220,160,.55)' : 'rgba(150,90,20,.3)'; for (let i = 0; i < (mot ? 70 : 30); i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.8, (rg() - 0.5) * R * 1.8, R * (mot ? 0.06 : 0.04), 0, 7); c.fill(); } c.restore();
+      if (mot) { c.fillStyle = '#c8ccd8'; c.fillRect(-R * 0.2, -R * 0.75, R * 0.4, R * 0.12); } else { c.fillStyle = '#f6e6c0'; c.beginPath(); c.ellipse(0, -R * 0.55, R * 0.22, R * 0.11, 0.3, 0, 7); c.fill(); }
+    } else if (ci === 14) { // ondeh ondeh: three pandan balls rolled in coconut
+      shadow(R * 0.9, R * 0.9);
+      [[-0.45, 0.3], [0.45, 0.3], [0, -0.35]].forEach(([x, y], k) => { c.fillStyle = rad(x * R - R * 0.15, y * R - R * 0.18, R * 0.03, R * 0.6, [[0, '#d4ffb8'], [0.5, '#4fb83a'], [1, '#1f6a14']]); c.beginPath(); c.arc(x * R, y * R, R * 0.48, 0, 7); c.fill();
+        const rg = Kit.rng(41 + k); c.fillStyle = 'rgba(255,255,255,.92)'; for (let i = 0; i < 14; i++) { const a = rg() * 6.28, d = rg() * R * 0.42; c.save(); c.translate(x * R + Math.cos(a) * d, y * R + Math.sin(a) * d); c.rotate(rg() * 3); c.fillRect(-R * 0.05, -R * 0.012, R * 0.1, R * 0.024); c.restore(); }
+        c.fillStyle = 'rgba(120,60,10,.6)'; c.beginPath(); c.arc(x * R + R * 0.12, y * R + R * 0.12, R * 0.06, 0, 7); c.fill(); });
+      gloss = false;
+    } else if (ci === 15) { // kueh lapis: rainbow-ish layered red & white cake
+      shadow(R * 0.8, R * 0.95); c.save(); candyPath(c, 15, R); c.clip(); const n = 9;
+      for (let i = 0; i < n; i++) { c.fillStyle = i % 2 ? '#fff0f2' : ['#e83a5a', '#ff7a8a', '#e83a5a'][i % 3]; c.fillRect(-R, -R * 0.82 + i * R * 1.64 / n, R * 2, R * 1.64 / n + 1); } c.restore();
+      c.strokeStyle = 'rgba(140,20,40,.5)'; c.lineWidth = R * 0.04; candyPath(c, 15, R); c.stroke();
+    } else if (ci === 16) { // pineapple tart: buttery crust with golden jam and a clove
+      shadow(R * 0.85, R * 0.88);
+      c.fillStyle = rad(-R * 0.3, -R * 0.35, R * 0.05, R * 1.05, [[0, '#fff0c0'], [0.5, '#e8b85a'], [1, '#a8701a']]); candyPath(c, 16, R); c.fill();
+      c.fillStyle = rad(-R * 0.1, -R * 0.15, R * 0.03, R * 0.6, [[0, '#ffe080'], [0.6, '#f0a020'], [1, '#c06a08']]); c.beginPath(); c.arc(0, 0, R * 0.52, 0, 7); c.fill();
+      c.strokeStyle = 'rgba(255,240,200,.75)'; c.lineWidth = R * 0.07; for (let k = -1; k <= 1; k++) { c.beginPath(); c.moveTo(-R * 0.45, k * R * 0.22); c.lineTo(R * 0.45, k * R * 0.22); c.moveTo(k * R * 0.22, -R * 0.45); c.lineTo(k * R * 0.22, R * 0.45); c.stroke(); }
+      c.fillStyle = '#4a2a10'; c.beginPath(); c.arc(0, -R * 0.02, R * 0.07, 0, 7); c.fill();
+    } else if (ci === 17) { // kulfi on a stick: creamy with pistachio and saffron
+      c.fillStyle = '#d8a868'; Kit.rr(c, -R * 0.09, R * 0.35, R * 0.18, R * 0.62, R * 0.06); c.fill();
+      c.fillStyle = rad(-R * 0.2, -R * 0.4, R * 0.05, R * 1.0, [[0, '#ffffff'], [0.5, '#fff0d0'], [1, '#d8b878']]); candyPath(c, 17, R); c.fill();
+      c.fillStyle = 'rgba(255,170,40,.55)'; c.beginPath(); c.ellipse(0, -R * 0.6, R * 0.42, R * 0.14, 0, 0, 7); c.fill();
+      const rg = Kit.rng(53); for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#7ccf4a' : '#e8a020'; c.save(); c.translate((rg() - 0.5) * R * 0.7, -R * 0.65 + rg() * R * 0.25); c.rotate(rg() * 3); c.fillRect(-R * 0.06, -R * 0.02, R * 0.12, R * 0.04); c.restore(); }
+    } else if (ci === 18) { // chocolate barfi: two-tone square with silver vark
+      shadow(R * 0.8, R * 0.92);
+      c.fillStyle = '#2a1206'; c.save(); c.translate(0, R * 0.12); candyPath(c, 18, R); c.fill(); c.restore();
+      c.save(); candyPath(c, 18, R); c.clip(); c.fillStyle = rad(-R * 0.3, -R * 0.4, R * 0.05, R * 1.1, [[0, '#c8906a'], [0.5, '#6a3a1e'], [1, '#3a1a08']]); c.fillRect(-R, -R, R * 2, R * 2);
+      c.fillStyle = rad(-R * 0.2, R * 0.3, R * 0.05, R * 1.0, [[0, '#fff8e8'], [1, '#e0d0b0']]); c.fillRect(-R, R * 0.1, R * 2, R); c.restore();
+      c.fillStyle = 'rgba(220,225,240,.85)'; const rg = Kit.rng(61); for (let i = 0; i < 6; i++) c.fillRect((rg() - 0.5) * R * 1.2, -R * 0.7 + rg() * R * 0.6, R * 0.1, R * 0.07);
+    } else if (ci === 19) { // rasmalai: soft cheese disc in saffron milk with pistachio
+      c.fillStyle = 'rgba(255,214,120,.65)'; c.beginPath(); c.ellipse(0, R * 0.25, R * 1.0, R * 0.62, 0, 0, 7); c.fill();
+      c.fillStyle = rad(-R * 0.25, -R * 0.3, R * 0.05, R * 0.8, [[0, '#ffffff'], [0.6, '#fff4dc'], [1, '#d8c090']]); c.beginPath(); c.ellipse(0, -R * 0.05, R * 0.72, R * 0.5, 0, 0, 7); c.fill();
+      const rg = Kit.rng(67); for (let i = 0; i < 7; i++) { c.fillStyle = i % 3 ? '#7ccf4a' : '#e8501a'; c.save(); c.translate((rg() - 0.5) * R * 0.9, (rg() - 0.6) * R * 0.5); c.rotate(rg() * 3); c.fillRect(-R * 0.07, -R * 0.02, R * 0.14, R * 0.04); c.restore(); }
+    } else if (ci === 20) { // gajar halwa: heap of grated carrot with cashews and raisins
+      shadow(R * 0.9, R * 0.65);
+      c.fillStyle = rad(-R * 0.2, -R * 0.4, R * 0.05, R * 1.0, [[0, '#ffc090'], [0.5, '#ff6a2a'], [1, '#a8300a']]); candyPath(c, 20, R); c.fill();
+      c.save(); candyPath(c, 20, R); c.clip(); const rg = Kit.rng(71); c.strokeStyle = 'rgba(255,190,120,.6)'; c.lineWidth = R * 0.04; for (let i = 0; i < 26; i++) { const x = (rg() - 0.5) * R * 1.8, y = (rg() - 0.5) * R * 1.4; c.beginPath(); c.moveTo(x, y); c.lineTo(x + R * 0.2, y + (rg() - 0.5) * R * 0.15); c.stroke(); } c.restore();
+      c.fillStyle = '#f6e6c0'; c.beginPath(); c.ellipse(-R * 0.25, -R * 0.35, R * 0.16, R * 0.08, 0.4, 0, 7); c.fill(); c.fillStyle = '#4a1a20'; c.beginPath(); c.arc(R * 0.3, -R * 0.2, R * 0.07, 0, 7); c.fill(); c.fillStyle = '#7ccf4a'; c.beginPath(); c.ellipse(R * 0.05, -R * 0.55, R * 0.1, R * 0.04, -0.3, 0, 7); c.fill();
     } else { // rose sandesh: soft pink shell with a rose petal
       shadow(R * 0.7, R * 0.9);
       c.fillStyle = rad(-R * 0.3, -R * 0.35, R * 0.05, R * 1.15, [[0, '#ffe6f2'], [0.45, '#ff8fc4'], [1, '#d63a82']]); candyPath(c, 5, R); c.fill();
