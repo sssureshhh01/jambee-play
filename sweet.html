@@ -193,12 +193,55 @@ const Wallet = (() => {
       if (!inHub || !container) return;
       const b = document.createElement('button');
       b.textContent = '⬅ Back to Arcade';
-      b.style.cssText = 'display:block;margin:14px auto 0;padding:10px 18px;border-radius:14px;border:0;background:rgba(255,255,255,.18);color:inherit;font:800 14px system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(4px)';
+      b.style.cssText = 'display:block;margin:14px auto 0;padding:12px 22px;border-radius:16px;border:0;background:rgba(255,255,255,.22);color:inherit;font:900 15px system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(4px)';
       b.onclick = e => { e.stopPropagation(); Wallet.exit(); };
       container.appendChild(b);
+      // plus a big, always-visible pill in the top-left corner of the game's start screen (below the notch)
+      const ov = container.closest('.overlay') || container.parentElement;
+      if (ov && !ov.querySelector('.arcBack')) {
+        const t = document.createElement('button'); t.className = 'arcBack'; t.innerHTML = '⬅ Arcade';
+        t.style.cssText = 'position:absolute;z-index:50;left:max(12px,env(safe-area-inset-left));top:calc(env(safe-area-inset-top) + 12px);min-height:48px;padding:0 20px;border-radius:24px;border:0;background:linear-gradient(#ffe36b,#ffb21a);color:#3a1a00;font:900 17px system-ui,sans-serif;box-shadow:0 4px 0 #b86b00,0 6px 18px rgba(0,0,0,.35);cursor:pointer';
+        t.onclick = e => { e.stopPropagation(); Wallet.exit(); };
+        if (getComputedStyle(ov).position === 'static') ov.style.position = 'relative';
+        ov.appendChild(t);
+      }
     }
   };
 })();
+
+// ===== One Music / Sound setting for the whole arcade =====
+// Every game keeps its own save with music/sound flags. Before a game starts we copy the arcade-wide choice into it,
+// and add a quick 🎵 button next to the 🏠 button that flips music in any game (and everywhere else too).
+(() => {
+  const KEY = 'arcade_audio';
+  let A = { music: true, sound: true };
+  try { A = Object.assign(A, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+  const saveA = () => { try { localStorage.setItem(KEY, JSON.stringify(A)); } catch (e) {} };
+  try { // sync every game save that has music/sound flags
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k === KEY || k === 'arcade_wallet_v1') continue;
+      let v; try { v = JSON.parse(localStorage.getItem(k)); } catch (e) { continue; }
+      if (v && typeof v === 'object' && ('music' in v || 'sound' in v)) { v.music = A.music; v.sound = A.sound; localStorage.setItem(k, JSON.stringify(v)); } }
+  } catch (e) {}
+  window.ArcadeAudio = { get: () => A };
+  const wire = () => {
+    const home = document.getElementById('homeBtn'), tm = document.getElementById('tMusic'), ts = document.getElementById('tSound');
+    // the game's own Settings switches also update the arcade-wide choice
+    if (tm) tm.addEventListener('click', () => { A.music = !A.music; saveA(); paint(); });
+    if (ts) ts.addEventListener('click', () => { A.sound = !A.sound; saveA(); });
+    if (!home || !tm || document.getElementById('musicQuick')) return;
+    const q = document.createElement('button'); q.id = 'musicQuick'; q.className = home.className; q.setAttribute('aria-label', 'Music on or off');
+    q.style.marginLeft = '8px';
+    const paint = () => { q.textContent = A.music ? '🎵' : '🔇'; q.style.opacity = A.music ? '1' : '.75'; };
+    window.__paintMusic = paint; paint();
+    q.onclick = e => { e.stopPropagation(); tm.click(); const T = document.getElementById('toast'); if (T) { T.textContent = A.music ? '🎵 Music on' : '🔇 Music off'; T.classList.add('show'); setTimeout(() => T.classList.remove('show'), 1500); } };
+    home.insertAdjacentElement('afterend', q);
+    // keep the home + music buttons together on the left of the top bar
+    if (home.parentElement && !home.parentElement.querySelector('.lbtns')) { const w = document.createElement('div'); w.className = 'lbtns'; w.style.cssText = 'display:flex;align-items:center;flex:0 0 auto'; home.parentElement.insertBefore(w, home); w.appendChild(home); w.appendChild(q); }
+  };
+  function paint() { if (window.__paintMusic) window.__paintMusic(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else setTimeout(wire, 0);
+})();
+
 
 </script>
 <script>
@@ -713,11 +756,24 @@ const Kit = {
   function newlyUnlocked(n) { return Object.keys(UNLOCK).filter(i => UNLOCK[i] === n).map(i => POOL_NAMES[i]); }
   // cascade praise: a different pool for each chain size, never the same line twice in a row
   const PRAISE = [[], [],
-    ['Wahhh!!', 'Shiok!', 'Nice lah!', 'Steady!', 'Sabash!', 'Best ah!', 'Fuyoh!', 'Pooooduuuu!', 'Goyang goyang!', 'Tanku nakaa!', 'Sweet ah!'],
-    ['Superruuuu!', 'Semma!', 'Power lah!', 'Mass da!', 'Solid bro!', 'Walao!', 'Dhanana ka!', 'Kalakureenga!', 'Jolly ah!', 'Mantap!'],
-    ['Super Comboo!', 'Eppadi laaa!!', 'Kalakkal!', 'Steady pom pi pi!', 'Gempak!', 'Neegae vera level!', 'Yaaaru saamy ithu!', 'Sema mass!'],
-    ['Thalaivaaa!', 'Ultimate lah!', 'Wah lau eh!!', 'Vera level!', 'Shiok sweets!', 'Oh my Kadavulae!', 'Aiyoo so sweet!', 'Boss level!'],
-    ['LEGENDARY LAH!', 'Eppadi laaa!! 🔥', 'Superruuuu MAX!', 'Kadavulae!! So sweet!', 'Yaaaru saamy ithu!! 😱', 'Neegae vera level!! 👑']];
+    ['Wahhh!!', 'Shiok!', 'Nice lah!', 'Steady!', 'Sabash!', 'Best ah!', 'Fuyoh!', 'Pooooduuuu!', 'Goyang goyang!', 'Tanku nakaa!', 'Sweet ah!', 'Can lah!', 'Not bad ah!', 'Sedap!', 'Bagus!', 'Super pa!', 'Arumai!', 'Nalla irukku!', 'Okay what!'],
+    ['Superruuuu!', 'Semma!', 'Power lah!', 'Mass da!', 'Solid bro!', 'Walao!', 'Dhanana ka!', 'Kalakureenga!', 'Jolly ah!', 'Mantap!', 'Fuyoh fuyoh!', 'Power ah!', 'Terbaik!', 'Syok ah!', 'Atas!', 'Thara mass!', 'Kalakku da!'],
+    ['Super Comboo!', 'Eppadi laaa!!', 'Kalakkal!', 'Steady pom pi pi!', 'Gempak!', 'Neegae vera level!', 'Yaaaru saamy ithu!', 'Sema mass!', 'Champion lah!', 'Jaguh!', 'Semma kick!', 'Machan super!', 'Nanba super!', 'Siao liao!'],
+    ['Thalaivaaa!', 'Ultimate lah!', 'Wah lau eh!!', 'Vera level!', 'Shiok sweets!', 'Oh my Kadavulae!', 'Aiyoo so sweet!', 'Boss level!', 'Gempak gila!', 'Habis la!', 'Mind blowing da!', 'Sweet overload!', 'Makan all!'],
+    ['LEGENDARY LAH!', 'Eppadi laaa!! 🔥', 'Superruuuu MAX!', 'Kadavulae!! So sweet!', 'Yaaaru saamy ithu!! 😱', 'Neegae vera level!! 👑', 'UNSTOPPABLE LAH!', 'KING OF SWEETS 👑', 'SEMMA MASS DA!! 🔥', 'MANTAP GILA!!']];
+  // every word gets its own look: font, colours and animation (picked from the word itself, so a word always looks the same)
+  const WSTY = [
+    { font: '900 {s}px system-ui,sans-serif', fill: ['#ff5ca8', '#ffd60a', '#5ce1ff', '#b86bff'], edge: '#5a1478', glow: 'rgba(255,90,200,.85)', anim: 'pop' },
+    { font: 'italic 900 {s}px Georgia,serif', fill: ['#fff4b0', '#ffc21a', '#ff7a00'], edge: '#6a2a00', glow: 'rgba(255,180,40,.9)', anim: 'zoom' },
+    { font: '900 {s}px "Arial Black",Impact,sans-serif-condensed,sans-serif', fill: ['#ffffff', '#ffe600', '#ff2a2a'], edge: '#3a0000', glow: 'rgba(255,60,0,.9)', anim: 'shake', fire: 1 },
+    { font: 'bold {s}px "Comic Sans MS",casual,cursive', fill: ['#7dff9a', '#3ad8ff', '#7d5cff'], edge: '#0a2a5a', glow: 'rgba(60,220,255,.9)', anim: 'wave' },
+    { font: 'bold {s}px cursive,"Brush Script MT",serif', fill: ['#ffd0e6', '#ff5ca8', '#c0186a'], edge: '#4a0a2a', glow: 'rgba(255,92,168,.95)', anim: 'spin' },
+    { font: '900 {s}px system-ui,sans-serif', fill: 'rainbow', edge: '#2a0a4a', glow: 'rgba(255,255,255,.9)', anim: 'wave' },
+    { font: '900 {s}px "Trebuchet MS",sans-serif', fill: ['#e8fff8', '#4dffd2', '#00b894'], edge: '#003a2a', glow: 'rgba(0,255,190,.9)', anim: 'pop', neon: 1 },
+    { font: 'italic 900 {s}px system-ui,sans-serif', fill: ['#fff8d0', '#ffd700', '#b8860b'], edge: '#3a2400', glow: 'rgba(255,215,0,1)', anim: 'zoom', gold: 1 },
+  ];
+  const wStyle = t => { let h = 0; for (const ch of t) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return WSTY[h % WSTY.length]; };
+  const wTier = t => PRAISE.findIndex(a => a.includes(t));
   let lastPraise = '';
   const praise = n => { const pool = PRAISE[Math.min(6, n)].filter(x => x !== lastPraise); lastPraise = pool[Math.floor(Math.random() * pool.length)]; return lastPraise; };
 
@@ -740,11 +796,19 @@ const Kit = {
       const amt = Math.min(14 + Math.floor(n / 4), 40);
       g.items = n < 8 ? [{ c: a, n: amt }] : [{ c: a, n: amt }, { c: b, n: amt }];
     }
-    return { n, k, moves, g, seed: n * 31 + 7, set: sweetSet(n) };
+    // pressure and obstacles (Candy-Crush style), mixed in as you progress
+    const timed = n >= 6 && n % 5 === 0 ? Math.round(60 + Math.min(45, n / 4)) : 0;
+    const ice = n >= 7 && n % 4 === 3 ? Math.min(6 + Math.floor(n / 8), 16) : 0, iceHp = n >= 40 ? 2 : 1;
+    const crates = n >= 9 && n % 4 === 1 ? Math.min(5 + Math.floor(n / 9), 14) : 0;
+    const choc = n >= 14 && n % 6 === 2 ? Math.min(2 + Math.floor(n / 30), 5) : 0;
+    const bombs = n >= 11 && n % 5 === 1 ? Math.min(2 + Math.floor(n / 40), 4) : 0;
+    if (crates && type !== 'jelly') { g.type = 'crates'; delete g.target; delete g.items; }
+    return { n, k, moves, g, seed: n * 31 + 7, set: sweetSet(n), timed, ice, iceHp, crates, choc, bombs, bombMoves: Math.max(9, 15 - Math.floor(n / 25)) };
   }
 
   // ================= State =================
   let D, grid, jelly, movesLeft = 0, score = 0, collected = [], phase = 'idle', swap = null, cascade = 0, lastSwap = null;
+  let timeLeft = 0, moveDone = false, chocHit = false, boomLost = false, lowTick = 0;
   let won = false, lost = false, paused = true, toolsUsed = 0, bonusLeft = 0, hammerMode = false, idleT = 0, hint = null, nextId = 1, rnd = Math.random;
   const parts = [], floats = [], beams = [], rings = [];
   let shake = 0, flash = 0, freeze = 0, punch = 0, fwT = 0, fwNext = 0;
@@ -764,6 +828,17 @@ const Kit = {
 
   // ================= Board helpers =================
   const mk = (c, r, sp) => ({ id: nextId++, c, sp: sp || null, y: r, vy: 0, dying: 0, land: 0, born: 0 });
+  const isBlk = p => p && (p.sp === 'crate' || p.sp === 'choc');
+  const stuck = p => p && (isBlk(p) || p.ice > 0); // can't be swapped
+  function placeBlockers() { // turn some sweets into crates, chocolate, ice-locked sweets and countdown bombs
+    const free = []; for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) free.push([r, c]);
+    for (let i = free.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [free[i], free[j]] = [free[j], free[i]]; }
+    const take = (n, f, rows) => { for (let i = 0; i < free.length && n > 0; i++) { const [r, c] = free[i]; if (rows && r < N - rows) continue; f(grid[r][c]); free.splice(i, 1); i--; n--; } };
+    take(D.crates, p => { p.sp = 'crate'; p.c = -5; p.hp = D.n >= 30 && rnd() < 0.4 ? 2 : 1; }, 5);
+    take(D.choc, p => { p.sp = 'choc'; p.c = -5; p.hp = 1; }, 4);
+    take(D.ice, p => { p.ice = D.iceHp; });
+    take(D.bombs, p => { p.bomb = D.bombMoves + Math.floor(rnd() * 4); });
+  }
   const inB = (r, c) => r >= 0 && c >= 0 && r < N && c < N;
   const col = (r, c) => grid[r][c] && !grid[r][c].dying ? (grid[r][c].sp === 'b' ? -1 : grid[r][c].c) : -2;
   function newBoard() {
@@ -773,6 +848,7 @@ const Kit = {
         let k; do { k = Math.floor(rnd() * D.k); } while ((c >= 2 && grid[r][c - 1].c === k && grid[r][c - 2].c === k) || (r >= 2 && grid[r - 1][c].c === k && grid[r - 2][c].c === k));
         grid[r][c] = mk(k, r); grid[r][c].y = r - N - 1 - (N - r) * 0.3;
       }
+      placeBlockers();
       if (findMove()) return;
     }
   }
@@ -793,7 +869,7 @@ const Kit = {
   }
   function findMove() {
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) for (const [dr, dc] of [[0, 1], [1, 0]]) {
-      const r2 = r + dr, c2 = c + dc; if (!inB(r2, c2) || !grid[r][c] || !grid[r2][c2]) continue;
+      const r2 = r + dr, c2 = c + dc; if (!inB(r2, c2) || !grid[r][c] || !grid[r2][c2] || stuck(grid[r][c]) || stuck(grid[r2][c2])) continue;
       if (grid[r][c].sp && grid[r2][c2].sp) return [[r, c], [r2, c2]];
       if (grid[r][c].sp === 'b' || grid[r2][c2].sp === 'b') return [[r, c], [r2, c2]];
       swapCells(r, c, r2, c2); const ok = findRuns().length > 0; swapCells(r, c, r2, c2);
@@ -816,7 +892,11 @@ const Kit = {
       // jelly under the cell
       if (jelly[r][c] > 0) { jelly[r][c]--; for (let i = 0; i < 6; i++) burst(cx(c), cy(r), i % 2 ? '#ffffff' : jelly[r][c] ? '#ffd36b' : '#cfd6e4'); }
       if (!p || p.dying) continue;
+      if (isBlk(p)) { hitBlock(p, r, c); continue; }
+      if (p.ice > 0) { p.ice--; p.born = 0.25; for (let i = 0; i < 10; i++) burst(cx(c), cy(r), i % 2 ? '#ffffff' : '#9fe6ff'); K.tone(1700, 0.08, { type: 'square', vol: 0.04, to: 2400 }); if (p.ice > 0) continue; addFloat('Ice smashed!', cx(c), cy(r) - cs * 0.5, '#bff4ff', cs * 0.34); continue; }
       p.dying = 0.0001; n++;
+      if (p.bomb) { addFloat('Defused! +100', cx(c), cy(r) - cs * 0.5, '#ffe36b', cs * 0.36); score += 100; }
+      for (const [dr, dc] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) { const q = inB(r + dr, c + dc) && grid[r + dr][c + dc]; if (q && isBlk(q) && !q.dying && !done.has((r + dr) * N + c + dc)) { done.add((r + dr) * N + c + dc); hitBlock(q, r + dr, c + dc); } }
       score += Math.round(20 * (1 + cascade * 0.5)) + (p.sp ? 40 : 0);
       if (!p.sp && collected[p.c] != null) collected[p.c]++;
       for (let i = 0; i < 8; i++) burst(cx(c), cy(r), p.sp === 'b' ? COL[i % D.k].c : i % 3 ? COL[p.c].c : COL[p.c].l);
@@ -833,6 +913,13 @@ const Kit = {
       }
     }
     return n;
+  }
+  function hitBlock(p, r, c) { // crates and chocolate break when sweets clear next to them (or a blast hits them)
+    if (p.dying) return; p.hp = (p.hp || 1) - 1; p.born = 0.3; shake = Math.max(shake, 0.2);
+    for (let i = 0; i < 10; i++) burst(cx(c), cy(r), p.sp === 'choc' ? (i % 2 ? '#5a2a14' : '#c89070') : (i % 2 ? '#c8884a' : '#ffd08a'));
+    K.noise(0.12, 0.12, p.sp === 'choc' ? 600 : 1200); K.tone(p.sp === 'choc' ? 220 : 160, 0.1, { type: 'square', vol: 0.05 });
+    if (p.sp === 'choc') chocHit = true;
+    if (p.hp <= 0) { p.dying = 0.0001; score += 60; if (p.sp === 'crate') addFloat('+60', cx(c), cy(r), '#ffd08a', cs * 0.32); }
   }
   function rainbowZap(r, c, target) {
     flash = 0.25; hitStop(0.18, 1); K.tone(400, 0.5, { type: 'sawtooth', vol: 0.05, to: 1600 });
@@ -863,17 +950,19 @@ const Kit = {
   function afterClear() {
     phase = 'clear'; phaseT = 0;
     K.tone(K.PENT[Math.min(11, 2 + cascade)], 0.15, { type: 'triangle', vol: 0.1 }); K.noise(0.12, 0.08, 3000);
+    if (D.timed && cascade >= 3) { timeLeft += 2; addFloat('+2s ⏱', W / 2, oy - cs * 0.2, '#7ad4ff', cs * 0.45); }
     if (cascade >= 2) { announce(praise(cascade)); if (cascade >= 3) hitStop(0.06 + cascade * 0.02, 0.4 + cascade * 0.15); if (bg) bg.pulse(null, null, 0.8 + cascade * 0.3, glowCol); }
     K.buzz(cascade > 1 ? [12, 20, 12] : 10);
     syncHud();
   }
   let phaseT = 0;
+  const bombCount = () => { let n = 0; grid.forEach(row => row.forEach(p => { if (p && p.bomb && !p.dying) n++; })); return n; };
   function gravity() {
     for (let c = 0; c < N; c++) {
       let write = N - 1;
       for (let r = N - 1; r >= 0; r--) { const p = grid[r][c]; if (p) { if (write !== r) { grid[write][c] = p; grid[r][c] = null; } write--; } }
       let spawnY = -1;
-      for (let r = write; r >= 0; r--) { const p = mk(Math.floor(rnd() * D.k), r); p.y = spawnY--; grid[r][c] = p; }
+      for (let r = write; r >= 0; r--) { const p = mk(Math.floor(rnd() * D.k), r); p.y = spawnY--; if (D.bombs && rnd() < 0.025 && bombCount() < D.bombs) p.bomb = D.bombMoves; grid[r][c] = p; }
     }
     phase = 'fall';
   }
@@ -882,6 +971,8 @@ const Kit = {
   function trySwap(a, b) {
     if (phase !== 'idle' || won || lost || paused || movesLeft <= 0) return;
     const pa = grid[a[0]][a[1]], pb = grid[b[0]][b[1]]; if (!pa || !pb) return;
+    if (stuck(pa) || stuck(pb)) { const q = stuck(pa) ? a : b, sp = grid[q[0]][q[1]]; addFloat(sp.ice ? 'Frozen! Match it to break the ice' : sp.sp === 'choc' ? 'Chocolate! Match next to it' : 'Crate! Match next to it', cx(q[1]), cy(q[0]) - cs * 0.5, '#ffffff', cs * 0.3); shake = 0.3; K.tone(140, 0.12, { type: 'square', vol: 0.05 }); K.buzz(25); return; }
+    if (D.timed && timeLeft <= 0) return;
     hint = null; idleT = 0;
     swap = { a, b, t: 0, back: false };
     swapCells(a[0], a[1], b[0], b[1]);
@@ -890,7 +981,7 @@ const Kit = {
   function finishSwap() {
     const { a, b } = swap, pa = grid[b[0]][b[1]], pb = grid[a[0]][a[1]]; // pa moved to b, pb moved to a
     if (swap.back) { swap = null; phase = 'idle'; return; }
-    cascade = 0;
+    cascade = 0; moveDone = true; chocHit = false;
     // special combos
     if (pa.sp && pb.sp || pa.sp === 'b' || pb.sp === 'b') {
       movesLeft--; swap = null; comboSwap(pa, b, pb, a); return;
@@ -926,16 +1017,26 @@ const Kit = {
     const g = D.g;
     if (g.type === 'score') return score >= g.target;
     if (g.type === 'jelly') return jelly.every(row => row.every(v => v === 0));
+    if (g.type === 'crates') return cratesLeft() === 0;
     return g.items.every(it => collected[it.c] >= it.n);
   }
+  function cratesLeft() { let n = 0; grid.forEach(row => row.forEach(p => { if (p && p.sp === 'crate' && !p.dying) n++; })); return n; }
   function jellyLeft() { let n = 0; jelly.forEach(row => row.forEach(v => n += v)); return n; }
   function settle() {
     cascade = 0;
-    if (!won && goalDone()) { won = true; bonusLeft = movesLeft; fwT = 3.2; if (bonusLeft) { announce('BONUS BLAST!'); K.tone(784, 0.3, { type: 'triangle', vol: 0.1 }); } }
+    if (!won && moveDone && !goalDone()) { // once per move: bombs tick down, chocolate spreads if none was hit
+      moveDone = false;
+      let boom = null; grid.forEach((row, r) => row.forEach((p, c) => { if (p && p.bomb && !p.dying) { p.bomb--; p.born = 0.2; if (p.bomb <= 0 && !boom) boom = [r, c]; } }));
+      if (boom) { boomLost = true; lost = true; phase = 'done'; const [r, c] = boom; flash = 0.6; shake = 1.4; hitStop(0.3, 1.5); for (let i = 0; i < 60; i++) burst(cx(c), cy(r), ['#ff3a00', '#ffb020', '#333333'][i % 3]); K.noise(0.9, 0.5, 200); K.tone(60, 0.8, { type: 'sawtooth', vol: 0.15, to: 30 }); K.buzz([80, 40, 120]); announce('KABOOM!'); setTimeout(showFail, 1100); return; }
+      if (D.choc && !chocHit) { const ch = []; grid.forEach((row, r) => row.forEach((p, c) => { if (p && p.sp === 'choc' && !p.dying) for (const [dr, dc] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) { const q = inB(r + dr, c + dc) && grid[r + dr][c + dc]; if (q && !q.sp && !q.ice && !q.bomb && !q.dying) ch.push(q); } }));
+        if (ch.length && Math.random() < 0.75) { const q = ch[Math.floor(Math.random() * ch.length)]; q.sp = 'choc'; q.c = -5; q.hp = 1; q.born = 0.4; K.tone(110, 0.25, { type: 'sine', vol: 0.06, to: 70 }); } }
+    }
+    moveDone = false;
+    if (!won && goalDone()) { won = true; bonusLeft = D.timed ? Math.min(12, Math.floor(timeLeft / 5)) : movesLeft; fwT = 3.2; if (bonusLeft) { announce('BONUS BLAST!'); K.tone(784, 0.3, { type: 'triangle', vol: 0.1 }); } }
     if (won) {
       if (bonusLeft > 0) {
-        const batch = Math.min(bonusLeft, 5); bonusLeft -= batch; movesLeft = Math.max(0, movesLeft - batch);
-        const cand = []; grid.forEach((row, r) => row.forEach((p, c) => { if (p && !p.sp) cand.push([r, c]); }));
+        const batch = Math.min(bonusLeft, 5); bonusLeft -= batch; if (D.timed) timeLeft = Math.max(0, timeLeft - batch * 5); else movesLeft = Math.max(0, movesLeft - batch);
+        const cand = []; grid.forEach((row, r) => row.forEach((p, c) => { if (p && !p.sp && !p.ice) cand.push([r, c]); }));
         const set = new Set();
         for (let i = 0; i < batch && cand.length; i++) { const [r, c] = cand.splice(Math.floor(Math.random() * cand.length), 1)[0]; grid[r][c].sp = Math.random() < 0.5 ? 'h' : 'v'; set.add(r * N + c); }
         cascade = 1; clearSet(set); afterClear(); syncHud(); return;
@@ -947,10 +1048,11 @@ const Kit = {
       if (bg) { bg.pulse(null, null, 2.5, '#ffffff'); for (let i = 0; i < 30; i++) setTimeout(() => bg.burst(Math.random() * innerWidth, Math.random() * innerHeight * 0.7, COL[i % 6].c, 10), i * 35); }
       return;
     }
-    if (movesLeft <= 0) { lost = true; phase = 'done'; setTimeout(showFail, 400); return; }
+    if ((!D.timed && movesLeft <= 0) || (D.timed && timeLeft <= 0)) { lost = true; phase = 'done'; setTimeout(showFail, 400); return; }
     if (!findMove()) { addFloat('No moves — shuffling!', W / 2, oy + cs * N / 2, '#ffffff', cs * 0.45); shuffle(true); return; }
     phase = 'idle'; syncHud();
   }
+  function chocLeft() { let n = 0; grid.forEach(row => row.forEach(p => { if (p && p.sp === 'choc' && !p.dying) n++; })); return n; }
   function shuffle(free) {
     const pieces = []; grid.forEach(row => row.forEach(p => { if (p && !p.sp) pieces.push(p.c); }));
     for (let tries = 0; tries < 60; tries++) {
@@ -968,16 +1070,20 @@ const Kit = {
     box.innerHTML = ''; const g = D.g, chips = [];
     if (g.type === 'score') { const d = document.createElement('div'); d.className = 'goal'; d.innerHTML = `<div><div class="gl">SCORE</div><div class="bar"><i></i></div><div class="gl st">0 / ${g.target}</div></div>`; box.appendChild(d); chips.push({ kind: 'score', el: d }); }
     else if (g.type === 'jelly') { const d = document.createElement('div'); d.className = 'goal'; const cv = Kit.chip((x, r) => frostTile(x, -r, -r, r * 2, 2)); d.appendChild(cv); const s = document.createElement('span'); d.appendChild(s); box.appendChild(d); chips.push({ kind: 'jelly', el: d, s }); }
+    else if (g.type === 'crates') { const d = document.createElement('div'); d.className = 'goal'; const cv = Kit.chip((x, r) => drawBlock(x, 0, 0, r * 2.1, { sp: 'crate', hp: 1 }, 1)); d.appendChild(cv); const s2 = document.createElement('span'); d.appendChild(s2); box.appendChild(d); chips.push({ kind: 'crates', el: d, s: s2 }); }
     else g.items.forEach(it => { const d = document.createElement('div'); d.className = 'goal'; d.appendChild(candyChip(it.c)); const s = document.createElement('span'); d.appendChild(s); box.appendChild(d); chips.push({ kind: 'item', it, el: d, s }); });
     if (!big) { goalChips.length = 0; goalChips.push(...chips); }
     return chips;
   }
   function syncHud() {
     $('lvlTitle').textContent = 'LEVEL ' + S.level; $('playSub').textContent = 'Level ' + S.level; $('coinTxt').textContent = S.coins;
-    $('movesTxt').textContent = movesLeft; $('movesBox').classList.toggle('low', movesLeft <= 5 && !won);
+    if (D && D.timed) { const t = Math.max(0, Math.ceil(timeLeft)); $('movesTxt').textContent = Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); $('movesBox').classList.toggle('low', t <= 10 && !won); }
+    else { $('movesTxt').textContent = movesLeft; $('movesBox').classList.toggle('low', movesLeft <= 5 && !won); }
+    { const ml = document.querySelector('#movesBox .ml, #movesBox small, #movesBox .l'); if (ml && D) ml.textContent = D.timed ? 'TIME' : 'MOVES'; }
     goalChips.forEach(ch => {
       if (ch.kind === 'score') { ch.el.querySelector('i').style.width = Math.min(100, score / D.g.target * 100) + '%'; ch.el.querySelector('.st').textContent = `${score} / ${D.g.target}`; ch.el.classList.toggle('done', score >= D.g.target); }
       else if (ch.kind === 'jelly') { const n = jellyLeft(); ch.s.textContent = n ? n : '✓'; ch.el.classList.toggle('done', !n); }
+      else if (ch.kind === 'crates') { const n = cratesLeft(); ch.s.textContent = n ? n : '✓'; ch.el.classList.toggle('done', !n); }
       else { const left = Math.max(0, ch.it.n - collected[ch.it.c]); ch.s.textContent = left ? left : '✓'; ch.el.classList.toggle('done', !left); }
     });
     K.badge('tool1B', S.hammer, 50); K.badge('tool2B', S.shuffle, 30);
@@ -991,6 +1097,7 @@ const Kit = {
     S.stars[S.level] = Math.max(S.stars[S.level] || 0, stars);
     $('winTitle').textContent = `Level ${S.level} complete!`; $('winScore').textContent = `Score ${score}`;
     if (S.level < 1000) S.level++; else K.toast('🏆 All 1000 levels done!');
+    if ((S.level - 1) % LOCK_EVERY === 0 && S.level > 1) { S.lockUntil = Date.now() + LOCK_MS; S.lockLvl = S.level; }
     S.coins += coins; K.persist(); lastReward = coins; doubled = false;
     if (K.HAS_W) { Wallet.event('ss_level'); Wallet.addXp(15 + stars * 10); Wallet.setGameLevel('ss', S.level); if (stars === 3) Wallet.event('stars3'); }
     $('winCoins').textContent = `+${coins} 🪙`; $('doubleBtn').style.display = 'block';
@@ -1003,18 +1110,23 @@ const Kit = {
     const g = D.g; let left = '';
     if (g.type === 'score') left = `${g.target - score} points to go`;
     else if (g.type === 'jelly') left = `${jellyLeft()} silver foil tiles left`;
+    else if (g.type === 'crates') left = `${cratesLeft()} crates left`;
     else left = g.items.map(it => Math.max(0, it.n - collected[it.c])).reduce((a, b) => a + b, 0) + ' sweets to go';
-    $('failTxt').textContent = `So close — ${left}!`; $('failOv').classList.add('show');
+    $('failTxt').textContent = boomLost ? 'KABOOM! A countdown sweet blew up. Match them before they hit 0!' : D.timed ? `Time's up — ${left}!` : `So close — ${left}!`;
+    $('moreCoins').innerHTML = (D.timed ? '+15 seconds' : boomLost ? 'Defuse & +5 moves' : '+5 moves') + '<span class="sub">60 🪙</span>';
+    $('failOv').classList.add('show'); heartPending = true;
   }
-  function moreMoves() { $('failOv').classList.remove('show'); movesLeft += 5; lost = false; phase = 'idle'; syncHud(); K.tone(880, 0.2, { type: 'triangle', vol: 0.1 }); }
+  function moreMoves() { $('failOv').classList.remove('show'); heartPending = false; if (D.timed) timeLeft += 15; else movesLeft += 5; if (boomLost) { grid.forEach(row => row.forEach(p => { if (p && p.bomb) p.bomb += 5; })); boomLost = false; } lost = false; phase = 'idle'; syncHud(); K.tone(880, 0.2, { type: 'triangle', vol: 0.1 }); }
 
   // ================= Effects =================
   function burst(x, y, col) { const a = Math.random() * 6.28, sp = cs * (2 + Math.random() * 5); parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - cs * 2, age: 0, life: 0.45 + Math.random() * 0.4, r: cs * (0.04 + Math.random() * 0.07), col }); }
   const pick = a => a[Math.floor(Math.random() * a.length)];
   function addFloat(text, x, y, color, size) { floats.push({ text, x, y, color, size, age: 0, life: 1.1 }); }
   function announce(text) {
-    if (/Comboo|Eppadi|Superruuuu|LEGEND|Thalaiva|Kadavul|Wah lau|Ultimate|vera level|saamy|Boss|Aiyoo/.test(text)) { for (let i = 0; i < 60; i++) parts.push({ x: Math.random() * W, y: -Math.random() * H * 0.3, vx: (Math.random() - 0.5) * cs, vy: cs * (3 + Math.random() * 4), age: 0, life: 1.6 + Math.random(), r: cs * (0.06 + Math.random() * 0.08), col: ['#ff5ca8', '#ffd60a', '#5ce1ff', '#b86bff', '#7dff9a'][i % 5], g: 0 }); flash = Math.max(flash, 0.18); }
-    floats.push({ text, x: W / 2, y: oy + cs * N * 0.42, size: cs * 0.95, age: 0, life: 1.4, big: true, rot: (Math.random() - 0.5) * 0.16 });
+    if (wTier(text) >= 4 || /Comboo|Eppadi|Superruuuu|LEGEND|Thalaiva|Kadavul|Wah lau|Ultimate|vera level|saamy|Boss|Aiyoo/.test(text)) { for (let i = 0; i < 60; i++) parts.push({ x: Math.random() * W, y: -Math.random() * H * 0.3, vx: (Math.random() - 0.5) * cs, vy: cs * (3 + Math.random() * 4), age: 0, life: 1.6 + Math.random(), r: cs * (0.06 + Math.random() * 0.08), col: ['#ff5ca8', '#ffd60a', '#5ce1ff', '#b86bff', '#7dff9a'][i % 5], g: 0 }); flash = Math.max(flash, 0.18); }
+    const sty = wStyle(text), tier = Math.max(2, wTier(text)), size = cs * (0.78 + (tier - 2) * 0.13) * (text.length > 14 ? 0.92 : 1);
+    floats.push({ text, x: W / 2, y: oy + cs * N * 0.42, size, age: 0, life: 1.25 + tier * 0.08, big: true, rot: (Math.random() - 0.5) * 0.16, sty, tier });
+    if (sty.fire || tier >= 5) for (let i = 0; i < 36; i++) parts.push({ x: W / 2 + (Math.random() - 0.5) * W * 0.7, y: oy + cs * N * 0.42 + cs * 0.4, vx: (Math.random() - 0.5) * cs, vy: -cs * (3 + Math.random() * 4), age: 0, life: 0.7 + Math.random() * 0.5, r: cs * (0.06 + Math.random() * 0.08), col: ['#ffe600', '#ff8a00', '#ff2a00'][i % 3] });
     for (let i = 0; i < 26; i++) { const a = i / 26 * 6.28, v = cs * (4 + Math.random() * 4); stars.push({ x: W / 2, y: oy + cs * N * 0.42, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 0.7 + Math.random() * 0.4, r: cs * (0.1 + Math.random() * 0.1), col: COL[i % 6].l, spin: Math.random() * 6 }); }
   }
   function firework() {
@@ -1279,6 +1391,29 @@ const Kit = {
     const sh = (performance.now() / 1400 + (x + y) / 300) % 1.6 - 0.3; c2.fillStyle = 'rgba(255,255,255,.55)'; c2.beginPath(); c2.moveTo(x + w * sh, y); c2.lineTo(x + w * (sh + 0.2), y); c2.lineTo(x + w * (sh - 0.2), y + w); c2.lineTo(x + w * (sh - 0.4), y + w); c2.closePath(); c2.fill();
     c2.restore(); c2.restore();
   }
+  function drawBlock(c2, x, y, s, p, alpha) { // wooden crate (2 hits = iron bands) or a chocolate square
+    const r = s * 0.44; c2.save(); c2.globalAlpha = alpha; c2.translate(x, y);
+    if (p.sp === 'crate') { const g = c2.createLinearGradient(0, -r, 0, r); g.addColorStop(0, '#e8b070'); g.addColorStop(1, '#a8682a'); c2.fillStyle = g; Kit.rr(c2, -r, -r, r * 2, r * 2, r * 0.16); c2.fill();
+      c2.strokeStyle = '#6a3a12'; c2.lineWidth = r * 0.14; Kit.rr(c2, -r * 0.88, -r * 0.88, r * 1.76, r * 1.76, r * 0.1); c2.stroke(); c2.beginPath(); c2.moveTo(-r * 0.8, -r * 0.8); c2.lineTo(r * 0.8, r * 0.8); c2.moveTo(r * 0.8, -r * 0.8); c2.lineTo(-r * 0.8, r * 0.8); c2.stroke();
+      c2.strokeStyle = 'rgba(255,230,180,.6)'; c2.lineWidth = r * 0.05; c2.beginPath(); c2.moveTo(-r * 0.85, -r * 0.92); c2.lineTo(r * 0.85, -r * 0.92); c2.stroke();
+      if (p.hp > 1) { c2.fillStyle = '#8a929e'; c2.fillRect(-r, -r * 0.18, r * 2, r * 0.36); c2.fillStyle = '#cfd6e0'; c2.fillRect(-r, -r * 0.18, r * 2, r * 0.1); for (const sx of [-0.7, 0, 0.7]) { c2.fillStyle = '#5a626e'; c2.beginPath(); c2.arc(r * sx, 0, r * 0.07, 0, 7); c2.fill(); } } }
+    else { const g = c2.createLinearGradient(-r, -r, r, r); g.addColorStop(0, '#8a4a28'); g.addColorStop(1, '#3a1a08'); c2.fillStyle = g; Kit.rr(c2, -r, -r, r * 2, r * 2, r * 0.22); c2.fill();
+      c2.strokeStyle = 'rgba(30,10,0,.6)'; c2.lineWidth = r * 0.07; c2.beginPath(); c2.moveTo(0, -r); c2.lineTo(0, r); c2.moveTo(-r, 0); c2.lineTo(r, 0); c2.stroke();
+      c2.fillStyle = 'rgba(255,220,180,.35)'; for (const [a, b] of [[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.5], [0.5, 0.5]]) { c2.beginPath(); c2.ellipse(r * a - r * 0.1, r * b - r * 0.15, r * 0.22, r * 0.08, -0.5, 0, 7); c2.fill(); } }
+    c2.restore();
+  }
+  const GLOW = {};
+  function glowSprite(col) { if (GLOW[col]) return GLOW[col]; const cv = document.createElement('canvas'); cv.width = cv.height = 64; const x = cv.getContext('2d'), g = x.createRadialGradient(32, 32, 6, 32, 32, 32); g.addColorStop(0, col); g.addColorStop(0.45, col + '99'); g.addColorStop(1, col + '00'); x.fillStyle = g; x.fillRect(0, 0, 64, 64); return GLOW[col] = cv; }
+  function drawOverlays(c2, p, x, y, s, now) { // ice lock and countdown number drawn over a sweet
+    if (p.ice > 0) { const r = s * 0.46; c2.save(); c2.translate(x, y); const g = c2.createLinearGradient(-r, -r, r, r); g.addColorStop(0, 'rgba(230,250,255,.85)'); g.addColorStop(0.5, 'rgba(150,215,255,.55)'); g.addColorStop(1, 'rgba(200,240,255,.8)');
+      c2.fillStyle = g; Kit.rr(c2, -r, -r, r * 2, r * 2, r * 0.25); c2.fill(); c2.strokeStyle = 'rgba(255,255,255,.95)'; c2.lineWidth = Math.max(1.5, r * 0.08); c2.stroke();
+      c2.strokeStyle = 'rgba(255,255,255,.7)'; c2.lineWidth = Math.max(1, r * 0.04); c2.beginPath(); c2.moveTo(-r * 0.6, -r * 0.2); c2.lineTo(-r * 0.1, r * 0.3); c2.lineTo(r * 0.4, -r * 0.5); if (p.ice > 1) { c2.moveTo(r * 0.5, r * 0.6); c2.lineTo(0, r * 0.1); } c2.stroke();
+      c2.fillStyle = 'rgba(255,255,255,.8)'; c2.beginPath(); c2.ellipse(-r * 0.45, -r * 0.6, r * 0.3, r * 0.1, -0.4, 0, 7); c2.fill(); if (p.ice > 1) { c2.font = `900 ${r * 0.55}px system-ui`; c2.textAlign = 'right'; c2.textBaseline = 'bottom'; c2.fillStyle = '#2a7ae8'; c2.fillText('×2', r * 0.95, r * 0.98); } c2.restore(); }
+    if (p.bomb) { const r = s * 0.24, hot = p.bomb <= 3; c2.save(); c2.translate(x + s * 0.24, y - s * 0.24); const pul = hot ? 1 + 0.15 * Math.sin(now / 90) : 1; c2.scale(pul, pul);
+      c2.shadowColor = hot ? '#ff2a00' : '#000'; c2.shadowBlur = hot ? r * 1.2 : r * 0.3; c2.fillStyle = hot ? '#e8102a' : '#2a1a3a'; c2.beginPath(); c2.arc(0, 0, r, 0, 7); c2.fill(); c2.shadowBlur = 0;
+      c2.strokeStyle = '#ffd23f'; c2.lineWidth = r * 0.16; c2.stroke(); c2.fillStyle = '#fff'; c2.font = `900 ${r * 1.15}px system-ui`; c2.textAlign = 'center'; c2.textBaseline = 'middle'; c2.fillText(p.bomb, 0, r * 0.06);
+      c2.fillStyle = '#ffb020'; c2.beginPath(); c2.arc(r * 0.7, -r * 0.85, r * (0.22 + 0.1 * Math.sin(now / 60)), 0, 7); c2.fill(); c2.restore(); }
+  }
   function drawCandyAt(c2, x, y, s, ci, sp, scale, alpha) {
     const r = s * 0.45 * scale; if (r <= 0.5) return;
     c2.save(); c2.globalAlpha = alpha; c2.translate(x, y);
@@ -1314,10 +1449,10 @@ const Kit = {
     ctx.fillStyle = fr; Kit.rr(ctx, ox - 14, oy - 14, cs * N + 28, cs * N + 28, cs * 0.5); ctx.fill(); ctx.restore();
     ctx.save(); ctx.strokeStyle = '#d6246e'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.setLineDash([0.1, cs * 0.28]); ctx.lineDashOffset = -now / 40; Kit.rr(ctx, ox - 8, oy - 8, cs * N + 16, cs * N + 16, cs * 0.4); ctx.stroke(); ctx.restore();
     if (glowT > 0) { ctx.save(); ctx.globalAlpha = glowT; ctx.shadowColor = glowCol; ctx.shadowBlur = cs * 1.2; ctx.strokeStyle = glowCol; ctx.lineWidth = 6; Kit.rr(ctx, ox - 10, oy - 10, cs * N + 20, cs * N + 20, cs * 0.45); ctx.stroke(); ctx.restore(); }
-    ctx.fillStyle = '#fff6e6'; Kit.rr(ctx, ox - 3, oy - 3, cs * N + 6, cs * N + 6, cs * 0.3); ctx.fill();
+    { const bgr = ctx.createLinearGradient(0, oy, 0, oy + cs * N); bgr.addColorStop(0, '#3a1458'); bgr.addColorStop(1, '#22083a'); ctx.fillStyle = bgr; Kit.rr(ctx, ox - 3, oy - 3, cs * N + 6, cs * N + 6, cs * 0.3); ctx.fill(); }
     ctx.fillStyle = 'rgba(255,255,255,0.35)'; Kit.rr(ctx, ox - 6, oy - 11, cs * N * 0.6, 4, 2); ctx.fill();
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
-      ctx.fillStyle = (r + c) % 2 ? 'rgba(255,190,120,0.3)' : 'rgba(255,222,170,0.32)'; Kit.rr(ctx, ox + c * cs + 1.5, oy + r * cs + 1.5, cs - 3, cs - 3, cs * 0.18); ctx.fill();
+      ctx.fillStyle = (r + c) % 2 ? 'rgba(255,140,220,0.13)' : 'rgba(150,120,255,0.16)'; Kit.rr(ctx, ox + c * cs + 1.5, oy + r * cs + 1.5, cs - 3, cs - 3, cs * 0.18); ctx.fill();
       if (jelly[r][c] > 0) frostTile(ctx, ox + c * cs + 2, oy + r * cs + 2, cs - 4, jelly[r][c]);
     }
     ctx.save(); ctx.beginPath(); ctx.rect(ox - 6, oy - 4, cs * N + 12, cs * N + 10); ctx.clip();
@@ -1335,7 +1470,11 @@ const Kit = {
       if (!p.dying) { sc *= 1 + 0.025 * Math.sin(now / 520 + p.id * 1.7); ctx.fillStyle = 'rgba(140,70,10,0.18)'; ctx.beginPath(); ctx.ellipse(x + cs * 0.03, y + cs * 0.32, cs * 0.3 * sc, cs * 0.07, 0, 0, 7); ctx.fill(); }
       if (hint && hint.some(([hr, hc]) => hr === r && hc === c)) sc *= 1 + 0.08 * Math.sin(now / 90);
       if (sel && sel[0] === r && sel[1] === c) { sc *= 1.12 + 0.05 * Math.sin(now / 90); ctx.save(); ctx.globalAlpha = 0.55; ctx.shadowColor = COL[p.c].c; ctx.shadowBlur = cs * 0.5; ctx.fillStyle = COL[p.c].l; Kit.rr(ctx, ox + c * cs + 2, oy + r * cs + 2, cs - 4, cs - 4, cs * 0.25); ctx.fill(); ctx.restore(); }
+      if (isBlk(p)) { drawBlock(ctx, x, y, cs * sc, p, al); continue; }
+      if (!p.dying && !p.sp) { const gs = glowSprite(COL[p.c].c), pulse = 0.38 + 0.18 * Math.sin(now / 600 + p.id), gw = cs * 1.25 * sc; ctx.save(); ctx.globalAlpha = pulse * al; ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(gs, x - gw / 2, y - gw / 2, gw, gw); ctx.restore(); }
       drawCandyAt(ctx, x, y, cs, p.c, p.sp, sc, al);
+      { const sh = ((now / 2600 + (c + r) * 0.06) % 1.6) - 0.3; if (!p.dying && sh > 0 && sh < 1) { ctx.save(); ctx.beginPath(); ctx.arc(x, y, cs * 0.42 * sc, 0, 7); ctx.clip(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = 'rgba(255,255,255,.28)'; const L = cs; ctx.translate(x - L / 2 + sh * L, y); ctx.rotate(0.5); ctx.fillRect(-cs * 0.07, -L, cs * 0.14, L * 2); ctx.restore(); } }
+      drawOverlays(ctx, p, x, y, cs * sc, now);
       const gl = (now / 1000 + p.id * 0.37) % 4.5; if (!p.dying && gl < 0.4) { ctx.save(); ctx.globalAlpha = Math.sin(gl / 0.4 * Math.PI); ctx.fillStyle = '#ffffff'; ctx.translate(x - cs * 0.15, y - cs * 0.18); ctx.rotate(gl * 3); star4(ctx, 0, 0, cs * 0.16); ctx.restore(); }
     }
     ctx.restore();
@@ -1355,12 +1494,29 @@ const Kit = {
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (const q of fws) { const a = Math.max(0, 1 - q.age / q.life); ctx.strokeStyle = q.col; ctx.globalAlpha = a; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(q.px, q.py); ctx.lineTo(q.x, q.y); ctx.stroke(); } ctx.restore();
     ctx.globalAlpha = 1; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     for (const f of floats) { ctx.save(); ctx.globalAlpha = Math.max(0, 1 - Math.max(0, f.age - (f.big ? 0.9 : 0.55)) / 0.5);
-      if (f.big) { const t = Math.min(1, f.age / 0.45), el = t >= 1 ? 1 : 1 - Math.pow(2, -9 * t) * Math.cos(t * 14); ctx.translate(f.x, f.y - Math.max(0, f.age - 0.9) * cs); ctx.rotate(f.rot); ctx.scale(el, el);
-        ctx.font = `900 ${f.size}px system-ui,sans-serif`; const w = ctx.measureText(f.text).width; if (w > W * 0.86) { const k = W * 0.86 / w; ctx.scale(k, k); }
-        { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.rotate(f.age * 0.8); const rr = Math.max(w, f.size * 3) * 0.75; for (let i = 0; i < 14; i++) { ctx.rotate(Math.PI / 7); const gr = ctx.createLinearGradient(0, 0, rr, 0); gr.addColorStop(0, 'rgba(255,230,120,.35)'); gr.addColorStop(1, 'rgba(255,120,200,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(rr, -rr * 0.09); ctx.lineTo(rr, rr * 0.09); ctx.fill(); } ctx.restore(); }
-        ctx.shadowColor = 'rgba(255,90,200,.8)'; ctx.shadowBlur = f.size * 0.5; const gg = ctx.createLinearGradient(-w / 2, 0, w / 2, 0); ['#ff5ca8', '#ffd60a', '#5ce1ff', '#b86bff'].forEach((c, i) => gg.addColorStop(i / 3, c));
-        ctx.lineJoin = 'round'; ctx.lineWidth = f.size * 0.32; ctx.strokeStyle = '#5a1478'; ctx.strokeText(f.text, 0, f.size * 0.06); ctx.lineWidth = f.size * 0.16; ctx.strokeStyle = '#ffffff'; ctx.strokeText(f.text, 0, 0); ctx.fillStyle = gg; ctx.fillText(f.text, 0, 0);
-        ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.fillRect(-w / 2, -f.size * 0.32, w, f.size * 0.12); ctx.restore(); continue; }
+      if (f.big) { const st = f.sty || WSTY[0], t = Math.min(1, f.age / 0.45), elastic = t >= 1 ? 1 : 1 - Math.pow(2, -9 * t) * Math.cos(t * 14);
+        let sc = elastic, rot = f.rot, jx = 0, jy = 0;
+        if (st.anim === 'zoom') { const e = 1 - Math.pow(1 - Math.min(1, f.age / 0.3), 3); sc = 2.6 - 1.6 * e; }
+        else if (st.anim === 'spin') { rot = f.rot - (1 - elastic) * 1.4; }
+        else if (st.anim === 'shake') { const k = Math.max(0, 0.6 - f.age) * f.size * 0.12; jx = (Math.random() - 0.5) * k; jy = (Math.random() - 0.5) * k; }
+        sc *= 1 + Math.sin(f.age * 9) * 0.025 * (f.tier || 2);
+        ctx.translate(f.x + jx, f.y + jy - Math.max(0, f.age - 0.9) * cs); ctx.rotate(rot); ctx.scale(sc, sc);
+        ctx.font = st.font.replace('{s}', Math.round(f.size)); const w = ctx.measureText(f.text).width; if (w > W * 0.88) { const k = W * 0.88 / w; ctx.scale(k, k); }
+        { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.rotate(f.age * 0.8); const rr = Math.max(w, f.size * 3) * 0.75; const rc = st.fill === 'rainbow' ? `hsla(${(f.age * 300) % 360},100%,70%,.35)` : st.glow.replace(/[\d.]+\)$/, '.3)'); for (let i = 0; i < 14; i++) { ctx.rotate(Math.PI / 7); const gr = ctx.createLinearGradient(0, 0, rr, 0); gr.addColorStop(0, rc); gr.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(rr, -rr * 0.09); ctx.lineTo(rr, rr * 0.09); ctx.fill(); } ctx.restore(); }
+        let gg; if (st.fill === 'rainbow') { gg = ctx.createLinearGradient(-w / 2, 0, w / 2, 0); for (let i = 0; i <= 6; i++) gg.addColorStop(i / 6, `hsl(${(i * 55 + f.age * 360) % 360},100%,62%)`); }
+        else { gg = ctx.createLinearGradient(0, -f.size * 0.5, 0, f.size * 0.5); st.fill.forEach((c, i) => gg.addColorStop(i / (st.fill.length - 1), c)); }
+        const chars = [...f.text], cw = chars.map(ch => ctx.measureText(ch).width); let xx = -w / 2;
+        ctx.lineJoin = 'round'; ctx.textAlign = 'left';
+        for (let pass = 0; pass < 3; pass++) { xx = -w / 2;
+          for (let i = 0; i < chars.length; i++) { const yy = st.anim === 'wave' ? Math.sin(f.age * 10 - i * 0.6) * f.size * 0.12 : 0;
+            if (pass === 0) { ctx.shadowColor = st.glow; ctx.shadowBlur = f.size * (st.neon ? 0.9 : 0.5); ctx.lineWidth = f.size * 0.32; ctx.strokeStyle = st.edge; ctx.strokeText(chars[i], xx, yy + f.size * 0.06); }
+            else if (pass === 1) { ctx.shadowBlur = 0; ctx.lineWidth = f.size * (st.neon ? 0.1 : 0.16); ctx.strokeStyle = st.neon ? st.fill[1] : '#ffffff'; ctx.strokeText(chars[i], xx, yy); }
+            else { ctx.fillStyle = gg; ctx.fillText(chars[i], xx, yy); }
+            xx += cw[i]; } }
+        ctx.textAlign = 'center';
+        if (st.gold || (f.tier || 0) >= 5) { const sx = ((f.age * 1.4) % 1.4 - 0.2) * w; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.translate(-w / 2 + sx, 0); ctx.rotate(0.35); ctx.fillRect(-f.size * 0.12, -f.size, f.size * 0.24, f.size * 2); ctx.restore(); }
+        else { ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fillRect(-w / 2, -f.size * 0.32, w, f.size * 0.1); }
+        ctx.restore(); continue; }
       ctx.translate(f.x, f.y - f.age * cs * 0.6); const sc = 0.5 + Math.min(1, f.age / 0.12) * 0.5; ctx.scale(sc, sc);
       ctx.font = `900 ${f.size}px system-ui,sans-serif`; ctx.lineWidth = f.size * 0.18; ctx.strokeStyle = 'rgba(90,20,120,0.85)'; ctx.strokeText(f.text, 0, 0); ctx.fillStyle = f.color; ctx.fillText(f.text, 0, 0); ctx.restore(); }
     ctx.restore();
@@ -1387,6 +1543,9 @@ const Kit = {
       if (p.y < r) { p.vy += 55 * dt; p.y = Math.min(r, p.y + p.vy * dt); moving = true; if (p.y >= r) { p.vy = 0; p.land = 1; } }
       else { p.y = r; p.vy = 0; }
     }
+    if (D && D.timed && !paused && !won && !lost && phase !== 'done' && grid) { const before = Math.ceil(timeLeft); timeLeft = Math.max(0, timeLeft - dt); const now2 = Math.ceil(timeLeft);
+      if (now2 !== before) { syncHud(); if (now2 <= 5 && now2 > 0) { K.tone(now2 <= 3 ? 1200 : 900, 0.07, { type: 'square', vol: 0.06 }); punch = Math.max(punch, 0.3); } }
+      if (timeLeft <= 0 && phase === 'idle') settle(); }
     if (swap) { swap.t += dt; if (swap.t >= 0.16) finishSwap(); }
     if (phase === 'clear') { phaseT += dt; if (phaseT >= 0.24) { grid.forEach((row, r) => row.forEach((p, c) => { if (p && p.dying) grid[r][c] = null; })); gravity(); } }
     else if (phase === 'fall' && !moving) { if (!resolveMatches()) settle(); }
@@ -1487,7 +1646,41 @@ const Kit = {
     ov.addEventListener('pointerdown', e => e.stopPropagation());
   }
 
+  // ================= Hearts (lives) and the sweet-shop restock wait — Candy-Crush style =================
+  const MAXH = 5, REFILL = 20 * 60 * 1000, LOCK_EVERY = 10, LOCK_MS = 15 * 60 * 1000;
+  let heartPending = false;
+  if (S.hearts == null) S.hearts = MAXH;
+  function heartsNow() { const now = Date.now(); if (S.hearts >= MAXH) { S.heartT = 0; return S.hearts; } if (!S.heartT) S.heartT = now + REFILL;
+    while (S.hearts < MAXH && now >= S.heartT) { S.hearts++; S.heartT += REFILL; } if (S.hearts >= MAXH) S.heartT = 0; return S.hearts; }
+  function loseHeart() { heartsNow(); if (S.hearts > 0) { S.hearts--; if (!S.heartT) S.heartT = Date.now() + REFILL; } K.persist(); paintHearts(); }
+  const mmss = ms => { const t = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+  const heartEl = document.createElement('div'); heartEl.id = 'heartBar';
+  heartEl.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:8px;margin:2px auto 12px;padding:8px 16px;border-radius:18px;background:rgba(255,255,255,.92);box-shadow:0 4px 0 rgba(160,30,90,.25);font:900 16px system-ui;color:#c0186a;width:fit-content';
+  function paintHearts() { const h = heartsNow(); heartEl.innerHTML = `<span style="font-size:20px;letter-spacing:1px">${'❤️'.repeat(h)}${'🤍'.repeat(MAXH - h)}</span>` + (h < MAXH ? `<span style="font:800 13px system-ui;color:#8a5a9a">+1 in ${mmss(S.heartT - Date.now())}</span>` : '<span style="font:800 13px system-ui;color:#1a9a4a">FULL</span>'); }
+  setInterval(() => { if (document.getElementById('heartBar')) paintHearts(); const w = document.getElementById('waitOv'); if (w && w._tick) w._tick(); }, 1000);
+  function waitScreen(kind) { // kind: 'hearts' (no lives left) or 'lock' (shop restocking every 10 levels)
+    let ov = document.getElementById('waitOv'); if (ov) ov.remove(); ov = document.createElement('div'); ov.id = 'waitOv';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:70;background:rgba(40,10,50,.72);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(5px)';
+    const lock = kind === 'lock', cost = lock ? 80 : 120;
+    ov.innerHTML = `<div style="background:linear-gradient(#fff8ec,#ffe6f2);border-radius:26px;max-width:380px;width:100%;padding:22px 18px 16px;text-align:center;font-family:system-ui;box-shadow:0 12px 40px rgba(0,0,0,.4)">
+      <div style="font-size:64px;line-height:1">${lock ? '🏪' : '💔'}</div>
+      <div style="font:900 24px system-ui;color:#5a1478;margin:6px 0 4px">${lock ? 'Sweet shop is restocking!' : 'Out of hearts!'}</div>
+      <div style="font:600 14px system-ui;color:#8a5a9a;margin-bottom:12px">${lock ? 'The halwai is making fresh sweets for level ' + S.level + '. Come back soon!' : 'Hearts refill by themselves — 1 every 20 minutes.'}</div>
+      <div id="waitClock" style="font:900 44px system-ui;color:#e2246e;margin:4px 0 14px;text-shadow:0 3px 0 #ffd0e6"></div>
+      <button id="waitAd" style="display:block;width:100%;border:0;border-radius:16px;padding:13px;margin-bottom:8px;font:900 16px system-ui;color:#fff;background:linear-gradient(#5ab8ff,#2a7ae8);box-shadow:0 4px 0 #164a9a">▶ ${lock ? 'Open now' : '+1 ❤️'} <span style="font:700 11px system-ui;opacity:.85">· real app plays an ad · free in prototype</span></button>
+      <button id="waitCoins" style="display:block;width:100%;border:0;border-radius:16px;padding:13px;margin-bottom:8px;font:900 16px system-ui;color:#5a2a00;background:linear-gradient(#ffe36b,#ffb21a);box-shadow:0 4px 0 #b86b00">${lock ? 'Skip the wait' : 'Refill all ❤️'} · ${cost} 🪙</button>
+      <button id="waitClose" style="border:0;background:none;font:800 14px system-ui;color:#8a5a9a;padding:8px">Later</button></div>`;
+    document.body.appendChild(ov); ov.addEventListener('pointerdown', e => e.stopPropagation());
+    const done = () => { ov.remove(); paintHearts(); startLevel(); };
+    ov._tick = () => { const left = lock ? S.lockUntil - Date.now() : (heartsNow() > 0 ? 0 : S.heartT - Date.now()); $('waitClock') && ($('waitClock').textContent = mmss(left)); if (left <= 0) done(); };
+    ov._tick();
+    ov.querySelector('#waitAd').onclick = () => { if (lock) S.lockUntil = 0; else { heartsNow(); S.hearts = Math.min(MAXH, S.hearts + 1); } K.persist(); K.tone(1046, 0.2, { type: 'triangle', vol: 0.1 }); done(); };
+    ov.querySelector('#waitCoins').onclick = () => { if (S.coins < cost) { K.toast(`Need ${cost - S.coins} more coins`); return; } S.coins -= cost; if (lock) S.lockUntil = 0; else { S.hearts = MAXH; S.heartT = 0; } K.persist(); syncHud(); done(); };
+    ov.querySelector('#waitClose').onclick = () => { ov.remove(); $('homeOv').classList.add('show'); paused = true; };
+  }
   function startLevel() {
+    if (heartsNow() <= 0) { $('homeOv').classList.remove('show'); waitScreen('hearts'); return; }
+    if (S.lockUntil && S.lockUntil > Date.now() && S.lockLvl === S.level) { $('homeOv').classList.remove('show'); waitScreen('lock'); return; }
     D = levelDef(S.level); rnd = Kit.rng(D.seed + Math.floor(Math.random() * 1000));
     SET = D.set; COL = SET.map(i => POOL_COL[i]); NAMES = SET.map(i => POOL_NAMES[i]);
     { const nu = newlyUnlocked(S.level); if (nu.length) setTimeout(() => K.toast('New sweet unlocked: ' + nu.join(', ') + ' 🍬'), 1600); }
@@ -1496,7 +1689,7 @@ const Kit = {
     jelly = Array.from({ length: N }, () => Array(N).fill(0));
     if (D.g.jelly) D.g.jelly.forEach((v, k) => { jelly[Math.floor(k / N)][k % N] = v; });
     collected = Array(6).fill(null); if (D.g.items) D.g.items.forEach(it => collected[it.c] = 0); else for (let i = 0; i < 6; i++) collected[i] = 0;
-    movesLeft = D.moves; score = 0; won = false; lost = false; toolsUsed = 0; bonusLeft = 0; hammerMode = false; sel = null; hint = null; idleT = 0; cascade = 0; swap = null;
+    movesLeft = D.timed ? 999 : D.moves; timeLeft = D.timed || 0; boomLost = false; moveDone = false; heartPending = false; score = 0; won = false; lost = false; toolsUsed = 0; bonusLeft = 0; hammerMode = false; sel = null; hint = null; idleT = 0; cascade = 0; swap = null;
     parts.length = 0; floats.length = 0; beams.length = 0; rings.length = 0; stars.length = 0; fws.length = 0; fwT = 0; freeze = 0; punch = 0;
     newBoard(); phase = 'fall';
     buildGoals($('goals')); syncHud();
@@ -1505,16 +1698,18 @@ const Kit = {
     $('introNote').textContent = S.level === 1 ? 'Swap two sweets to line up 3 of the same. Match 4 or 5 to make special sweets!'
       : g.type === 'jelly' ? pick(['Peel off every silver foil tile by matching sweets on top of it.', 'The halwai wrapped some tiles in silver foil. Match on them to unwrap!']) : g.type === 'collect' ? 'Collect ' + g.items.map(it => it.n + ' ' + NAMES[it.c]).join(' and ') + '!' : pick(['Reach the target score!', 'Fill the sweet box to the target!', 'Cook up a big score!', 'Serve enough sweets to hit the target!']);
     buildGoals($('introGoals'), true).forEach(ch => { if (ch.kind === 'item') ch.s.textContent = ch.it.n; if (ch.kind === 'jelly') ch.s.textContent = jellyLeft(); });
-    $('introMoves').textContent = `${D.moves} moves`;
+    $('introMoves').textContent = D.timed ? `⏱ ${D.timed} seconds — beat the clock!` : `${D.moves} moves`;
+    { const tips = []; if (D.timed) tips.push('⏱ Timed level: be quick!'); if (D.ice) tips.push('🧊 Frozen sweets: match them to crack the ice'); if (D.crates) tips.push('📦 Crates: match next to them to break them'); if (D.choc) tips.push('🍫 Chocolate spreads every move unless you break some!'); if (D.bombs) tips.push('💣 Countdown sweets: match them before they hit 0!'); if (tips.length) $('introNote').textContent = tips.join(' · ');
+      if (S.level === 1 || !tips.length) {} }
     $('introOv').classList.add('show'); paused = true;
   }
   function takeGrants() { if (!K.HAS_W) return; const a = Wallet.take('ss_hammer'), b = Wallet.take('ss_shuffle'); if (a || b) { S.hammer += a; S.shuffle += b; K.persist(); syncHud(); K.toast('Boosters from the Arcade shop added! 🎁'); } }
   $('playBtn').onclick = () => { K.ac(); K.startMusic([[261.63, 329.63, 392], [220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66]], 4); $('homeOv').classList.remove('show'); takeGrants(); startLevel(); };
   $('introGo').onclick = () => { $('introOv').classList.remove('show'); paused = false; K.tone(1318, 0.2, { type: 'triangle', vol: 0.1 }); if (S.level === 1) setTimeout(() => { hint = findMove(); }, 1500); };
-  $('homeBtn').onclick = () => { paused = true; $('homeOv').classList.add('show'); syncHud(); };
+  $('homeBtn').onclick = () => { if (heartPending) { heartPending = false; loseHeart(); $('failOv').classList.remove('show'); } paused = true; $('homeOv').classList.add('show'); paintHearts(); syncHud(); };
   $('nextBtn').onclick = () => { $('winOv').classList.remove('show'); startLevel(); };
   $('doubleBtn').onclick = () => { if (doubled) return; doubled = true; S.coins += lastReward; K.persist(); $('winCoins').textContent = `+${lastReward * 2} 🪙`; $('doubleBtn').style.display = 'none'; syncHud(); };
-  $('retryBtn').onclick = () => { $('failOv').classList.remove('show'); startLevel(); };
+  $('retryBtn').onclick = () => { $('failOv').classList.remove('show'); if (heartPending) { heartPending = false; loseHeart(); } startLevel(); };
   $('moreCoins').onclick = () => { if (S.coins < 60) { K.toast(`Need ${60 - S.coins} more coins`); return; } S.coins -= 60; K.persist(); moreMoves(); };
   $('moreAd').onclick = moreMoves;
   $('tool1Btn').onclick = () => { K.ac(); if (paused || won || phase !== 'idle') return; hammerMode = !hammerMode; $('tool1Btn').classList.toggle('active', hammerMode); if (hammerMode) K.toast('Tap a sweet to smash it 🔨'); };
@@ -1523,6 +1718,7 @@ const Kit = {
   { // album button on the home screen, and shown automatically the first time
     const hb = $('homeOv') && $('homeOv').querySelector('.home'), pb = $('playBtn'); if (hb && pb) { const b = document.createElement('button'); b.id = 'albumBtn'; b.className = pb.className.replace(/\bprimary\b/, ''); b.style.cssText = 'margin-top:10px;width:100%;border:0;border-radius:18px;padding:12px;font:900 17px system-ui;background:linear-gradient(#ffe6f2,#ffc8e0);color:#8a1a5a;box-shadow:0 4px 0 rgba(160,30,90,.35)'; b.textContent = '🍬 Sweets Album'; b.onclick = e => { e.stopPropagation(); showAlbum(false); }; pb.insertAdjacentElement('afterend', b); }
     if (!S.albumSeen) setTimeout(() => showAlbum(true), 900);
+    if (pb) { pb.insertAdjacentElement('beforebegin', heartEl); paintHearts(); }
     drawStall(S.level || 1); window.addEventListener('resize', () => drawStall(S.level || 1));
   }
   { // candy-land hills, lollipops and candy canes along the bottom of the screen
@@ -1569,7 +1765,7 @@ const Kit = {
   window.addEventListener('resize', resize); if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
   resize(); $('playSub').textContent = 'Level ' + S.level; $('coinTxt').textContent = S.coins;
   requestAnimationFrame(frame);
-  window.__ss = { S, get grid() { return grid; }, findMove, trySwap: (a, b) => trySwap(a, b), get phase() { return phase; }, get won() { return won; }, get lost() { return lost; }, startLevel, get score() { return score; }, get moves() { return movesLeft; } };
+  window.__ss = { S, announce, clr: (r, c) => { cascade = 1; clearSet(new Set([r * N + c])); afterClear(); }, get D() { return D; }, get grid() { return grid; }, findMove, trySwap: (a, b) => trySwap(a, b), get phase() { return phase; }, get won() { return won; }, get lost() { return lost; }, startLevel, get score() { return score; }, get moves() { return movesLeft; } };
 })();
 
 </script>

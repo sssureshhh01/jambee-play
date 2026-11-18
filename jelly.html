@@ -182,12 +182,55 @@ const Wallet = (() => {
       if (!inHub || !container) return;
       const b = document.createElement('button');
       b.textContent = '⬅ Back to Arcade';
-      b.style.cssText = 'display:block;margin:14px auto 0;padding:10px 18px;border-radius:14px;border:0;background:rgba(255,255,255,.18);color:inherit;font:800 14px system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(4px)';
+      b.style.cssText = 'display:block;margin:14px auto 0;padding:12px 22px;border-radius:16px;border:0;background:rgba(255,255,255,.22);color:inherit;font:900 15px system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(4px)';
       b.onclick = e => { e.stopPropagation(); Wallet.exit(); };
       container.appendChild(b);
+      // plus a big, always-visible pill in the top-left corner of the game's start screen (below the notch)
+      const ov = container.closest('.overlay') || container.parentElement;
+      if (ov && !ov.querySelector('.arcBack')) {
+        const t = document.createElement('button'); t.className = 'arcBack'; t.innerHTML = '⬅ Arcade';
+        t.style.cssText = 'position:absolute;z-index:50;left:max(12px,env(safe-area-inset-left));top:calc(env(safe-area-inset-top) + 12px);min-height:48px;padding:0 20px;border-radius:24px;border:0;background:linear-gradient(#ffe36b,#ffb21a);color:#3a1a00;font:900 17px system-ui,sans-serif;box-shadow:0 4px 0 #b86b00,0 6px 18px rgba(0,0,0,.35);cursor:pointer';
+        t.onclick = e => { e.stopPropagation(); Wallet.exit(); };
+        if (getComputedStyle(ov).position === 'static') ov.style.position = 'relative';
+        ov.appendChild(t);
+      }
     }
   };
 })();
+
+// ===== One Music / Sound setting for the whole arcade =====
+// Every game keeps its own save with music/sound flags. Before a game starts we copy the arcade-wide choice into it,
+// and add a quick 🎵 button next to the 🏠 button that flips music in any game (and everywhere else too).
+(() => {
+  const KEY = 'arcade_audio';
+  let A = { music: true, sound: true };
+  try { A = Object.assign(A, JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) {}
+  const saveA = () => { try { localStorage.setItem(KEY, JSON.stringify(A)); } catch (e) {} };
+  try { // sync every game save that has music/sound flags
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k === KEY || k === 'arcade_wallet_v1') continue;
+      let v; try { v = JSON.parse(localStorage.getItem(k)); } catch (e) { continue; }
+      if (v && typeof v === 'object' && ('music' in v || 'sound' in v)) { v.music = A.music; v.sound = A.sound; localStorage.setItem(k, JSON.stringify(v)); } }
+  } catch (e) {}
+  window.ArcadeAudio = { get: () => A };
+  const wire = () => {
+    const home = document.getElementById('homeBtn'), tm = document.getElementById('tMusic'), ts = document.getElementById('tSound');
+    // the game's own Settings switches also update the arcade-wide choice
+    if (tm) tm.addEventListener('click', () => { A.music = !A.music; saveA(); paint(); });
+    if (ts) ts.addEventListener('click', () => { A.sound = !A.sound; saveA(); });
+    if (!home || !tm || document.getElementById('musicQuick')) return;
+    const q = document.createElement('button'); q.id = 'musicQuick'; q.className = home.className; q.setAttribute('aria-label', 'Music on or off');
+    q.style.marginLeft = '8px';
+    const paint = () => { q.textContent = A.music ? '🎵' : '🔇'; q.style.opacity = A.music ? '1' : '.75'; };
+    window.__paintMusic = paint; paint();
+    q.onclick = e => { e.stopPropagation(); tm.click(); const T = document.getElementById('toast'); if (T) { T.textContent = A.music ? '🎵 Music on' : '🔇 Music off'; T.classList.add('show'); setTimeout(() => T.classList.remove('show'), 1500); } };
+    home.insertAdjacentElement('afterend', q);
+    // keep the home + music buttons together on the left of the top bar
+    if (home.parentElement && !home.parentElement.querySelector('.lbtns')) { const w = document.createElement('div'); w.className = 'lbtns'; w.style.cssText = 'display:flex;align-items:center;flex:0 0 auto'; home.parentElement.insertBefore(w, home); w.appendChild(home); w.appendChild(q); }
+  };
+  function paint() { if (window.__paintMusic) window.__paintMusic(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else setTimeout(wire, 0);
+})();
+
 
 </script>
 <script>
