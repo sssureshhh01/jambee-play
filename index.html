@@ -58,6 +58,7 @@
     .g-jj{background:linear-gradient(135deg,#00b4d8,#3ec6ff 55%,#7af0c0);}
   .g-ss{background:linear-gradient(135deg,#ff4d8d,#ff8fc7 55%,#ffb347);}
   .g-sk{background:linear-gradient(135deg,#2f7fd8,#6ec6ff 55%,#ff8a5c);}
+  .g-cc{background:linear-gradient(135deg,#0e6a9a,#2fc3d8 55%,#f2b860);}
   .g-pb{background:linear-gradient(135deg,#3a6cff,#5fb0ff 55%,#ff9de2);}
   .g-jd{background:linear-gradient(135deg,#1f7a35,#3f9a4a 55%,#d9b27a);}
   .g-px{background:linear-gradient(135deg,#05030f,#3a1a7a 55%,#13a8d8);}
@@ -167,7 +168,7 @@
     <div class="coins" id="coinPill"><span class="coin"></span><span id="coinTxt">0</span></div>
   </div>
   <div class="title">JAMBEE</div>
-  <div class="subtitle">9 GAMES · 6,000+ LEVELS · ENDLESS FUN</div>
+  <div class="subtitle">10 GAMES · 7,000+ LEVELS · ENDLESS FUN</div>
   <div class="quick">
     <button class="qbtn" id="dailyBtn">🎁 Daily<span class="dot" id="dailyDot"></span></button>
     <button class="qbtn" id="shopBtn">🛒 Shop</button>
@@ -182,6 +183,7 @@
     <div class="gcard g-jj" data-game="jj"><div class="help" data-help="jj">?</div><canvas id="pv-jj" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Jelly Escape</div><div class="gtag">Slide jellies out the door</div><div class="gprog"><i id="gp-jj"></i></div><div class="glv" id="gl-jj">Level 1 / 1000</div></div><div class="play">▶</div></div>
     <div class="gcard g-ss" data-game="ss"><div class="help" data-help="ss">?</div><canvas id="pv-ss" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Mithai Mela</div><div class="gtag">Match real Indian sweets</div><div class="gprog"><i id="gp-ss"></i></div><div class="glv" id="gl-ss">Level 1 / 1000</div></div><div class="play">▶</div></div>
     <div class="gcard g-sk" data-game="sk"><div class="help" data-help="sk">?</div><canvas id="pv-sk" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Sky Stack</div><div class="gtag">Tap to stack, climb to space</div><div class="gprog"><i id="gp-sk"></i></div><div class="glv" id="gl-sk">Best: 0 floors</div></div><div class="play">▶</div></div>
+    <div class="gcard g-cc" data-game="cc"><div class="help" data-help="cc">?</div><canvas id="pv-cc" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Cannon Cove</div><div class="gtag">Fire cannons, sink the pirates</div><div class="gprog"><i id="gp-cc"></i></div><div class="glv" id="gl-cc">Level 1 / 1000</div></div><div class="play">▶</div></div>
     <div class="gcard g-pb" data-game="pb"><div class="help" data-help="pb">?</div><canvas id="pv-pb" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Pop Party</div><div class="gtag">Tap groups to pop</div><div class="gprog"><i id="gp-pb"></i></div><div class="glv" id="gl-pb">Level 1 / 1000</div></div><div class="play">▶</div></div>
     <div class="gcard g-jd" data-game="jd"><div class="help" data-help="jd">?</div><canvas id="pv-jd" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Geetu Jungle Dash</div><div class="gtag">Run through the animal forest</div><div class="gprog"><i id="gp-jd"></i></div><div class="glv" id="gl-jd">Best: 0 m</div></div><div class="play">▶</div></div>
     <div class="gcard g-px" data-game="px"><div class="help" data-help="px">?</div><canvas id="pv-px" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Plasma Parry</div><div class="gtag">Slice drone fire with a plasma blade</div><div class="gprog"><i id="gp-px"></i></div><div class="glv" id="gl-px">Best: 0</div></div><div class="play">▶</div></div>
@@ -659,8 +661,8 @@ const IBG_SCENES = (() => {
   'use strict';
   const $ = id => document.getElementById(id);
   const GAMES = { pp: { file: 'potion.html', name: 'Potion Pour' }, jj: { file: 'jelly.html', name: 'Jelly Escape' }, mg: { file: 'grid.html', name: 'Midnight Grid' },
-    sk: { file: 'stack.html', name: 'Sky Stack' }, ss: { file: 'sweet.html', name: 'Mithai Mela' }, pb: { file: 'pop.html', name: 'Pop Party' }, jd: { file: 'dash.html', name: 'Geetu Jungle Dash' }, px: { file: 'plasma.html', name: 'Plasma Parry' }, sd: { file: 'bloom.html', name: 'Sudoku Bloom' } };
-  const GAME_IDS = ['pp', 'jj', 'mg', 'ss', 'sk', 'pb', 'jd', 'px', 'sd'];
+    sk: { file: 'stack.html', name: 'Sky Stack' }, ss: { file: 'sweet.html', name: 'Mithai Mela' }, pb: { file: 'pop.html', name: 'Pop Party' }, jd: { file: 'dash.html', name: 'Geetu Jungle Dash' }, px: { file: 'plasma.html', name: 'Plasma Parry' }, sd: { file: 'bloom.html', name: 'Sudoku Bloom' }, cc: { file: 'cannon.html', name: 'Cannon Cove' } };
+  const GAME_IDS = ['pp', 'jj', 'mg', 'ss', 'sk', 'cc', 'pb', 'jd', 'px', 'sd'];
   const ENDLESS = { jd: ' m', px: '', sk: ' floors' };
   const AVATARS = ['🦊', '🐼', '🐯', '🐸', '🐵', '🦄', '🐙', '🐧', '🐨', '🦁'];
   const SHOP_AV = [['🦖', 250], ['🐺', 250], ['🦋', 300], ['🐝', 300], ['🐳', 350], ['🦉', 350], ['👽', 450], ['🤖', 450], ['🤠', 550], ['🧙', 700], ['🦸', 850], ['🥷', 1000]];
@@ -874,7 +876,7 @@ const IBG_SCENES = (() => {
     const st = Wallet.state(), t = st.totals, prof = st.profile || { name: 'You', av: '🦊' }, body = $('lbBody'); body.innerHTML = '';
     document.querySelectorAll('#lbOv .tab').forEach(x => x.classList.toggle('on', x.dataset.lb === lbTab));
     if (lbTab === 'me') {
-      [['🧪', 'Potion Pour', `Level ${t.pp_lvl || 1}`], ['🟦', 'Jelly Escape', `Level ${t.jj_lvl || 1}`], ['🌙', 'Midnight Grid', `Best ${t.mg_score || 0}`], ['🍥', 'Mithai Mela', `Level ${t.ss_lvl || 1}`], ['🏗️', 'Sky Stack', `Best ${t.sk_best || 0} floors`], ['🎉', 'Pop Party', `Level ${t.pb_lvl || 1}`], ['🏃', 'Geetu Jungle Dash', `Best ${t.jd_best || 0} m`], ['⚡', 'Plasma Parry', `Best ${t.px_best || 0}`], ['🔢', 'Sudoku Bloom', `Level ${t.sd_lvl || 1}`], ['⭐', 'Player level', `${Wallet.level}`], ['🔥', 'Daily streak', `${st.daily.streak || 0} days`]]
+      [['🧪', 'Potion Pour', `Level ${t.pp_lvl || 1}`], ['🟦', 'Jelly Escape', `Level ${t.jj_lvl || 1}`], ['🌙', 'Midnight Grid', `Best ${t.mg_score || 0}`], ['🍥', 'Mithai Mela', `Level ${t.ss_lvl || 1}`], ['🏗️', 'Sky Stack', `Best ${t.sk_best || 0} floors`], ['🏴‍☠️', 'Cannon Cove', `Level ${t.cc_lvl || 1}`], ['🎉', 'Pop Party', `Level ${t.pb_lvl || 1}`], ['🏃', 'Geetu Jungle Dash', `Best ${t.jd_best || 0} m`], ['⚡', 'Plasma Parry', `Best ${t.px_best || 0}`], ['🔢', 'Sudoku Bloom', `Level ${t.sd_lvl || 1}`], ['⭐', 'Player level', `${Wallet.level}`], ['🔥', 'Daily streak', `${st.daily.streak || 0} days`]]
         .forEach(([i, n, v]) => { const r = document.createElement('div'); r.className = 'lbrow'; r.innerHTML = `<span class="av2">${i}</span><span class="nm2">${n}</span><span>${v}</span>`; body.appendChild(r); });
       return;
     }
@@ -903,6 +905,7 @@ const IBG_SCENES = (() => {
     { id: 'jj_level', icon: '🟦', text: n => `Clear ${n} Jelly Escape levels`, n: [2, 3, 4], reward: 60, game: 'jj' },
     { id: 'jj_jellies', icon: '🍬', text: n => `Help ${n} jellies escape`, n: [15, 25, 40], reward: 50, game: 'jj' },
     { id: 'ss_level', icon: '🍥', text: n => `Clear ${n} Mithai Mela levels`, n: [2, 3, 4], reward: 60, game: 'ss' },
+    { id: 'cc_level', icon: '🏴‍☠️', text: n => `Clear ${n} Cannon Cove levels`, n: [2, 3, 5], reward: 60, game: 'cc' },
     { id: 'sk_floors', icon: '🏗️', text: n => `Stack ${n} floors in Sky Stack`, n: [20, 40, 60], reward: 60, game: 'sk' },
     { id: 'sk_perfect', icon: '✨', text: n => `Land ${n} perfect drops in Sky Stack`, n: [5, 10, 15], reward: 60, game: 'sk' },
     { id: 'pb_level', icon: '🎉', text: n => `Clear ${n} Pop Party levels`, n: [2, 3, 4], reward: 60, game: 'pb' },
@@ -944,6 +947,8 @@ const IBG_SCENES = (() => {
     { id: 'jelly_1', icon: '🍬', name: 'Jailbreak', desc: 'Clear your first Jelly Escape level', ok: (t) => (t.jj_level || 0) >= 1 },
     { id: 'jelly_25', icon: '🚪', name: 'Escape Artist', desc: 'Clear 25 Jelly Escape levels', ok: (t) => (t.jj_level || 0) >= 25 },
     { id: 'sweet_1', icon: '🍥', name: 'Sweet Tooth', desc: 'Clear your first Mithai Mela level', ok: (t) => (t.ss_level || 0) >= 1 },
+    { id: 'cove_1', icon: '🏴‍☠️', name: 'Powder Monkey', desc: 'Clear your first Cannon Cove level', ok: (t) => (t.cc_level || 0) >= 1 },
+    { id: 'cove_25', icon: '⚓', name: 'Pirate Hunter', desc: 'Clear 25 Cannon Cove levels', ok: (t) => (t.cc_level || 0) >= 25 },
     { id: 'stack_30', icon: '🏗️', name: 'Sky Builder', desc: 'Stack 30 floors in one Sky Stack game', ok: (t) => (t.sk_best || 0) >= 30 },
     { id: 'stack_75', icon: '🚀', name: 'Star Tower', desc: 'Stack 75 floors in one Sky Stack game', ok: (t) => (t.sk_best || 0) >= 75 },
     { id: 'party_1', icon: '🎉', name: 'Party Starter', desc: 'Clear your first Pop Party level', ok: (t) => (t.pb_level || 0) >= 1 },
@@ -981,7 +986,7 @@ const IBG_SCENES = (() => {
   $('infoOk').onclick = () => $('infoOv').classList.remove('show');
   $('statsBtn').onclick = () => {
     ac(); sfx.tap(); const t = Wallet.state().totals, st = Wallet.state();
-    info('📊', 'My stats', `Player level ${Wallet.level} · ${st.earned} coins earned · Potion levels ${t.pp_level || 0} · Jelly levels ${t.jj_level || 0} · Mithai levels ${t.ss_level || 0} · Best tower ${t.sk_best || 0} floors · Party levels ${t.pb_level || 0} · Best run ${t.jd_best || 0} m · Best Plasma Parry ${t.px_best || 0} · Grid lines ${t.mg_lines || 0} · Best Grid score ${t.mg_score || 0} · Bubbles popped ${t.bubbles || 0}`);
+    info('📊', 'My stats', `Player level ${Wallet.level} · ${st.earned} coins earned · Potion levels ${t.pp_level || 0} · Jelly levels ${t.jj_level || 0} · Mithai levels ${t.ss_level || 0} · Best tower ${t.sk_best || 0} floors · Cove levels ${t.cc_level || 0} · Party levels ${t.pb_level || 0} · Best run ${t.jd_best || 0} m · Best Plasma Parry ${t.px_best || 0} · Grid lines ${t.mg_lines || 0} · Best Grid score ${t.mg_score || 0} · Bubbles popped ${t.bubbles || 0}`);
   };
 
   // ================= Refresh UI =================
@@ -1012,6 +1017,7 @@ const IBG_SCENES = (() => {
     jj: [['👆', 'Drag a jelly — it slides around other jellies and walls.'], ['🚪', 'Slide it against a door of the same colour to let it escape. It must fit the door!'], ['❄️', 'Frozen jellies show a number — that many others must escape first.'], ['⏱', 'Beat the timer! Stuck? Use Hint, or Freeze to stop the clock.']],
     ss: [['👆', 'Swipe a sweet into its neighbour to swap them.'], ['🍬', 'Line up 3 or more of the same mithai (Gulab Jamun, Jalebi, Kaju Katli, Pista Barfi, Kesar Peda, Rose Sandesh) to clear them.'], ['✨', 'Match 4 = Silver Vark (clears a line), L or T shape = Syrup Burst, 5 in a row = Mithai Box (clears every sweet of one kind).'], ['🎯', 'Reach the goal before you run out of moves. Match on silver foil tiles to peel them off!']],
     sk: [['👆', 'Tap anywhere to drop the sliding block onto the tower.'], ['✂️', 'Any part hanging over the edge is sliced off, so your next block is smaller.'], ['✨', 'Line it up exactly for a PERFECT drop. 3 perfects in a row make the block grow back.'], ['🚀', 'Keep climbing from the meadow, past the sunset and clouds, all the way to space!']],
+    cc: [['👇', 'Drag DOWN anywhere to load the cannon — the further you pull, the harder it fires.'], ['↔️', 'Slide left or right while pulling to turn the cannon.'], ['🏴‍☠️', 'Let go to fire! Knock every pirate down or into the sea to win.'], ['🧨', 'Hit red TNT barrels to blow forts apart. From level 4, tap 💣 for a bomb shot.'], ['⭐', 'Fewer cannonballs used = more stars and coins.']],
     pb: [['👆', 'Tap 2 or more touching blocks of the same colour to pop them.'], ['🚀', 'Pop 5+ for a rocket, 7+ for a bomb, 9+ for a rainbow ball.'], ['💥', 'Tap specials that touch each other for giant combos.'], ['📦', 'Pop next to crates to break them. Reach the goals before moves run out.']],
     jd: [['👈', 'Swipe left or right to switch lanes.'], ['☝️', 'Swipe up to jump over logs, campfires and streams.'], ['👇', 'Swipe down to slide under low branches. Dodge the big boulders!'], ['🦜', 'Watch out for the forest animals cheering Geetu on!'], ['🧲', 'Grab coins and power-ups: magnet, shield and double coins.']],
     sd: [['🔢', 'Fill every row, column and 3×3 box with 1–9 — no repeats.'], ['✏️', 'Use Notes to pencil in guesses.'], ['❤️', 'Three wrong numbers and you are out of hearts.'], ['⚡', 'Place numbers quickly for a combo; finish a row, column or box to make it bloom.']],
@@ -1094,7 +1100,7 @@ const IBG_SCENES = (() => {
     jel(ox + g * 1.4, oy + g * 0.15, g * 0.9, g * 0.9, '#ffd60a', 1, Math.sin(t / 340 + 1) * 0.04);
     jel(jx, jy, g * 0.9, g * 1.6, '#ff4d6d', a, slide > 0 && slide < 1 ? 0.08 : 0);
   }
-  ['ss', 'sk', 'pb', 'jd', 'px', 'sd'].forEach(g => { pv[g] = $('pv-' + g).getContext('2d'); });
+  ['ss', 'sk', 'cc', 'pb', 'jd', 'px', 'sd'].forEach(g => { pv[g] = $('pv-' + g).getContext('2d'); });
   function drawNewPreviews(t) {
     let c = pv.ss; c.clearRect(0, 0, 192, 192);
     { const MC = [['#b8501e', 'o'], ['#ff7a00', 's'], ['#dfe4ee', 'd'], ['#7fcf5a', 'q'], ['#ffc21a', 'o'], ['#ff7ab6', 'h']], cyc = (t / 1600) % 1;
@@ -1115,6 +1121,17 @@ const IBG_SCENES = (() => {
       const slideX = cyc < 0.6 ? -2.6 + Math.sin(cyc / 0.6 * Math.PI) * 2.6 * 1.2 : -1.2;
       box(slideX, n + (cyc < 0.6 ? 0.4 : 0), -1.2, 2.4 - n * 0.12, 2.4, (200 + n * 14) % 360);
       if (cyc > 0.6 && cyc < 0.8) { c.strokeStyle = `rgba(255,255,255,${(0.8 - cyc) * 5})`; c.lineWidth = 3; c.beginPath(); c.ellipse(96, 150 - (n + 1) * 15 + 13, 70, 30, 0, 0, 7); c.stroke(); }
+    }
+    c = pv.cc; c.clearRect(0, 0, 192, 192);
+    { // Cannon Cove: cannonball arcs into a little fort, splash
+      const cyc = (t / 2000) % 1; c.fillStyle = '#2fc3d8'; c.beginPath(); c.moveTo(0, 150); for (let x = 0; x <= 192; x += 12) c.lineTo(x, 148 + Math.sin(x / 18 + t / 300) * 4); c.lineTo(192, 192); c.lineTo(0, 192); c.fill();
+      c.fillStyle = '#f2d8a0'; c.beginPath(); c.ellipse(140, 150, 46, 12, 0, 0, 7); c.fill();
+      const hit = cyc > 0.55, tilt = hit ? Math.min(0.5, (cyc - 0.55) * 2) : 0;
+      c.save(); c.translate(150, 146); c.rotate(tilt); c.fillStyle = '#a8703c'; c.fillRect(-26, -10, 8, -40); c.fillRect(-4, -10, 8, -40); c.fillRect(-30, -54, 40, 7); c.fillStyle = '#c08a50'; c.fillRect(-22, -30, 20, 20);
+      c.fillStyle = '#d83a3a'; c.beginPath(); c.arc(-10, -62, 9, 0, 7); c.fill(); c.fillStyle = '#e0a070'; c.beginPath(); c.arc(-10, -72, 8, 0, 7); c.fill(); c.fillStyle = '#c8202a'; c.beginPath(); c.arc(-10, -75, 8, Math.PI, 0); c.fill(); c.restore();
+      c.save(); c.translate(26, 150); c.rotate(-0.6); c.fillStyle = '#3a3a44'; c.beginPath(); c.roundRect ? c.roundRect(-8, -9, 44, 18, 8) : c.rect(-8, -9, 44, 18); c.fill(); c.restore(); c.fillStyle = '#7a4e26'; c.beginPath(); c.arc(24, 156, 11, 0, 7); c.fill();
+      if (!hit) { const k = cyc / 0.55, bx = 50 + k * 90, by = 128 - Math.sin(k * Math.PI) * 70 + k * 10; c.fillStyle = '#1a1a1a'; c.beginPath(); c.arc(bx, by, 7, 0, 7); c.fill(); c.fillStyle = 'rgba(255,255,255,.5)'; for (let i = 1; i < 5; i++) { const kk = Math.max(0, k - i * 0.05), x = 50 + kk * 90, y = 128 - Math.sin(kk * Math.PI) * 70 + kk * 10; c.beginPath(); c.arc(x, y, 4 - i * 0.6, 0, 7); c.fill(); } }
+      else { const a = 1 - (cyc - 0.55) / 0.45; c.fillStyle = `rgba(234,248,255,${a})`; for (let i = 0; i < 7; i++) { c.beginPath(); c.arc(140 + (i - 3) * 8, 140 - (1 - a) * 60 * (1 - Math.abs(i - 3) / 4), 6, 0, 7); c.fill(); } c.fillStyle = `rgba(255,176,32,${a})`; c.beginPath(); c.arc(140, 110, 20 * (1 - a) + 6, 0, 7); c.fill(); }
     }
     c = pv.pb; c.clearRect(0, 0, 192, 192);
     for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { const i = (r + k * 2) % 4, grow = r >= 2 && k <= 1 && ((t / 1500) % 1) > 0.5; c.save(); c.translate(30 + k * 44, 30 + r * 44); const s = grow ? 1 + Math.sin(((t / 1500) % 1) * 12) * 0.1 : 1; c.scale(s, s); c.fillStyle = ['#ff4d6d', '#ffd60a', '#38d17a', '#3a86ff'][grow ? 0 : i]; c.beginPath(); c.roundRect ? c.roundRect(-19, -19, 38, 38, 10) : c.rect(-19, -19, 38, 38); c.fill(); c.fillStyle = 'rgba(255,255,255,0.4)'; c.fillRect(-14, -16, 28, 8); c.restore(); }
