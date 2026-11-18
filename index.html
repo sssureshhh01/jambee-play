@@ -55,12 +55,11 @@
     box-shadow:0 4px 0 rgba(0,0,0,.2);animation:breathe 2s ease-in-out infinite;}
   @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
   .g-pp{background:linear-gradient(135deg,#7b2ff7,#c77dff 60%,#ff5fc8);}
-  .g-hs{background:linear-gradient(135deg,#ff9f1c,#ffd23f 60%,#3ddc84);}
-  .g-jj{background:linear-gradient(135deg,#00b4d8,#3ec6ff 55%,#7af0c0);}
-  .g-ss{background:linear-gradient(135deg,#ff4d8d,#ff8fc7 55%,#ffb347);}
+    .g-jj{background:linear-gradient(135deg,#00b4d8,#3ec6ff 55%,#7af0c0);}
+  .g-sk{background:linear-gradient(135deg,#2f7fd8,#6ec6ff 55%,#ff8a5c);}
   .g-pb{background:linear-gradient(135deg,#3a6cff,#5fb0ff 55%,#ff9de2);}
   .g-jd{background:linear-gradient(135deg,#1f7a35,#3f9a4a 55%,#d9b27a);}
-  .g-js{background:linear-gradient(135deg,#5a3420,#ff4d6d 55%,#ff9f1c);}
+  .g-px{background:linear-gradient(135deg,#05030f,#3a1a7a 55%,#13a8d8);}
   .g-sd{background:linear-gradient(135deg,#0f5a48,#16a37f 55%,#ffd23f);}
   .g-mg{background:linear-gradient(135deg,#0f1a3a,#2f53ff 60%,#3fd6e8);}
   .mission{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:var(--card);margin-bottom:10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);}
@@ -167,7 +166,7 @@
     <div class="coins" id="coinPill"><span class="coin"></span><span id="coinTxt">0</span></div>
   </div>
   <div class="title">JAMBEE</div>
-  <div class="subtitle">9 GAMES · 6,000+ LEVELS · ENDLESS FUN</div>
+  <div class="subtitle">8 GAMES · 5,000+ LEVELS · ENDLESS FUN</div>
   <div class="quick">
     <button class="qbtn" id="dailyBtn">🎁 Daily<span class="dot" id="dailyDot"></span></button>
     <button class="qbtn" id="shopBtn">🛒 Shop</button>
@@ -178,13 +177,12 @@
   <h3>Games</h3>
   <div class="games">
     <div class="gcard g-pp" data-game="pp"><div class="help" data-help="pp">?</div><canvas id="pv-pp" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Potion Pour</div><div class="gtag">Sort the magic potions</div><div class="gprog"><i id="gp-pp"></i></div><div class="glv" id="gl-pp">Level 1 / 1000</div></div><div class="play">▶</div></div>
-    <div class="gcard g-hs" data-game="hs"><div class="help" data-help="hs">?</div><canvas id="pv-hs" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Hive Stack</div><div class="gtag">Stack, merge &amp; pop</div><div class="gprog"><i id="gp-hs"></i></div><div class="glv" id="gl-hs">Level 1 / 1000</div></div><div class="play">▶</div></div>
     <div class="gcard g-mg" data-game="mg"><div class="help" data-help="mg">?</div><canvas id="pv-mg" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Midnight Grid</div><div class="gtag">Fill lines, chain combos</div><div class="gprog"><i id="gp-mg"></i></div><div class="glv" id="gl-mg">Level 1 / 1000</div></div><div class="play">▶</div></div>
     <div class="gcard g-jj" data-game="jj"><div class="help" data-help="jj">?</div><canvas id="pv-jj" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Jelly Escape</div><div class="gtag">Slide jellies out the door</div><div class="gprog"><i id="gp-jj"></i></div><div class="glv" id="gl-jj">Level 1 / 1000</div></div><div class="play">▶</div></div>
-    <div class="gcard g-ss" data-game="ss"><div class="help" data-help="ss">?</div><canvas id="pv-ss" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Mithai Mela</div><div class="gtag">Match Indian sweets</div><div class="gprog"><i id="gp-ss"></i></div><div class="glv" id="gl-ss">Level 1 / 1000</div></div><div class="play">▶</div></div>
+    <div class="gcard g-sk" data-game="sk"><div class="help" data-help="sk">?</div><canvas id="pv-sk" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Sky Stack</div><div class="gtag">Tap to stack, climb to space</div><div class="gprog"><i id="gp-sk"></i></div><div class="glv" id="gl-sk">Best: 0 floors</div></div><div class="play">▶</div></div>
     <div class="gcard g-pb" data-game="pb"><div class="help" data-help="pb">?</div><canvas id="pv-pb" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Pop Party</div><div class="gtag">Tap groups to pop</div><div class="gprog"><i id="gp-pb"></i></div><div class="glv" id="gl-pb">Level 1 / 1000</div></div><div class="play">▶</div></div>
     <div class="gcard g-jd" data-game="jd"><div class="help" data-help="jd">?</div><canvas id="pv-jd" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Geetu Jungle Dash</div><div class="gtag">Run through the animal forest</div><div class="gprog"><i id="gp-jd"></i></div><div class="glv" id="gl-jd">Best: 0 m</div></div><div class="play">▶</div></div>
-    <div class="gcard g-js" data-game="js"><div class="help" data-help="js">?</div><canvas id="pv-js" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Juicy Slice</div><div class="gtag">Slice fruit, dodge bombs</div><div class="gprog"><i id="gp-js"></i></div><div class="glv" id="gl-js">Best: 0</div></div><div class="play">▶</div></div>
+    <div class="gcard g-px" data-game="px"><div class="help" data-help="px">?</div><canvas id="pv-px" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Plasma Parry</div><div class="gtag">Slice drone fire with a plasma blade</div><div class="gprog"><i id="gp-px"></i></div><div class="glv" id="gl-px">Best: 0</div></div><div class="play">▶</div></div>
     <div class="gcard g-sd" data-game="sd"><div class="help" data-help="sd">?</div><canvas id="pv-sd" width="192" height="192"></canvas><div class="ginfo"><div class="gname">Sudoku Bloom</div><div class="gtag">Fill the grid, make it bloom</div><div class="gprog"><i id="gp-sd"></i></div><div class="glv" id="gl-sd">Level 1</div></div><div class="play">▶</div></div>
   </div>
   <h3>Today's missions</h3>
@@ -658,22 +656,20 @@ const IBG_SCENES = (() => {
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const GAMES = { pp: { file: 'potion.html', name: 'Potion Pour' }, hs: { file: 'hive.html', name: 'Hive Stack' }, jj: { file: 'jelly.html', name: 'Jelly Escape' }, mg: { file: 'grid.html', name: 'Midnight Grid' },
-    ss: { file: 'sweet.html', name: 'Mithai Mela' }, pb: { file: 'pop.html', name: 'Pop Party' }, jd: { file: 'dash.html', name: 'Geetu Jungle Dash' }, js: { file: 'slice.html', name: 'Juicy Slice' }, sd: { file: 'bloom.html', name: 'Sudoku Bloom' } };
-  const GAME_IDS = ['pp', 'hs', 'jj', 'mg', 'ss', 'pb', 'jd', 'js', 'sd'];
-  const ENDLESS = { jd: ' m', js: '' };
+  const GAMES = { pp: { file: 'potion.html', name: 'Potion Pour' }, jj: { file: 'jelly.html', name: 'Jelly Escape' }, mg: { file: 'grid.html', name: 'Midnight Grid' },
+    sk: { file: 'stack.html', name: 'Sky Stack' }, pb: { file: 'pop.html', name: 'Pop Party' }, jd: { file: 'dash.html', name: 'Geetu Jungle Dash' }, px: { file: 'plasma.html', name: 'Plasma Parry' }, sd: { file: 'bloom.html', name: 'Sudoku Bloom' } };
+  const GAME_IDS = ['pp', 'jj', 'mg', 'sk', 'pb', 'jd', 'px', 'sd'];
+  const ENDLESS = { jd: ' m', px: '', sk: ' floors' };
   const AVATARS = ['🦊', '🐼', '🐯', '🐸', '🐵', '🦄', '🐙', '🐧', '🐨', '🦁'];
   const SHOP_AV = [['🦖', 250], ['🐺', 250], ['🦋', 300], ['🐝', 300], ['🐳', 350], ['🦉', 350], ['👽', 450], ['🤖', 450], ['🤠', 550], ['🧙', 700], ['🦸', 850], ['🥷', 1000]];
   const EXCL_AV = { '🐉': 'Day 14 streak reward', '🧞': 'Day 28 streak reward' };
   const FRAMES = { none: { name: 'No frame' }, bronze: { name: 'Bronze', how: 'Day 7 streak' }, silver: { name: 'Silver', price: 300 }, neon: { name: 'Neon', price: 600 }, gold: { name: 'Gold', how: 'Day 21 streak' }, rainbow: { name: 'Rainbow', how: 'Day 28 streak' } };
   const BOOSTERS = [
     { icon: '🧪', name: 'Potion pack', desc: '3 Hints + 2 Extra flasks for Potion Pour', price: 200, g: { pp_hints: 3, pp_flasks: 2 } },
-    { icon: '🔨', name: 'Hive pack', desc: '3 Smash + 3 Shuffle for Hive Stack', price: 200, g: { hs_hammer: 3, hs_shuffle: 3 } },
     { icon: '❄️', name: 'Jelly pack', desc: '3 Hints + 2 Freeze for Jelly Escape', price: 200, g: { jj_hints: 3, jj_freeze: 2 } },
     { icon: '💣', name: 'Grid pack', desc: '2 Bombs + 2 Rotate + 2 Shuffle for Midnight Grid', price: 200, g: { mg_bomb: 2, mg_rotate: 2, mg_shuffle: 2 } },
-    { icon: '🍥', name: 'Mithai pack', desc: '3 Hammers + 3 Shuffles for Mithai Mela', price: 200, g: { ss_hammer: 3, ss_shuffle: 3 } },
     { icon: '🎉', name: 'Party pack', desc: '3 Hammers + 3 Shuffles for Pop Party', price: 200, g: { pb_hammer: 3, pb_shuffle: 3 } },
-    { icon: '🎒', name: 'Mega bundle', desc: 'All six packs at once — save 400!', price: 800, g: { pp_hints: 3, pp_flasks: 2, hs_hammer: 3, hs_shuffle: 3, jj_hints: 3, jj_freeze: 2, mg_bomb: 2, mg_rotate: 2, mg_shuffle: 2, ss_hammer: 3, ss_shuffle: 3, pb_hammer: 3, pb_shuffle: 3 } },
+    { icon: '🎒', name: 'Mega bundle', desc: 'All four packs at once — save 200!', price: 600, g: {pp_hints: 3, pp_flasks: 2, jj_hints: 3, jj_freeze: 2, mg_bomb: 2, mg_rotate: 2, mg_shuffle: 2, pb_hammer: 3, pb_shuffle: 3 } },
   ];
   const owned = () => { const st = Wallet.state(); st.owned = st.owned || {}; st.owned.av = st.owned.av || []; st.owned.fr = st.owned.fr || []; return st.owned; };
 
@@ -875,7 +871,7 @@ const IBG_SCENES = (() => {
     const st = Wallet.state(), t = st.totals, prof = st.profile || { name: 'You', av: '🦊' }, body = $('lbBody'); body.innerHTML = '';
     document.querySelectorAll('#lbOv .tab').forEach(x => x.classList.toggle('on', x.dataset.lb === lbTab));
     if (lbTab === 'me') {
-      [['🧪', 'Potion Pour', `Level ${t.pp_lvl || 1}`], ['🐝', 'Hive Stack', `Level ${t.hs_lvl || 1}`], ['🟦', 'Jelly Escape', `Level ${t.jj_lvl || 1}`], ['🌙', 'Midnight Grid', `Best ${t.mg_score || 0}`], ['🪔', 'Mithai Mela', `Level ${t.ss_lvl || 1}`], ['🎉', 'Pop Party', `Level ${t.pb_lvl || 1}`], ['🏃', 'Geetu Jungle Dash', `Best ${t.jd_best || 0} m`], ['🍉', 'Juicy Slice', `Best ${t.js_best || 0}`], ['🔢', 'Sudoku Bloom', `Level ${t.sd_lvl || 1}`], ['⭐', 'Player level', `${Wallet.level}`], ['🔥', 'Daily streak', `${st.daily.streak || 0} days`]]
+      [['🧪', 'Potion Pour', `Level ${t.pp_lvl || 1}`], ['🟦', 'Jelly Escape', `Level ${t.jj_lvl || 1}`], ['🌙', 'Midnight Grid', `Best ${t.mg_score || 0}`], ['🏗️', 'Sky Stack', `Best ${t.sk_best || 0} floors`], ['🎉', 'Pop Party', `Level ${t.pb_lvl || 1}`], ['🏃', 'Geetu Jungle Dash', `Best ${t.jd_best || 0} m`], ['⚡', 'Plasma Parry', `Best ${t.px_best || 0}`], ['🔢', 'Sudoku Bloom', `Level ${t.sd_lvl || 1}`], ['⭐', 'Player level', `${Wallet.level}`], ['🔥', 'Daily streak', `${st.daily.streak || 0} days`]]
         .forEach(([i, n, v]) => { const r = document.createElement('div'); r.className = 'lbrow'; r.innerHTML = `<span class="av2">${i}</span><span class="nm2">${n}</span><span>${v}</span>`; body.appendChild(r); });
       return;
     }
@@ -897,18 +893,17 @@ const IBG_SCENES = (() => {
   // ================= Missions =================
   const MISSIONS = [
     { id: 'pp_level', icon: '🧪', text: n => `Clear ${n} Potion Pour levels`, n: [2, 3, 4], reward: 60, game: 'pp' },
-    { id: 'hs_level', icon: '🐝', text: n => `Clear ${n} Hive Stack levels`, n: [1, 2, 3], reward: 60, game: 'hs' },
     { id: 'mg_lines', icon: '🟧', text: n => `Clear ${n} lines in Midnight Grid`, n: [10, 15, 25], reward: 60, game: 'mg' },
-    { id: 'hs_tiles', icon: '🍯', text: n => `Pop ${n} hive tiles`, n: [50, 80, 120], reward: 50, game: 'hs' },
     { id: 'mg_score', icon: '🌙', text: n => `Score ${n} in one Midnight Grid game`, n: [300, 600, 1000], reward: 70, game: 'mg' },
     { id: 'bubbles', icon: '🫧', text: n => `Pop ${n} floating bubbles`, n: [10, 20, 30], reward: 40, game: null },
     { id: 'stars3', icon: '⭐', text: n => `Get 3 stars on ${n} levels`, n: [1, 2, 3], reward: 70, game: null },
     { id: 'jj_level', icon: '🟦', text: n => `Clear ${n} Jelly Escape levels`, n: [2, 3, 4], reward: 60, game: 'jj' },
     { id: 'jj_jellies', icon: '🍬', text: n => `Help ${n} jellies escape`, n: [15, 25, 40], reward: 50, game: 'jj' },
-    { id: 'ss_level', icon: '🍥', text: n => `Clear ${n} Mithai Mela levels`, n: [2, 3, 4], reward: 60, game: 'ss' },
+    { id: 'sk_floors', icon: '🏗️', text: n => `Stack ${n} floors in Sky Stack`, n: [20, 40, 60], reward: 60, game: 'sk' },
+    { id: 'sk_perfect', icon: '✨', text: n => `Land ${n} perfect drops in Sky Stack`, n: [5, 10, 15], reward: 60, game: 'sk' },
     { id: 'pb_level', icon: '🎉', text: n => `Clear ${n} Pop Party levels`, n: [2, 3, 4], reward: 60, game: 'pb' },
     { id: 'jd_meters', icon: '🏃', text: n => `Run ${n} m with Geetu`, n: [500, 1000, 2000], reward: 60, game: 'jd' },
-    { id: 'js_fruits', icon: '🍉', text: n => `Slice ${n} fruits in Juicy Slice`, n: [40, 80, 150], reward: 60, game: 'js' },
+    { id: 'px_slices', icon: '⚡', text: n => `Slice ${n} shots in Plasma Parry`, n: [30, 60, 100], reward: 60, game: 'px' },
     { id: 'pp_daily', icon: '🏆', text: () => 'Beat the Potion Pour daily challenge', n: [1, 1, 1], reward: 90, game: 'pp' },
   ];
   function seeded(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; }
@@ -942,15 +937,14 @@ const IBG_SCENES = (() => {
   const BADGES = [
     { id: 'first_pour', icon: '🧪', name: 'First Pour', desc: 'Clear your first Potion Pour level', ok: (t) => (t.pp_level || 0) >= 1 },
     { id: 'potion_50', icon: '⚗️', name: 'Potion Master', desc: 'Clear 50 Potion Pour levels', ok: (t) => (t.pp_level || 0) >= 50 },
-    { id: 'hive_1', icon: '🐝', name: 'Busy Bee', desc: 'Clear your first Hive Stack level', ok: (t) => (t.hs_level || 0) >= 1 },
-    { id: 'hive_25', icon: '🍯', name: 'Hive Hero', desc: 'Clear 25 Hive Stack levels', ok: (t) => (t.hs_level || 0) >= 25 },
     { id: 'jelly_1', icon: '🍬', name: 'Jailbreak', desc: 'Clear your first Jelly Escape level', ok: (t) => (t.jj_level || 0) >= 1 },
     { id: 'jelly_25', icon: '🚪', name: 'Escape Artist', desc: 'Clear 25 Jelly Escape levels', ok: (t) => (t.jj_level || 0) >= 25 },
-    { id: 'sweet_1', icon: '🍥', name: 'Sweet Tooth', desc: 'Clear your first Mithai Mela level', ok: (t) => (t.ss_level || 0) >= 1 },
+    { id: 'stack_30', icon: '🏗️', name: 'Sky Builder', desc: 'Stack 30 floors in one Sky Stack game', ok: (t) => (t.sk_best || 0) >= 30 },
+    { id: 'stack_75', icon: '🚀', name: 'Star Tower', desc: 'Stack 75 floors in one Sky Stack game', ok: (t) => (t.sk_best || 0) >= 75 },
     { id: 'party_1', icon: '🎉', name: 'Party Starter', desc: 'Clear your first Pop Party level', ok: (t) => (t.pb_level || 0) >= 1 },
     { id: 'run_1k', icon: '🏃', name: 'Forest Marathon', desc: 'Run 1,000 m in one Geetu Jungle Dash run', ok: (t) => (t.jd_best || 0) >= 1000 },
-    { id: 'slice_100', icon: '🍉', name: 'Fruit Master', desc: 'Score 100 in one Juicy Slice game', ok: (t) => (t.js_best || 0) >= 100 },
-    { id: 'chain5', icon: '⛓️', name: 'Chain Reaction', desc: 'Get a ×5 chain in Hive Stack', ok: (t) => (t.hs_chain || 0) >= 5 },
+    { id: 'parry_1k', icon: '⚡', name: 'Blade Master', desc: 'Score 1,000 in one Plasma Parry game', ok: (t) => (t.px_best || 0) >= 1000 },
+    { id: 'wave_10', icon: '🛸', name: 'Drone Breaker', desc: 'Reach wave 10 in Plasma Parry', ok: (t) => (t.px_wave || 0) >= 10 },
     { id: 'lines100', icon: '🟧', name: 'Line Breaker', desc: 'Clear 100 lines in Midnight Grid', ok: (t) => (t.mg_lines || 0) >= 100 },
     { id: 'score2k', icon: '🌙', name: 'Night Owl', desc: 'Score 2,000 in one Midnight Grid game', ok: (t) => (t.mg_score || 0) >= 2000 },
     { id: 'bubbles100', icon: '🫧', name: 'Bubble Popper', desc: 'Pop 100 floating bubbles', ok: (t) => (t.bubbles || 0) >= 100 },
@@ -982,7 +976,7 @@ const IBG_SCENES = (() => {
   $('infoOk').onclick = () => $('infoOv').classList.remove('show');
   $('statsBtn').onclick = () => {
     ac(); sfx.tap(); const t = Wallet.state().totals, st = Wallet.state();
-    info('📊', 'My stats', `Player level ${Wallet.level} · ${st.earned} coins earned · Potion levels ${t.pp_level || 0} · Hive levels ${t.hs_level || 0} · Jelly levels ${t.jj_level || 0} · Mithai levels ${t.ss_level || 0} · Party levels ${t.pb_level || 0} · Best run ${t.jd_best || 0} m · Best slice ${t.js_best || 0} · Grid lines ${t.mg_lines || 0} · Best Grid score ${t.mg_score || 0} · Bubbles popped ${t.bubbles || 0}`);
+    info('📊', 'My stats', `Player level ${Wallet.level} · ${st.earned} coins earned · Potion levels ${t.pp_level || 0} · Jelly levels ${t.jj_level || 0} · Best tower ${t.sk_best || 0} floors · Party levels ${t.pb_level || 0} · Best run ${t.jd_best || 0} m · Best Plasma Parry ${t.px_best || 0} · Grid lines ${t.mg_lines || 0} · Best Grid score ${t.mg_score || 0} · Bubbles popped ${t.bubbles || 0}`);
   };
 
   // ================= Refresh UI =================
@@ -1010,13 +1004,12 @@ const IBG_SCENES = (() => {
   const layer = $('gameLayer'), frame = $('gameFrame');
   const HOW = {
     pp: [['👆', 'Tap a flask to pick it up.'], ['🫗', 'Tap another flask to pour. You can only pour onto the same colour, or into an empty flask.'], ['🍾', 'Fill each flask with one colour to cork it. Cork them all to win!'], ['❓', 'Later levels hide some layers — pour to reveal them. Stuck? Use Undo, Hint or +Flask.']],
-    hs: [['✋', 'Drag a stack from the bottom onto an empty space.'], ['🔁', 'Matching colours next to each other jump together and merge.'], ['💥', 'Collect 10 of one colour on a stack and it pops! Chain pops for bonus fun.'], ['🎯', 'Clear the target number of tiles before the board fills up. 🪨 Rocks block spaces.']],
     jj: [['👆', 'Drag a jelly — it slides around other jellies and walls.'], ['🚪', 'Slide it against a door of the same colour to let it escape. It must fit the door!'], ['❄️', 'Frozen jellies show a number — that many others must escape first.'], ['⏱', 'Beat the timer! Stuck? Use Hint, or Freeze to stop the clock.']],
-    ss: [['👆', 'Swipe a sweet into its neighbour to swap them.'], ['🟠', 'Line up 3 or more of the same Indian sweet to clear them.'], ['✨', 'Match 4 = Sparkler (clears a line), L or T shape = Marigold Blast, 5 in a row = Rainbow Star. Swap two specials together for huge combos!'], ['🎯', 'Hit the level goal before you run out of moves.']],
+    sk: [['👆', 'Tap anywhere to drop the sliding block onto the tower.'], ['✂️', 'Any part hanging over the edge is sliced off, so your next block is smaller.'], ['✨', 'Line it up exactly for a PERFECT drop. 3 perfects in a row make the block grow back.'], ['🚀', 'Keep climbing from the meadow, past the sunset and clouds, all the way to space!']],
     pb: [['👆', 'Tap 2 or more touching blocks of the same colour to pop them.'], ['🚀', 'Pop 5+ for a rocket, 7+ for a bomb, 9+ for a rainbow ball.'], ['💥', 'Tap specials that touch each other for giant combos.'], ['📦', 'Pop next to crates to break them. Reach the goals before moves run out.']],
     jd: [['👈', 'Swipe left or right to switch lanes.'], ['☝️', 'Swipe up to jump over logs, campfires and streams.'], ['👇', 'Swipe down to slide under low branches. Dodge the big boulders!'], ['🦜', 'Watch out for the forest animals cheering Geetu on!'], ['🧲', 'Grab coins and power-ups: magnet, shield and double coins.']],
     sd: [['🔢', 'Fill every row, column and 3×3 box with 1–9 — no repeats.'], ['✏️', 'Use Notes to pencil in guesses.'], ['❤️', 'Three wrong numbers and you are out of hearts.'], ['⚡', 'Place numbers quickly for a combo; finish a row, column or box to make it bloom.']],
-    js: [['✋', 'Swipe across fruit to slice it.'], ['💣', 'Never slice a bomb!'], ['❤️', 'Let 3 fruits fall and it\'s game over.'], ['🌟', 'Gold star = fruit frenzy, ice crystal = slow motion. Slice 3+ in one swipe for a combo bonus.']],
+    px: [['✋', 'Swipe across glowing orbs and crystal spears to slice them with your plasma blade.'], ['🟡', 'Armored cores show an arrow: swipe in that direction to shatter them.'], ['🟥', 'Heavy plasma blocks can\'t be cut: swipe left or right fast to sidestep.'], ['🛡️', 'Each hit costs a shield. Lose all 3 and the run ends. Chain slices for combo multipliers!']],
     mg: [['✋', 'Drag a block shape onto the board.'], ['➖', 'Fill a whole row or column to clear it.'], ['🔥', 'Clear lines on back-to-back moves to build a streak. Streak ×4 = FEVER (double points)!'], ['💣', 'Use Rotate, Bomb and Shuffle when you\'re stuck. The game ends when nothing fits.']],
   };
   function showHow(id, then) {
@@ -1053,7 +1046,7 @@ const IBG_SCENES = (() => {
   });
 
   // ================= Animated game previews =================
-  const pv = { pp: $('pv-pp').getContext('2d'), hs: $('pv-hs').getContext('2d'), mg: $('pv-mg').getContext('2d'), jj: $('pv-jj').getContext('2d') };
+  const pv = { pp: $('pv-pp').getContext('2d'), mg: $('pv-mg').getContext('2d'), jj: $('pv-jj').getContext('2d') };
   function hexPath(c, x, y, r, sq) { c.beginPath(); for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3; c.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r * sq); } c.closePath(); }
   function drawPreviews(t) {
     // Potion Pour: three flasks with sloshing layers + bubbles
@@ -1067,14 +1060,6 @@ const IBG_SCENES = (() => {
       for (let b = 0; b < 3; b++) { const ph = (t / 1400 + b * 0.33 + k * 0.2) % 1; c.fillStyle = `rgba(255,255,255,${0.5 * (1 - ph)})`; c.beginPath(); c.arc(Math.sin(t / 300 + b) * 8, h - ph * 100, 3, 0, 7); c.fill(); }
       c.restore(); c.lineWidth = 3; c.strokeStyle = 'rgba(255,255,255,0.8)'; c.stroke(); c.fillStyle = '#fff'; c.fillRect(-w / 2 - 4, -4, w + 8, 6); c.restore();
     }
-    // Hive Stack: stacks with a tile hopping across
-    c = pv.hs; c.clearRect(0, 0, 192, 192);
-    const HC = [['#ff5a5f', '#c2343a'], ['#3a86ff', '#1f53c2'], ['#3ddc84', '#1f9c55'], ['#ffd23f', '#d19a00']];
-    const st = [[0, 0, 1, 1], [2, 2, 2], [3, 1, 1, 1, 1]], xs = [46, 96, 146], base = 150, T = 9, r = 24, sq = 0.78;
-    const hop = (t / 1100) % 1, from = Math.floor(t / 1100) % 2 === 0 ? 0 : 2;
-    st.forEach((s, i) => s.forEach((ci, k) => { const y = base - k * T + (i === 1 ? -6 : 0); hexPath(c, xs[i], y + T, r, sq); c.fillStyle = HC[ci][1]; c.fill(); hexPath(c, xs[i], y, r, sq); c.fillStyle = HC[ci][0]; c.fill(); c.strokeStyle = 'rgba(255,255,255,.6)'; c.lineWidth = 1.5; c.stroke(); }));
-    { const ax = xs[from], bx = 96, ay = base - 4 * T, by = base - 3 * T - 6, e = hop < 0.5 ? 2 * hop * hop : 1 - Math.pow(-2 * hop + 2, 2) / 2;
-      const x = ax + (bx - ax) * e, y = ay + (by - ay) * e - Math.sin(hop * Math.PI) * 40; hexPath(c, x, y + T, r, sq); c.fillStyle = HC[2][1]; c.fill(); hexPath(c, x, y, r, sq); c.fillStyle = HC[2][0]; c.fill(); c.strokeStyle = '#fff'; c.stroke(); }
     // Midnight Grid: mini grid with a piece dropping and a line flashing
     c = pv.mg; c.clearRect(0, 0, 192, 192);
     const G = 6, cs = 26, ox = 18, oy = 18, cyc = (t / 2200) % 1;
@@ -1103,11 +1088,20 @@ const IBG_SCENES = (() => {
     jel(ox + g * 1.4, oy + g * 0.15, g * 0.9, g * 0.9, '#ffd60a', 1, Math.sin(t / 340 + 1) * 0.04);
     jel(jx, jy, g * 0.9, g * 1.6, '#ff4d6d', a, slide > 0 && slide < 1 ? 0.08 : 0);
   }
-  ['ss', 'pb', 'jd', 'js', 'sd'].forEach(g => { pv[g] = $('pv-' + g).getContext('2d'); });
+  ['sk', 'pb', 'jd', 'px', 'sd'].forEach(g => { pv[g] = $('pv-' + g).getContext('2d'); });
   function drawNewPreviews(t) {
-    let c = pv.ss; c.clearRect(0, 0, 192, 192);
-    const sc = ['#ff2d95', '#ff7a00', '#ffb020', '#38bdff', '#9b5cff', '#8cf21a'];
-    for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { const i = (r * 3 + k * 2) % 6, pop = r === 1 && ((t / 1600) % 1) > 0.6, s = pop ? 1 - (((t / 1600) % 1) - 0.6) * 2.5 : 1; if (s <= 0) continue; c.save(); c.translate(30 + k * 44, 30 + r * 44 + (r === 1 ? 0 : Math.sin(t / 400 + k) * 2)); c.scale(s, s); c.fillStyle = sc[pop ? 0 : i]; Kit2(c, pop ? 0 : i, 17); c.fill(); c.fillStyle = 'rgba(255,255,255,0.5)'; c.beginPath(); c.ellipse(-5, -7, 6, 3, -0.6, 0, 7); c.fill(); c.restore(); }
+    let c = pv.sk; c.clearRect(0, 0, 192, 192);
+    { // Sky Stack: an isometric tower with a block sliding in and dropping
+      const iso = (x, y, z) => [96 + (x - z) * 26, 150 + (x + z) * 13 - y * 15];
+      const box = (x, y, z, w, d, hue) => { const p = [iso(x, y + 1, z), iso(x + w, y + 1, z), iso(x + w, y + 1, z + d), iso(x, y + 1, z + d), iso(x + w, y, z), iso(x + w, y, z + d), iso(x, y, z + d)];
+        const poly = (pts, col) => { c.fillStyle = col; c.beginPath(); pts.forEach(([a, b], i) => i ? c.lineTo(a, b) : c.moveTo(a, b)); c.closePath(); c.fill(); };
+        poly([p[1], p[2], p[5], p[4]], `hsl(${hue},60%,48%)`); poly([p[3], p[2], p[5], p[6]], `hsl(${hue},60%,40%)`); poly([p[0], p[1], p[2], p[3]], `hsl(${hue},65%,64%)`); };
+      const cyc = (t / 1800) % 1, n = 5;
+      for (let i = 0; i < n; i++) box(-1.2, i, -1.2, 2.4 - i * 0.12, 2.4, (200 + i * 14) % 360);
+      const slideX = cyc < 0.6 ? -2.6 + Math.sin(cyc / 0.6 * Math.PI) * 2.6 * 1.2 : -1.2;
+      box(slideX, n + (cyc < 0.6 ? 0.4 : 0), -1.2, 2.4 - n * 0.12, 2.4, (200 + n * 14) % 360);
+      if (cyc > 0.6 && cyc < 0.8) { c.strokeStyle = `rgba(255,255,255,${(0.8 - cyc) * 5})`; c.lineWidth = 3; c.beginPath(); c.ellipse(96, 150 - (n + 1) * 15 + 13, 70, 30, 0, 0, 7); c.stroke(); }
+    }
     c = pv.pb; c.clearRect(0, 0, 192, 192);
     for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { const i = (r + k * 2) % 4, grow = r >= 2 && k <= 1 && ((t / 1500) % 1) > 0.5; c.save(); c.translate(30 + k * 44, 30 + r * 44); const s = grow ? 1 + Math.sin(((t / 1500) % 1) * 12) * 0.1 : 1; c.scale(s, s); c.fillStyle = ['#ff4d6d', '#ffd60a', '#38d17a', '#3a86ff'][grow ? 0 : i]; c.beginPath(); c.roundRect ? c.roundRect(-19, -19, 38, 38, 10) : c.rect(-19, -19, 38, 38); c.fill(); c.fillStyle = 'rgba(255,255,255,0.4)'; c.fillRect(-14, -16, 28, 8); c.restore(); }
     c = pv.jd; c.clearRect(0, 0, 192, 192); drawDashPreview(c, t);
@@ -1116,11 +1110,19 @@ const IBG_SCENES = (() => {
       c.fillStyle = on ? '#ffd23f' : 'rgba(255,255,255,0.92)'; c.beginPath(); c.roundRect ? c.roundRect(x, y, s, s, 12) : c.rect(x, y, s, s); c.fill();
       const v = vals[k] || (on ? 7 : 0); if (v) { c.fillStyle = vals[k] ? '#173a33' : '#16a37f'; c.font = '900 34px system-ui,sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(v, x + s / 2, y + s / 2 + 2); }
       if (on) { c.fillStyle = 'rgba(255,126,182,0.8)'; for (let p = 0; p < 5; p++) { const a = p * 1.2566 + t / 300; c.beginPath(); c.arc(x + s / 2 + Math.cos(a) * 30, y + s / 2 + Math.sin(a) * 30, 5, 0, 7); c.fill(); } } } }
-    c = pv.js; c.clearRect(0, 0, 192, 192);
-    const ph = (t / 1400) % 1, fy = 150 - Math.sin(ph * Math.PI) * 100, cut = ph > 0.5;
-    if (!cut) { c.fillStyle = '#2f9a40'; c.beginPath(); c.arc(96, fy, 34, 0, 7); c.fill(); c.strokeStyle = '#1f6a2a'; c.lineWidth = 4; for (let i = -1; i <= 1; i++) { c.beginPath(); c.ellipse(96 + i * 12, fy, 4, 32, 0, 0, 7); c.stroke(); } }
-    else { const d = (ph - 0.5) * 120; [-1, 1].forEach(sd => { c.save(); c.translate(96 + sd * d, fy + d * 0.6); c.rotate(sd * d / 40); c.fillStyle = '#2f9a40'; c.beginPath(); c.arc(0, 0, 34, sd > 0 ? -Math.PI / 2 : Math.PI / 2, sd > 0 ? Math.PI / 2 : Math.PI * 1.5); c.fill(); c.fillStyle = '#ff4d6d'; c.beginPath(); c.arc(0, 0, 28, sd > 0 ? -Math.PI / 2 : Math.PI / 2, sd > 0 ? Math.PI / 2 : Math.PI * 1.5); c.fill(); c.restore(); });
-      c.strokeStyle = `rgba(255,255,255,${1 - (ph - 0.5) * 2})`; c.lineWidth = 5; c.lineCap = 'round'; c.beginPath(); c.moveTo(20, fy + 50); c.lineTo(172, fy - 50); c.stroke(); }
+    c = pv.px; c.clearRect(0, 0, 192, 192);
+    { // Plasma Parry: neon grid, a drone firing an orb at you, the blade slicing it
+      c.fillStyle = '#07041a'; c.fillRect(0, 0, 192, 192);
+      c.strokeStyle = 'rgba(43,217,255,0.55)'; c.lineWidth = 1.5; for (let i = -6; i <= 6; i++) { c.beginPath(); c.moveTo(96 + i * 6, 96); c.lineTo(96 + i * 40, 192); c.stroke(); }
+      for (let i = 0; i < 6; i++) { const y = 96 + Math.pow(((i / 6) + (t / 2000) % (1 / 6)), 2) * 96; c.beginPath(); c.moveTo(0, y); c.lineTo(192, y); c.stroke(); }
+      c.fillStyle = '#2a2450'; c.beginPath(); c.moveTo(96, 40); c.lineTo(110, 52); c.lineTo(96, 64); c.lineTo(82, 52); c.closePath(); c.fill(); c.strokeStyle = '#ff2bd6'; c.lineWidth = 2; c.beginPath(); c.ellipse(96, 52, 22, 6, 0, 0, 7); c.stroke();
+      const cyc = (t / 1600) % 1, z = Math.min(1, cyc / 0.6), r = 6 + z * z * 30, y = 56 + z * 50;
+      c.save(); c.globalCompositeOperation = 'lighter';
+      if (cyc < 0.6) { const g = c.createRadialGradient(96, y, 0, 96, y, r * 1.8); g.addColorStop(0, '#ffffff'); g.addColorStop(0.35, '#2bd9ff'); g.addColorStop(1, 'rgba(43,217,255,0)'); c.fillStyle = g; c.beginPath(); c.arc(96, y, r * 1.8, 0, 7); c.fill(); }
+      else { const d = (cyc - 0.6) * 140; [-1, 1].forEach(sd => { c.fillStyle = '#2bd9ff'; c.beginPath(); c.arc(96 + sd * d, 106 + sd * d * 0.3 + d * 0.4, 34 * (1 - (cyc - 0.6)), sd > 0 ? -0.6 : 2.5, sd > 0 ? 2.5 : 5.6); c.fill(); });
+        c.strokeStyle = `rgba(126,246,255,${1 - (cyc - 0.6) * 2.5})`; c.lineWidth = 6; c.lineCap = 'round'; c.shadowColor = '#7ef6ff'; c.shadowBlur = 16; c.beginPath(); c.moveTo(20, 150); c.lineTo(172, 62); c.stroke(); }
+      c.restore();
+    }
   }
   // Jungle Dash card: Geetu running away from us down a forest path, hopping a log now and then
   function drawDashPreview(c, t) {

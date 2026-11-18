@@ -657,7 +657,7 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
     timeMax = L.time; timeLeft = L.time; started = false; frozenT = 0; won = false; lost = false; toolsUsed = 0; drag = null; hint = null; streak = 0;
     parts.length = 0; floats.length = 0; layout(); syncHud();
     $('introTitle').textContent = 'Level ' + S.level;
-    let note = 'Drag each jelly to the door of the same colour to let it escape!';
+    let note = 'Drag each jelly to the door of its colour, then push it out (or let go on the door) to escape!';
     if (S.level === 3) note = 'New: a timer! Clear all jellies before time runs out.';
     else if (S.level === 6) note = 'New: 🪨 stones block the way.';
     else if (S.level === 12) note = 'New: ❄️ frozen jellies thaw after other jellies escape — watch the number!';
@@ -670,17 +670,19 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
 
   function fits(b, x, y) { for (const [dr, dc] of b.sh.cells) { const r = y + dr, c = x + dc; if (r < 0 || c < 0 || r >= R || c >= C) return false; const v = occ[r][c]; if (v !== -1 && v !== b.id) return false; } return true; }
   function setOcc(b, v) { b.sh.cells.forEach(([dr, dc]) => { occ[b.y + dr][b.x + dc] = v; }); }
+  // A jelly can leave through a door of its colour when every cell touching that wall sits inside the door opening.
   function exitDoor(b, x = b.x, y = b.y) {
     if (b.ice > 0) return null;
     for (const d of doors) {
       if (d.color !== b.color) continue;
-      if (d.side === 'L' && x === 0 && y >= d.start && y + b.sh.h <= d.start + d.len) return d;
-      if (d.side === 'R' && x + b.sh.w === C && y >= d.start && y + b.sh.h <= d.start + d.len) return d;
-      if (d.side === 'T' && y === 0 && x >= d.start && x + b.sh.w <= d.start + d.len) return d;
-      if (d.side === 'B' && y + b.sh.h === R && x >= d.start && x + b.sh.w <= d.start + d.len) return d;
+      const touch = b.sh.cells.filter(([dr, dc]) => d.side === 'L' ? x + dc === 0 : d.side === 'R' ? x + dc === C - 1 : d.side === 'T' ? y + dr === 0 : y + dr === R - 1);
+      if (!touch.length) continue;
+      const vert = d.side === 'L' || d.side === 'R';
+      if (touch.every(([dr, dc]) => { const k = vert ? y + dr : x + dc; return k >= d.start && k < d.start + d.len; })) return d;
     }
     return null;
   }
+  const OUT = { L: [-1, 0], R: [1, 0], T: [0, -1], B: [0, 1] };
   function step(b, dx, dy) {
     if (!fits(b, b.x + dx, b.y + dy)) return false;
     setOcc(b, -1); b.x += dx; b.y += dy; setOcc(b, b.id); return true;
@@ -1007,10 +1009,10 @@ if (typeof module !== 'undefined') module.exports = { jjGenerate, jjParams, JJ_S
       else { if (moved === 0 && !drag.bumped) { sfx.bump(); b.jig = 0.5; drag.bumped = true; } break; }
       drag.bumped = false;
       sfx.slide(moved);
-      const d = exitDoor(b); if (d) { escape(b, d); break; }
     }
+    if (drag) { const d = exitDoor(b); if (d) { const [ox2, oy2] = OUT[d.side]; d.flash = Math.max(d.flash || 0, 0.6); if ((ox2 && Math.sign(tx - b.x) === ox2) || (oy2 && Math.sign(ty - b.y) === oy2)) escape(b, d); } }
   });
-  const endDrag = () => { if (drag) { drag.b.jig = 0.7; drag = null; } };
+  const endDrag = () => { if (drag) { const b = drag.b, d = exitDoor(b); if (d) { escape(b, d); return; } b.jig = 0.7; drag = null; } };
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
 

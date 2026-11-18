@@ -718,18 +718,19 @@ const IBG_SCENES = (() => {
     if (lines > 0) {
       const wasFever = isFever();
       combo++; movesSinceClear = 0;
+      const mono = rows.filter(rr => board[rr].every(v => v === board[rr][0])).length + cols.filter(cc => board.every(row => row[cc] === board[0][cc])).length;
       const keys = new Set();
       rows.forEach(rr => { beams.push({ kind: 'row', i: rr, t: 0, ci: p.ci }); for (let cc = 0; cc < N; cc++) keys.add(rr * N + cc); });
       cols.forEach(cc => { beams.push({ kind: 'col', i: cc, t: 0, ci: p.ci }); for (let rr = 0; rr < N; rr++) keys.add(rr * N + cc); });
       keys.forEach(k => {
         const rr = Math.floor(k / N), cc = k % N;
         const x = bx + cc * cell + cell / 2, y = by + rr * cell + cell / 2;
-        clearing.push({ r: rr, c: cc, ci: board[rr][cc], delay: Math.hypot(x - cx, y - cy) / cell * 0.03, t: 0, spawned: false });
+        clearing.push({ r: rr, c: cc, ci: p.ci, delay: Math.hypot(x - cx, y - cy) / cell * 0.03, t: 0, spawned: false });
         board[rr][cc] = -1;
       });
       const base = lines * 10 + lines * (lines - 1) * 5;    // 1→10, 2→30, 3→60, 4→100
       const mult = combo * (isFever() ? 2 : 1);
-      const pts = base * mult;
+      const pts = base * mult * (mono ? 1 + mono : 1);
       let bonus = 0;
       if (board.every(row => row.every(v => v < 0))) bonus = 300;
       gained += pts + bonus;
@@ -745,6 +746,7 @@ const IBG_SCENES = (() => {
       addFloat('+' + (pts + bonus), cx, cy, '#ffffff', cell * 0.55, 0);
       const label = ['', '', 'DOUBLE!', 'TRIPLE!', 'QUAD!', 'UNREAL!', 'UNREAL!'][Math.min(lines, 6)];
       if (label) addFloat(label, W / 2, by + boardSize * 0.36, '#ffd690', cell * 0.78, 0.12);
+      if (mono) addFloat('SAME COLOUR ×' + (1 + mono) + '!', W / 2, by + boardSize * 0.26, COLORS[p.ci].glow, cell * 0.62, 0.05);
       if (combo >= 2) addFloat('COMBO ×' + combo, W / 2, by + boardSize * 0.5, '#a2f2fb', cell * 0.62, 0.22);
       if (bonus) addFloat('CLEAN SWEEP!', W / 2, by + boardSize * 0.64, '#ffc8e4', cell * 0.62, 0.32);
       if (!wasFever && isFever()) { addFloat('🔥 FEVER ×2 🔥', W / 2, by + boardSize * 0.64, '#ff9a3c', cell * 0.66, 0.4); sfx.fever(); }
@@ -862,6 +864,7 @@ const IBG_SCENES = (() => {
     bombMode = false; bombAim = null; syncPW();
     clearing = []; particles = []; floats = []; beams = []; waves = []; pop.fill(0);
     refillTray();
+    { const n = (store.get('mg_games', 0) | 0) + 1; store.set('mg_games', n); if (n <= 3) setTimeout(() => toast('Fill a whole row or column to clear it. Colours don\'t need to match, but same-colour lines score double!'), 600); }
     ['overOverlay', 'confirmOverlay', 'menuOverlay'].forEach(id => $(id).classList.remove('show'));
     save();
   }
