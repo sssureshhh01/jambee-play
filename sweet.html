@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#ffc896">
-<title>Mithai Mela</title>
+<title>Shiok Sweets</title>
 <style>
   :root{--text:#2a1450;--muted:#6b5a96;--accent:#e2246e;--accent2:#ff8a3d;--shadow:rgba(150,60,10,.3);}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -94,7 +94,7 @@
 <div class="overlay show" id="homeOv">
   <div class="home">
     <canvas id="logoCanvas" width="520" height="160"></canvas>
-    <div class="title">MITHAI<br>MELA</div>
+    <div class="title">SHIOK<br>SWEETS</div>
     <div class="tagline">SWAP · MATCH · CELEBRATE</div>
     <button class="cta gold" id="playBtn" style="font-size:21px;padding:18px">Play<span class="sub" id="playSub">Level 1</span></button>
     <button class="cta soft" id="settingsBtn">⚙️ Settings</button>
@@ -669,7 +669,7 @@ const Kit = {
   const N = 8;
   // six sweets to start, each with its own colour and shape
   // 12 sweets in 6 colour families. Each level picks one sweet per family, so colours never clash,
-  // and new sweets unlock as you progress: the further you go, the more different mithai you meet.
+  // and new sweets unlock as you progress: the further you go, the more different sweets you meet.
   const POOL_COL = [
     { c: '#b8501e', d: '#5a1e08', l: '#ffc08a' }, { c: '#ff7a00', d: '#c44a00', l: '#ffd08a' }, { c: '#cfd6e4', d: '#7e8698', l: '#ffffff' },
     { c: '#6cc04a', d: '#2f7a1a', l: '#d4ffb8' }, { c: '#ffc21a', d: '#b8860a', l: '#fff0a0' }, { c: '#ff5ca8', d: '#c0186a', l: '#ffd0e6' },
@@ -688,16 +688,19 @@ const Kit = {
     { c: '#fbf6ec', d: '#b8a888', l: '#ffffff' }, { c: '#d8a060', d: '#8a5a20', l: '#ffe0b0' }, { c: '#c88a4a', d: '#7a4a18', l: '#f0c890' },
     { c: '#f6d890', d: '#b89040', l: '#fff6d0' }, { c: '#fff4e0', d: '#c8b090', l: '#ffffff' }, { c: '#fffaf2', d: '#c8b8a0', l: '#ffffff' },
     { c: '#7ad46a', d: '#2a7a1a', l: '#e0ffd0' }, { c: '#ff6a8a', d: '#b8203a', l: '#ffd0da' },
+    { c: '#f0b030', d: '#a86a10', l: '#fff0b0' }, { c: '#f0c060', d: '#a87820', l: '#fff4c8' }, { c: '#f2c45a', d: '#a8781a', l: '#fff0b8' }, { c: '#5ab84a', d: '#246a1a', l: '#d8ffc8' }, { c: '#4fb83a', d: '#1f6a14', l: '#c8ffb0' }, { c: '#ffffff', d: '#c8c0b8', l: '#ffffff' }, { c: '#d89040', d: '#8a5010', l: '#ffe0a0' }, { c: '#f8f4ec', d: '#b8a888', l: '#ffffff' }, { c: '#fbf8f0', d: '#c8b8a0', l: '#ffffff' }, { c: '#fff0d0', d: '#c8a060', l: '#ffffff' }, { c: '#7ad46a', d: '#2a7a1a', l: '#e0ffd0' }, { c: '#ff7aa8', d: '#c0306a', l: '#ffe0ee' }, { c: '#f0b850', d: '#a86a10', l: '#fff0c0' }, { c: '#e8a840', d: '#9a5a10', l: '#ffe8b0' }, { c: '#ffa830', d: '#b8600a', l: '#ffe0a0' }, { c: '#6a2a6a', d: '#2a0a2a', l: '#c890c8' }, { c: '#ffa8c8', d: '#c8608a', l: '#fff0f6' }, { c: '#ff86b6', d: '#c03a7a', l: '#ffe0ee' },
   ];
   const POOL_NAMES = ['Gulab Jamun', 'Jalebi', 'Kaju Katli', 'Pista Barfi', 'Kesar Peda', 'Rose Sandesh', 'Rasgulla', 'Mysore Pak', 'Imarti', 'Kalakand', 'Chum Chum', 'Kaju Pista Roll',
     'Besan Ladoo', 'Motichoor Ladoo', 'Ondeh Ondeh', 'Kueh Lapis', 'Pineapple Tart', 'Kulfi', 'Chocolate Barfi', 'Rasmalai', 'Gajar Halwa',
     'Soan Papdi', 'Modak', 'Coconut Barfi', 'Mango Barfi', 'Kesari', 'Badusha', 'Kuih Seri Muka', 'Putu Piring', 'Dharwad Peda', 'Ghevar', 'Ang Ku Kueh', 'Kueh Dadar', 'Milk Peda',
-    'Nutella Tart', 'Cornflake Tart', 'Almond London', 'Egg Tart', 'Cheese Tart', 'Love Letters', 'Kueh Bangkit', 'Choc Chip Cookie', 'Peanut Cookie', 'Butter Cookie', 'Sugee Cookie', 'Kuih Makmur', 'Pandan Swiss Roll', 'Strawberry Tart'];
+    'Nutella Tart', 'Cornflake Tart', 'Almond London', 'Egg Tart', 'Cheese Tart', 'Love Letters', 'Kueh Bangkit', 'Choc Chip Cookie', 'Peanut Cookie', 'Butter Cookie', 'Sugee Cookie', 'Kuih Makmur', 'Pandan Swiss Roll', 'Strawberry Tart',
+    'Kuih Bahulu', 'Butter Ring', 'Nastar Roll', 'Kueh Salat', 'Kueh Lopis', 'Tang Yuan', 'Mooncake', 'Muah Chee', 'Putu Mayam', 'Payasam', 'Chendol', 'Ice Kachang', 'Kaya Puff', 'Apam Balik', 'Mango Sago', 'Pulut Hitam', 'Macaron', 'Pink Donut'];
+  const NEW_T = ['flower', 'ring', 'nastar', 'salat', 'pyramid', 'tangyuan', 'mooncake', 'muahchee', 'nest', 'bowl', 'bowlg', 'ice', 'puff', 'fold', 'bowlo', 'bowlp', 'macaron', 'donut']; // drawing style for sweets 48+
   // families: [brown], [orange], [white], [green], [yellow], [pink]; later sweets unlock at these levels
-  const FAMILY = [[0, 18, 29, 34, 36], [1, 8, 13, 20, 24, 25, 35, 41, 42], [2, 6, 9, 17, 19, 22, 28, 40, 44, 45], [3, 11, 14, 27, 32, 46], [4, 7, 12, 16, 21, 26, 30, 33, 37, 38, 39, 43], [5, 10, 15, 23, 31, 47]];
+  const FAMILY = [[0, 18, 29, 34, 36, 63], [1, 8, 13, 20, 24, 25, 35, 41, 42, 62], [2, 6, 9, 17, 19, 22, 28, 40, 44, 45, 53, 55, 56, 57], [3, 11, 14, 27, 32, 46, 51, 52, 58], [4, 7, 12, 16, 21, 26, 30, 33, 37, 38, 39, 43, 48, 49, 50, 54, 60, 61], [5, 10, 15, 23, 31, 47, 59, 64, 65]];
   // unlock order: a new sweet joins every 2–3 levels (tarts and cookies come early!)
-  const ORDER = [6, 34, 8, 16, 35, 7, 36, 10, 37, 11, 14, 38, 9, 39, 13, 15, 40, 47, 18, 41, 17, 42, 12, 43, 19, 20, 44, 21, 45, 22, 46, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33];
-  const UNLOCK = {}; ORDER.forEach((ci, k) => UNLOCK[ci] = 4 + Math.round(k * 2.5));
+  const ORDER = [6, 34, 8, 16, 48, 35, 7, 59, 36, 10, 37, 51, 11, 14, 38, 64, 9, 39, 52, 13, 15, 60, 40, 47, 49, 18, 41, 54, 17, 42, 58, 12, 43, 62, 19, 20, 50, 44, 21, 65, 45, 22, 53, 46, 23, 56, 24, 25, 57, 26, 27, 61, 28, 29, 55, 30, 31, 63, 32, 33];
+  const UNLOCK = {}; ORDER.forEach((ci, k) => UNLOCK[ci] = 4 + Math.round(k * 2.2));
   let SET = [0, 1, 2, 3, 4, 5], COL = SET.map(i => POOL_COL[i]), NAMES = SET.map(i => POOL_NAMES[i]);
   function sweetSet(n) {
     const rng = Kit.rng(n * 911 + 5), fams = FAMILY.map(f => f.filter(i => (UNLOCK[i] || 0) <= n));
@@ -713,7 +716,7 @@ const Kit = {
     ['Wahhh!!', 'Shiok!', 'Nice lah!', 'Steady!', 'Sabash!', 'Best ah!', 'Fuyoh!', 'Pooooduuuu!', 'Goyang goyang!', 'Tanku nakaa!', 'Sweet ah!'],
     ['Superruuuu!', 'Semma!', 'Power lah!', 'Mass da!', 'Solid bro!', 'Walao!', 'Dhanana ka!', 'Kalakureenga!', 'Jolly ah!', 'Mantap!'],
     ['Super Comboo!', 'Eppadi laaa!!', 'Kalakkal!', 'Steady pom pi pi!', 'Gempak!', 'Neegae vera level!', 'Yaaaru saamy ithu!', 'Sema mass!'],
-    ['Thalaivaaa!', 'Ultimate lah!', 'Wah lau eh!!', 'Vera level!', 'Mithai mania!', 'Oh my Kadavulae!', 'Aiyoo so sweet!', 'Boss level!'],
+    ['Thalaivaaa!', 'Ultimate lah!', 'Wah lau eh!!', 'Vera level!', 'Shiok sweets!', 'Oh my Kadavulae!', 'Aiyoo so sweet!', 'Boss level!'],
     ['LEGENDARY LAH!', 'Eppadi laaa!! 🔥', 'Superruuuu MAX!', 'Kadavulae!! So sweet!', 'Yaaaru saamy ithu!! 😱', 'Neegae vera level!! 👑']];
   let lastPraise = '';
   const praise = n => { const pool = PRAISE[Math.min(6, n)].filter(x => x !== lastPraise); lastPraise = pool[Math.floor(Math.random() * pool.length)]; return lastPraise; };
@@ -849,7 +852,7 @@ const Kit = {
         if (lastSwap) lastSwap.forEach(([r, c]) => { if (g.cells.has(r * N + c)) at = r * N + c; });
         const r = Math.floor(at / N), c = at % N, p = grid[r][c];
         // existing special in the spot fires first, then the new one is created
-        if (p.sp) { protect.add(-1); } else { protect.add(at); p.sp = type; p.born = 0.35; K.tone(1318, 0.18, { type: 'triangle', vol: 0.09 }); addFloat(type === 'b' ? 'MITHAI BOX!' : type === 'w' ? 'SYRUP BURST!' : 'SILVER VARK!', cx(c), cy(r) - cs * 0.6, '#ffffff', cs * 0.4); }
+        if (p.sp) { protect.add(-1); } else { protect.add(at); p.sp = type; p.born = 0.35; K.tone(1318, 0.18, { type: 'triangle', vol: 0.09 }); addFloat(type === 'b' ? 'GOODIE BOX!' : type === 'w' ? 'SYRUP BURST!' : 'SILVER VARK!', cx(c), cy(r) - cs * 0.6, '#ffffff', cs * 0.4); }
       }
     });
     lastSwap = null;
@@ -899,7 +902,7 @@ const Kit = {
   function comboSwap(pa, at, pb, bt) {
     const set = new Set(), [r, c] = at;
     const sps = [pa.sp, pb.sp].sort().join('');
-    if (pa.sp === 'b' && pb.sp === 'b') { flash = 0.4; for (let i = 0; i < N * N; i++) set.add(i); announce('MITHAI FEAST!'); hitStop(0.35, 1.6); }
+    if (pa.sp === 'b' && pb.sp === 'b') { flash = 0.4; for (let i = 0; i < N * N; i++) set.add(i); announce('SHIOK FEAST!'); hitStop(0.35, 1.6); }
     else if (pa.sp === 'b' || pb.sp === 'b') {
       const bomb = pa.sp === 'b' ? pa : pb, other = bomb === pa ? pb : pa, bpos = bomb === pa ? at : bt;
       const target = other.c; rainbowZap(bpos[0], bpos[1], target); set.add(bpos[0] * N + bpos[1]);
@@ -1059,6 +1062,7 @@ const Kit = {
     else if (ci === 29) c.arc(0, 0, R * 0.84, 0, 7);
     else if (ci === 31) c.ellipse(0, 0, R * 0.92, R * 0.78, 0, 0, 7);
     else if (ci === 32) Kit.rr(c, -R * 0.95, -R * 0.42, R * 1.9, R * 0.84, R * 0.42);
+    else if (ci >= 48) { const t = NEW_T[ci - 48]; if (t === 'nastar' || t === 'fold') Kit.rr(c, -R * 0.9, -R * 0.45, R * 1.8, R * 0.9, R * 0.45); else if (t === 'salat' || t === 'muahchee') Kit.rr(c, -R * 0.8, -R * 0.8, R * 1.6, R * 1.6, R * 0.12); else if (t === 'pyramid') { c.moveTo(0, -R * 0.85); c.lineTo(R * 0.9, R * 0.7); c.lineTo(-R * 0.9, R * 0.7); c.closePath(); } else c.arc(0, R * 0.02, R * 0.88, 0, 7); }
     else if (ci >= 34 && ci !== 39 && ci !== 46) c.arc(0, R * 0.02, R * (ci === 40 || ci === 45 ? 0.8 : 0.88), 0, 7);
     else if (ci === 39 || ci === 46) Kit.rr(c, -R * 0.95, -R * 0.42, R * 1.9, R * 0.84, R * 0.42);
     else if (ci === 20) { c.moveTo(-R * 0.95, R * 0.6); c.bezierCurveTo(-R * 0.9, -R * 0.4, -R * 0.3, -R * 0.85, 0, -R * 0.85); c.bezierCurveTo(R * 0.3, -R * 0.85, R * 0.9, -R * 0.4, R * 0.95, R * 0.6); c.closePath(); }
@@ -1170,6 +1174,33 @@ const Kit = {
       c.fillStyle = rad(-R * 0.2, -R * 0.4, R * 0.05, R * 1.0, [[0, '#ffc090'], [0.5, '#ff6a2a'], [1, '#a8300a']]); candyPath(c, 20, R); c.fill();
       c.save(); candyPath(c, 20, R); c.clip(); const rg = Kit.rng(71); c.strokeStyle = 'rgba(255,190,120,.6)'; c.lineWidth = R * 0.04; for (let i = 0; i < 26; i++) { const x = (rg() - 0.5) * R * 1.8, y = (rg() - 0.5) * R * 1.4; c.beginPath(); c.moveTo(x, y); c.lineTo(x + R * 0.2, y + (rg() - 0.5) * R * 0.15); c.stroke(); } c.restore();
       c.fillStyle = '#f6e6c0'; c.beginPath(); c.ellipse(-R * 0.25, -R * 0.35, R * 0.16, R * 0.08, 0.4, 0, 7); c.fill(); c.fillStyle = '#4a1a20'; c.beginPath(); c.arc(R * 0.3, -R * 0.2, R * 0.07, 0, 7); c.fill(); c.fillStyle = '#7ccf4a'; c.beginPath(); c.ellipse(R * 0.05, -R * 0.55, R * 0.1, R * 0.04, -0.3, 0, 7); c.fill();
+    } else if (ci >= 48) { // local favourites: bowls, kuih, cookies, cakes
+      const t = NEW_T[ci - 48], P = POOL_COL[ci], rg = Kit.rng(ci * 17), gr3 = () => rad(-R * 0.3, -R * 0.35, R * 0.05, R * 1.05, [[0, P.l], [0.5, P.c], [1, P.d]]);
+      const bowl = (inner, top) => { shadow(R * 0.85, R * 0.86); c.fillStyle = '#f4f6fa'; c.beginPath(); c.moveTo(-R * 0.95, -R * 0.05); c.quadraticCurveTo(-R * 0.9, R * 0.85, 0, R * 0.85); c.quadraticCurveTo(R * 0.9, R * 0.85, R * 0.95, -R * 0.05); c.fill(); c.strokeStyle = '#5fa8e8'; c.lineWidth = R * 0.06; c.beginPath(); c.moveTo(-R * 0.82, R * 0.35); c.quadraticCurveTo(0, R * 0.55, R * 0.82, R * 0.35); c.stroke();
+        c.fillStyle = inner; c.beginPath(); c.ellipse(0, -R * 0.05, R * 0.95, R * 0.32, 0, 0, 7); c.fill(); top && top(); };
+      if (t === 'bowl') bowl('#fff0d0', () => { c.fillStyle = 'rgba(232,160,40,.4)'; c.beginPath(); c.ellipse(0, -R * 0.05, R * 0.6, R * 0.18, 0, 0, 7); c.fill(); c.fillStyle = '#f6e6c0'; [[-0.35, -0.1], [0.2, -0.15], [0.45, 0]].forEach(([x, y]) => { c.beginPath(); c.ellipse(x * R, y * R, R * 0.14, R * 0.07, 0.5, 0, 7); c.fill(); }); c.fillStyle = '#4a1a20'; c.beginPath(); c.arc(-R * 0.05, -R * 0.02, R * 0.06, 0, 7); c.fill(); });
+      else if (t === 'bowlg') bowl('#f6efe0', () => { c.strokeStyle = '#4fb83a'; c.lineWidth = R * 0.07; c.lineCap = 'round'; for (let i = 0; i < 7; i++) { c.beginPath(); c.moveTo(-R * 0.6 + i * R * 0.2, -R * 0.15); c.quadraticCurveTo(-R * 0.5 + i * R * 0.2, 0, -R * 0.62 + i * R * 0.2, R * 0.05); c.stroke(); } c.fillStyle = 'rgba(120,60,10,.75)'; c.beginPath(); c.ellipse(R * 0.1, -R * 0.12, R * 0.35, R * 0.08, 0, 0, 7); c.fill(); c.fillStyle = '#c8403a'; c.beginPath(); c.arc(-R * 0.4, -R * 0.1, R * 0.08, 0, 7); c.fill(); });
+      else if (t === 'bowlo') bowl('#ffa830', () => { c.fillStyle = 'rgba(255,255,255,.85)'; for (let i = 0; i < 16; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.4, -R * 0.05 + (rg() - 0.5) * R * 0.35, R * 0.05, 0, 7); c.fill(); } c.fillStyle = '#ffd060'; Kit.rr(c, -R * 0.2, -R * 0.35, R * 0.35, R * 0.25, R * 0.06); c.fill(); });
+      else if (t === 'bowlp') bowl('#4a1a4a', () => { c.fillStyle = '#fffaf0'; c.beginPath(); c.ellipse(R * 0.1, -R * 0.1, R * 0.45, R * 0.13, 0.2, 0, 7); c.fill(); c.fillStyle = 'rgba(200,140,200,.6)'; for (let i = 0; i < 10; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.4, -R * 0.05 + (rg() - 0.5) * R * 0.3, R * 0.04, 0, 7); c.fill(); } });
+      else if (t === 'tangyuan') bowl('rgba(255,220,160,.9)', () => { [[-0.35, -0.12, '#ffffff'], [0.05, -0.2, '#ffb8d0'], [0.4, -0.08, '#ffffff'], [0.02, 0.02, '#ffe0a0']].forEach(([x, y, cc]) => { c.fillStyle = rad(x * R - R * 0.06, y * R - R * 0.1, R * 0.02, R * 0.25, [[0, '#ffffff'], [1, cc]]); c.beginPath(); c.arc(x * R, y * R - R * 0.05, R * 0.22, 0, 7); c.fill(); }); });
+      else if (t === 'ice') { shadow(R * 0.85, R * 0.86); c.fillStyle = '#f4f6fa'; c.beginPath(); c.ellipse(0, R * 0.55, R * 0.9, R * 0.28, 0, 0, 7); c.fill(); const sw = ['#ff5ca8', '#5ab8ff', '#ffd23f', '#7ad46a']; c.save(); c.beginPath(); c.moveTo(-R * 0.82, R * 0.5); c.quadraticCurveTo(-R * 0.7, -R * 0.95, 0, -R * 0.95); c.quadraticCurveTo(R * 0.7, -R * 0.95, R * 0.82, R * 0.5); c.closePath(); c.clip(); c.fillStyle = '#fbfcff'; c.fillRect(-R, -R, R * 2, R * 2); sw.forEach((cc, k) => { c.fillStyle = cc; c.globalAlpha = 0.75; c.fillRect(-R + k * R * 0.5, -R, R * 0.5, R * 2); }); c.globalAlpha = 1; c.fillStyle = 'rgba(255,255,255,.55)'; for (let i = 0; i < 30; i++) c.fillRect((rg() - 0.5) * R * 1.6, (rg() - 0.8) * R * 1.2, R * 0.05, R * 0.05); c.restore(); c.fillStyle = '#e83a3a'; c.beginPath(); c.arc(0, -R * 0.9, R * 0.1, 0, 7); c.fill(); gloss = false; }
+      else {
+        shadow(R * 0.85, R * 0.86); c.fillStyle = gr3(); candyPath(c, ci, R); c.fill();
+        c.save(); candyPath(c, ci, R); c.clip();
+        if (t === 'flower') { c.fillStyle = 'rgba(255,240,200,.55)'; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; c.beginPath(); c.ellipse(Math.cos(a) * R * 0.55, Math.sin(a) * R * 0.55, R * 0.28, R * 0.18, a, 0, 7); c.fill(); } c.fillStyle = P.d; c.beginPath(); c.arc(0, 0, R * 0.16, 0, 7); c.fill(); }
+        if (t === 'ring') { c.fillStyle = 'rgba(0,0,0,0)'; c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.arc(0, 0, R * 0.35, 0, 7); c.fill(); c.globalCompositeOperation = 'source-over'; c.strokeStyle = 'rgba(168,120,32,.55)'; c.lineWidth = R * 0.05; for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283; c.beginPath(); c.moveTo(Math.cos(a) * R * 0.4, Math.sin(a) * R * 0.4); c.lineTo(Math.cos(a + 0.4) * R * 0.85, Math.sin(a + 0.4) * R * 0.85); c.stroke(); } c.fillStyle = 'rgba(255,255,255,.8)'; for (let i = 0; i < 14; i++) c.fillRect((rg() - 0.5) * R * 1.6, (rg() - 0.5) * R * 1.6, R * 0.06, R * 0.06); }
+        if (t === 'nastar') { c.fillStyle = '#e88a10'; Kit.rr(c, -R * 0.6, -R * 0.15, R * 1.2, R * 0.3, R * 0.15); c.fill(); c.strokeStyle = 'rgba(168,120,26,.6)'; c.lineWidth = R * 0.04; for (let i = 0; i < 6; i++) { c.beginPath(); c.moveTo(-R * 0.7 + i * R * 0.28, -R * 0.45); c.lineTo(-R * 0.6 + i * R * 0.28, R * 0.45); c.stroke(); } }
+        if (t === 'salat') { c.fillStyle = '#f6f8ff'; c.fillRect(-R, R * 0.05, R * 2, R); c.fillStyle = '#5a6ad8'; for (let i = 0; i < 14; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.5, R * 0.15 + rg() * R * 0.6, R * 0.06, 0, 7); c.fill(); } }
+        if (t === 'pyramid') { c.fillStyle = 'rgba(255,255,255,.9)'; for (let i = 0; i < 26; i++) c.fillRect((rg() - 0.5) * R * 1.4, (rg() - 0.3) * R * 1.3, R * 0.07, R * 0.025); c.fillStyle = 'rgba(120,60,10,.8)'; c.beginPath(); c.ellipse(0, -R * 0.3, R * 0.22, R * 0.12, 0, 0, 7); c.fill(); }
+        if (t === 'mooncake') { c.strokeStyle = 'rgba(138,80,16,.6)'; c.lineWidth = R * 0.05; c.beginPath(); c.arc(0, 0, R * 0.62, 0, 7); c.stroke(); for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; c.beginPath(); c.arc(Math.cos(a) * R * 0.74, Math.sin(a) * R * 0.74, R * 0.12, 0, 7); c.stroke(); } c.beginPath(); for (let i = 0; i < 4; i++) { const a = i / 4 * 6.283; c.moveTo(0, 0); c.lineTo(Math.cos(a) * R * 0.35, Math.sin(a) * R * 0.35); } c.stroke(); }
+        if (t === 'muahchee') { c.fillStyle = '#d8b080'; for (let i = 0; i < 40; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 1.5, (rg() - 0.5) * R * 1.5, R * 0.05, 0, 7); c.fill(); } }
+        if (t === 'nest') { c.strokeStyle = 'rgba(200,184,160,.7)'; c.lineWidth = R * 0.03; for (let i = 0; i < 26; i++) { c.beginPath(); c.arc((rg() - 0.5) * R * 0.5, (rg() - 0.5) * R * 0.5, R * (0.3 + rg() * 0.5), rg() * 6, rg() * 6 + 2); c.stroke(); } c.fillStyle = '#d88a2a'; for (let i = 0; i < 20; i++) c.fillRect((rg() - 0.5) * R * 0.9, (rg() - 0.5) * R * 0.9, R * 0.06, R * 0.06); c.fillStyle = 'rgba(255,255,255,.9)'; for (let i = 0; i < 14; i++) c.fillRect((rg() - 0.5) * R * 1.2, (rg() - 0.5) * R * 1.2, R * 0.08, R * 0.025); }
+        if (t === 'puff') { c.strokeStyle = 'rgba(168,106,16,.55)'; c.lineWidth = R * 0.05; for (let k = 1; k < 4; k++) { c.beginPath(); c.arc(0, R * 0.2, R * (0.25 * k), Math.PI * 1.1, Math.PI * 1.9); c.stroke(); } c.fillStyle = '#7ad46a'; c.beginPath(); c.ellipse(0, R * 0.55, R * 0.4, R * 0.1, 0, 0, 7); c.fill(); }
+        if (t === 'fold') { c.fillStyle = '#fff4c8'; Kit.rr(c, -R * 0.85, -R * 0.1, R * 1.7, R * 0.22, R * 0.1); c.fill(); c.fillStyle = '#b8783a'; for (let i = 0; i < 14; i++) c.fillRect(-R * 0.8 + rg() * R * 1.6, -R * 0.08 + rg() * R * 0.16, R * 0.08, R * 0.06); c.strokeStyle = 'rgba(154,90,16,.5)'; c.lineWidth = R * 0.04; for (let i = 0; i < 9; i++) { c.beginPath(); c.arc(-R * 0.7 + i * R * 0.18, -R * 0.25, R * 0.08, 0, 7); c.stroke(); } }
+        if (t === 'macaron') { c.fillStyle = '#fff6fa'; c.fillRect(-R, -R * 0.12, R * 2, R * 0.24); c.fillStyle = 'rgba(200,96,138,.45)'; c.fillRect(-R, -R * 0.2, R * 2, R * 0.08); c.fillRect(-R, R * 0.12, R * 2, R * 0.08); }
+        if (t === 'donut') { c.fillStyle = '#e8b060'; c.fillRect(-R, R * 0.2, R * 2, R); c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.arc(0, 0, R * 0.28, 0, 7); c.fill(); c.globalCompositeOperation = 'source-over'; const sp2 = ['#ffd23f', '#5ab8ff', '#ffffff', '#7ad46a']; for (let i = 0; i < 18; i++) { const a = rg() * 6.28, d = R * (0.4 + rg() * 0.35); c.fillStyle = sp2[i % 4]; c.save(); c.translate(Math.cos(a) * d, Math.sin(a) * d * 0.9 - R * 0.05); c.rotate(rg() * 3); c.fillRect(-R * 0.06, -R * 0.02, R * 0.12, R * 0.04); c.restore(); } }
+        c.restore();
+      }
     } else if (ci >= 34) { // festive tarts & cookies
       const fill = { 34: ['#8a4a28', '#4a1a08'], 35: ['#ffd070', '#e89020'], 37: ['#fff27a', '#f0b020'], 38: ['#fff6c0', '#f0d070'], 47: ['#ff6a8a', '#c81a3a'] }[ci];
       shadow(R * 0.85, R * 0.86);
@@ -1445,7 +1476,7 @@ const Kit = {
     ov.style.cssText = 'position:fixed;inset:0;z-index:60;background:rgba(40,10,50,.6);display:flex;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(4px)';
     const box = document.createElement('div'); box.style.cssText = 'background:#fff8ec;border-radius:22px;max-width:520px;width:100%;max-height:88vh;overflow:auto;padding:16px 14px 12px;box-shadow:0 10px 40px rgba(0,0,0,.35);font-family:system-ui,sans-serif;text-align:center';
     const lv = S.level || 1, all = POOL_NAMES.map((nm, i) => ({ i, nm, at: UNLOCK[i] || 1 })).sort((a, b) => a.at - b.at || a.i - b.i);
-    box.innerHTML = `<div style="font:900 24px system-ui;color:#5a1478">🍬 Mithai Album 🍬</div><div style="font:600 13px system-ui;color:#8a5a9a;margin:4px 0 10px">${first ? 'Welcome! Here are all ' + all.length + ' sweets you can collect. New ones join the board as you level up!' : all.filter(a => a.at <= lv).length + ' of ' + all.length + ' sweets unlocked'}</div><div id="albGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px"></div>
+    box.innerHTML = `<div style="font:900 24px system-ui;color:#5a1478">🍬 Shiok Sweets Album 🍬</div><div style="font:600 13px system-ui;color:#8a5a9a;margin:4px 0 10px">${first ? 'Welcome! Here are all ' + all.length + ' sweets you can collect. New ones join the board as you level up!' : all.filter(a => a.at <= lv).length + ' of ' + all.length + ' sweets unlocked'}</div><div id="albGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px"></div>
       <button id="albClose" style="margin-top:12px;border:0;border-radius:14px;padding:11px 28px;font:900 16px system-ui;color:#fff;background:linear-gradient(#ff7aa8,#e2246e);box-shadow:0 4px 0 #a01050">${first ? "Let's play! 🎉" : 'Close'}</button>`;
     ov.appendChild(box); document.body.appendChild(ov); const grid = box.querySelector('#albGrid');
     for (const a of all) { const got = a.at <= lv, cell = document.createElement('div'); cell.style.cssText = `background:${got ? '#fff' : '#f2e8f0'};border-radius:14px;padding:6px 4px 7px;box-shadow:0 2px 0 rgba(90,20,120,.12);position:relative`;
@@ -1490,7 +1521,7 @@ const Kit = {
   $('tool2Btn').onclick = () => { K.ac(); if (paused || won || phase !== 'idle') return; K.spend('shuffle', 30, 'Shuffle'); toolsUsed++; shuffle(); syncHud(); };
   K.wireSettings();
   { // album button on the home screen, and shown automatically the first time
-    const hb = $('homeOv') && $('homeOv').querySelector('.home'), pb = $('playBtn'); if (hb && pb) { const b = document.createElement('button'); b.id = 'albumBtn'; b.className = pb.className.replace(/\bprimary\b/, ''); b.style.cssText = 'margin-top:10px;width:100%;border:0;border-radius:18px;padding:12px;font:900 17px system-ui;background:linear-gradient(#ffe6f2,#ffc8e0);color:#8a1a5a;box-shadow:0 4px 0 rgba(160,30,90,.35)'; b.textContent = '🍬 Mithai Album'; b.onclick = e => { e.stopPropagation(); showAlbum(false); }; pb.insertAdjacentElement('afterend', b); }
+    const hb = $('homeOv') && $('homeOv').querySelector('.home'), pb = $('playBtn'); if (hb && pb) { const b = document.createElement('button'); b.id = 'albumBtn'; b.className = pb.className.replace(/\bprimary\b/, ''); b.style.cssText = 'margin-top:10px;width:100%;border:0;border-radius:18px;padding:12px;font:900 17px system-ui;background:linear-gradient(#ffe6f2,#ffc8e0);color:#8a1a5a;box-shadow:0 4px 0 rgba(160,30,90,.35)'; b.textContent = '🍬 Sweets Album'; b.onclick = e => { e.stopPropagation(); showAlbum(false); }; pb.insertAdjacentElement('afterend', b); }
     if (!S.albumSeen) setTimeout(() => showAlbum(true), 900);
     drawStall(S.level || 1); window.addEventListener('resize', () => drawStall(S.level || 1));
   }
