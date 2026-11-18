@@ -1253,6 +1253,49 @@ const IBG_SCENES = (() => {
   window.__hub = { openGame, refresh };
 })();
 
+/* ---- New-version prompt (Google Play in-app updates) ---- */
+(function () {
+  var C = window.Capacitor;
+  if (!C || !C.isNativePlatform || !C.isNativePlatform()) return;
+  var AU = (C.Plugins && C.Plugins.AppUpdate) || (C.registerPlugin && C.registerPlugin('AppUpdate'));
+  if (!AU) return;
+  var shown = false;
+  function css() {
+    if (document.getElementById('updCss')) return;
+    var s = document.createElement('style'); s.id = 'updCss';
+    s.textContent = '#updBox{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(10,4,30,.72);backdrop-filter:blur(4px)}' +
+      '#updBox .c{width:min(86vw,360px);background:linear-gradient(160deg,#7b3ff2,#e8459b);border-radius:26px;padding:26px 22px 20px;text-align:center;color:#fff;font-family:inherit;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:updPop .35s cubic-bezier(.2,1.6,.4,1)}' +
+      '#updBox .b{font-size:64px;line-height:1;animation:updBob 1.2s ease-in-out infinite}' +
+      '#updBox h2{margin:10px 0 6px;font-size:24px;font-weight:900}#updBox p{margin:0 0 18px;font-size:15px;opacity:.95;line-height:1.4}' +
+      '#updBox button{display:block;width:100%;border:0;border-radius:999px;padding:14px;font-family:inherit;font-weight:900;font-size:17px;cursor:pointer}' +
+      '#updBox .go{background:#ffd23f;color:#3a1466;box-shadow:0 5px 0 #c99a00}#updBox .later{background:transparent;color:#fff;opacity:.8;margin-top:10px;font-size:14px;padding:8px}' +
+      '@keyframes updPop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}@keyframes updBob{50%{transform:translateY(-6px) rotate(-6deg)}}';
+    document.head.appendChild(s);
+  }
+  function ask(info) {
+    if (shown) return; shown = true; css();
+    var d = document.createElement('div'); d.id = 'updBox';
+    d.innerHTML = '<div class="c"><div class="b">🐝</div><h2>New version is here!</h2>' +
+      '<p>Update Jambee to get the newest games, levels and fixes. Wahhh!!</p>' +
+      '<button class="go">Update now</button><button class="later">Later</button></div>';
+    document.body.appendChild(d);
+    d.querySelector('.go').onclick = function () {
+      var p = info.immediateUpdateAllowed ? AU.performImmediateUpdate() : AU.openAppStore();
+      Promise.resolve(p).catch(function () { try { AU.openAppStore(); } catch (e) {} });
+      d.remove(); shown = false;
+    };
+    d.querySelector('.later').onclick = function () { d.remove(); };
+  }
+  function check() {
+    AU.getAppUpdateInfo().then(function (info) {
+      if (info.updateAvailability === 3) { AU.performImmediateUpdate().catch(function () {}); return; }
+      if (info.updateAvailability === 2) ask(info);
+    }).catch(function () {});
+  }
+  setTimeout(check, 1500);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && !document.getElementById('updBox')) { shown = false; setTimeout(check, 800); } });
+})();
+
 </script>
 </body>
 </html>
