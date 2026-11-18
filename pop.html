@@ -702,6 +702,134 @@ const Kit = {
   chip(drawFn) { const c = document.createElement('canvas'); c.width = 60; c.height = 60; const x = c.getContext('2d'); x.translate(30, 30); drawFn(x, 22); return c; },
 };
 
+// ================= BoardFX: a new board look every level + shared eye-candy (Shiok Sweets, Pop Party) =================
+window.BoardFX = (() => {
+  // kind: metal = shiny gradient frame, neon = dark glass with glowing tube, rainbow = colour-cycling frame
+  const T = [
+    { name: 'Gold Mithai', kind: 'metal', f: ['#ffe7a3', '#e8a93a', '#b86e14'], dot: '#d6246e', in: ['#3a1458', '#22083a'], tile: ['rgba(255,140,220,.13)', 'rgba(150,120,255,.16)'], fx: 'sparkle' },
+    { name: 'Rose Gold', kind: 'metal', f: ['#ffe4ea', '#f0a0b4', '#a8546a'], dot: '#ffffff', in: ['#4a1030', '#26061a'], tile: ['rgba(255,170,200,.14)', 'rgba(255,220,230,.08)'], fx: 'hearts' },
+    { name: 'Emerald', kind: 'metal', f: ['#c8ffd8', '#2ebd6b', '#0a6a38'], dot: '#ffd60a', in: ['#06321e', '#021a10'], tile: ['rgba(80,255,160,.12)', 'rgba(255,255,255,.06)'], fx: 'leaves' },
+    { name: 'Neon Cyber', kind: 'neon', f: ['#00f0ff', '#ff2bd6'], dot: '#ff2bd6', in: ['#0a0428', '#020012'], tile: ['rgba(0,240,255,.09)', 'rgba(255,43,214,.09)'], fx: 'grid' },
+    { name: 'Sapphire', kind: 'metal', f: ['#d6ecff', '#3a7ae8', '#12307a'], dot: '#ffffff', in: ['#0a1844', '#040a24'], tile: ['rgba(120,180,255,.13)', 'rgba(255,255,255,.06)'], fx: 'bubbles' },
+    { name: 'Lava Fire', kind: 'metal', f: ['#ffd060', '#ff5a1a', '#8a1a00'], dot: '#ffe600', in: ['#2e0a00', '#140200'], tile: ['rgba(255,120,40,.14)', 'rgba(255,220,80,.07)'], fx: 'embers' },
+    { name: 'Ice Crystal', kind: 'metal', f: ['#ffffff', '#a8e4ff', '#4aa0d8'], dot: '#ffffff', in: ['#0e3a5e', '#06203a'], tile: ['rgba(200,240,255,.15)', 'rgba(255,255,255,.07)'], fx: 'snow' },
+    { name: 'Rainbow', kind: 'rainbow', f: [], dot: '#ffffff', in: ['#1e0a3a', '#0a041e'], tile: ['rgba(255,255,255,.1)', 'rgba(255,255,255,.05)'], fx: 'sparkle' },
+    { name: 'Ruby', kind: 'metal', f: ['#ffc4c4', '#e02a3a', '#6a0810'], dot: '#ffd60a', in: ['#3a0612', '#1e0208'], tile: ['rgba(255,90,110,.13)', 'rgba(255,220,220,.06)'], fx: 'hearts' },
+    { name: 'Galaxy', kind: 'neon', f: ['#b86bff', '#5ce1ff'], dot: '#ffffff', in: ['#120830', '#03010c'], tile: ['rgba(184,107,255,.1)', 'rgba(92,225,255,.07)'], fx: 'stars' },
+    { name: 'Mint Choc', kind: 'metal', f: ['#dcfff2', '#5ad8b0', '#22806a'], dot: '#5a2a10', in: ['#2e1808', '#160a02'], tile: ['rgba(120,255,210,.12)', 'rgba(255,255,255,.05)'], fx: 'sparkle' },
+    { name: 'Sunset', kind: 'metal', f: ['#ffe4a0', '#ff8a4a', '#c0306a'], dot: '#ffffff', in: ['#3e0a3a', '#1a041e'], tile: ['rgba(255,160,100,.13)', 'rgba(255,100,160,.08)'], fx: 'petals' },
+    { name: 'Midnight Gold', kind: 'neon', f: ['#ffd700', '#ff9a00'], dot: '#ffd700', in: ['#161008', '#060300'], tile: ['rgba(255,215,0,.08)', 'rgba(255,255,255,.04)'], fx: 'stars' },
+    { name: 'Royal Purple', kind: 'metal', f: ['#ecd0ff', '#9a4ae0', '#44168a'], dot: '#ffd60a', in: ['#200a40', '#0e041e'], tile: ['rgba(200,140,255,.13)', 'rgba(255,255,255,.06)'], fx: 'sparkle' },
+    { name: 'Bubblegum', kind: 'metal', f: ['#ffe2f6', '#ff7ac8', '#c02a8a'], dot: '#5ce1ff', in: ['#3e0a40', '#24042a'], tile: ['rgba(255,140,210,.14)', 'rgba(120,220,255,.08)'], fx: 'bubbles' },
+    { name: 'Toxic Lime', kind: 'neon', f: ['#8cff1a', '#00ffa2'], dot: '#eaff00', in: ['#0a1e04', '#020a00'], tile: ['rgba(140,255,26,.09)', 'rgba(0,255,162,.06)'], fx: 'bubbles' },
+    { name: 'Silver Chrome', kind: 'metal', f: ['#ffffff', '#b8c2d4', '#525c70'], dot: '#5ce1ff', in: ['#1a1e2c', '#0a0c14'], tile: ['rgba(200,220,255,.11)', 'rgba(255,255,255,.05)'], fx: 'sparkle' },
+    { name: 'Festival Lights', kind: 'metal', f: ['#ffd27a', '#ff8a00', '#9a4400'], dot: 'multi', in: ['#2e0a26', '#14040e'], tile: ['rgba(255,190,80,.12)', 'rgba(255,90,180,.08)'], fx: 'petals' },
+    { name: 'Ocean Deep', kind: 'neon', f: ['#00c8ff', '#00ffd0'], dot: '#00ffd0', in: ['#021a34', '#000814'], tile: ['rgba(0,200,255,.1)', 'rgba(0,255,208,.06)'], fx: 'bubbles' },
+    { name: 'Hot Pink Neon', kind: 'neon', f: ['#ff2b8a', '#ffd23f'], dot: '#ffd23f', in: ['#2a0418', '#0e0008'], tile: ['rgba(255,43,138,.1)', 'rgba(255,210,63,.06)'], fx: 'hearts' },
+    { name: 'Pandan Coconut', kind: 'metal', f: ['#eaffd4', '#7ac83a', '#386a10'], dot: '#ffffff', in: ['#10300a', '#061404'], tile: ['rgba(160,255,100,.12)', 'rgba(255,255,255,.06)'], fx: 'leaves' },
+    { name: 'Cosmic Rainbow', kind: 'rainbow', f: [], dot: '#ffffff', in: ['#05051a', '#000004'], tile: ['rgba(255,255,255,.08)', 'rgba(255,255,255,.04)'], fx: 'stars' },
+  ];
+  const MULTI = ['#ff4f9a', '#ffd23f', '#5fd4ff', '#8cf21a', '#ff7a1a', '#b86bff'];
+  const theme = (level, salt = 0) => T[(Math.max(1, level) - 1 + salt) % T.length];
+  const hue = now => (now / 22) % 360;
+
+  function frame(ctx, th, x, y, w, h, cs, now) {
+    const pad = 14, R = cs * 0.5, X = x - pad, Y = y - pad, Wd = w + pad * 2, Hd = h + pad * 2;
+    ctx.save();
+    if (th.kind === 'metal') {
+      ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = cs * 0.8; ctx.shadowOffsetY = cs * 0.15;
+      const g = ctx.createLinearGradient(0, Y, 0, Y + Hd); g.addColorStop(0, th.f[0]); g.addColorStop(0.5, th.f[1]); g.addColorStop(1, th.f[2]);
+      ctx.fillStyle = g; Kit.rr(ctx, X, Y, Wd, Hd, R); ctx.fill(); ctx.shadowColor = 'transparent';
+      // moving shine across the frame
+      ctx.save(); Kit.rr(ctx, X, Y, Wd, Hd, R); ctx.clip(); ctx.globalCompositeOperation = 'lighter'; const sx = X - Wd * 0.3 + ((now / 3200) % 1.6) * Wd; const sg = ctx.createLinearGradient(sx, 0, sx + Wd * 0.25, 0); sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(0.5, 'rgba(255,255,255,.35)'); sg.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = sg; ctx.fillRect(X, Y, Wd, Hd); ctx.restore();
+    } else {
+      const a = th.kind === 'rainbow' ? `hsl(${hue(now)},100%,62%)` : th.f[0], b = th.kind === 'rainbow' ? `hsl(${(hue(now) + 160) % 360},100%,62%)` : th.f[1];
+      ctx.fillStyle = 'rgba(8,4,24,.82)'; Kit.rr(ctx, X, Y, Wd, Hd, R); ctx.fill();
+      if (th.kind === 'rainbow') { ctx.save(); Kit.rr(ctx, X, Y, Wd, Hd, R); ctx.lineWidth = 9; const rg = ctx.createLinearGradient(X, Y, X + Wd, Y + Hd); for (let i = 0; i <= 6; i++) rg.addColorStop(i / 6, `hsl(${(i * 60 + hue(now) * 2) % 360},100%,60%)`); ctx.strokeStyle = rg; ctx.shadowColor = a; ctx.shadowBlur = cs * 0.8; ctx.stroke(); ctx.restore(); }
+      else { const pul = 0.75 + 0.25 * Math.sin(now / 380); ctx.shadowColor = a; ctx.shadowBlur = cs * 0.9 * pul; ctx.strokeStyle = a; ctx.lineWidth = 4; Kit.rr(ctx, X + 1, Y + 1, Wd - 2, Hd - 2, R); ctx.stroke();
+        ctx.shadowColor = b; ctx.shadowBlur = cs * 0.5; ctx.strokeStyle = b; ctx.globalAlpha = 0.8; ctx.lineWidth = 1.8; Kit.rr(ctx, X + 7, Y + 7, Wd - 14, Hd - 14, R * 0.75); ctx.stroke(); ctx.globalAlpha = 1; }
+    }
+    ctx.restore();
+    // marquee light bulbs running round the frame
+    ctx.save(); ctx.lineCap = 'round'; ctx.setLineDash([0.1, cs * 0.28]); ctx.lineDashOffset = -now / 40; ctx.lineWidth = 4;
+    if (th.dot === 'multi') { for (let k = 0; k < 3; k++) { ctx.strokeStyle = MULTI[(Math.floor(now / 300) + k) % MULTI.length]; ctx.lineDashOffset = -now / 40 - k * cs * 0.093; ctx.setLineDash([0.1, cs * 0.28]); Kit.rr(ctx, x - 8, y - 8, w + 16, h + 16, cs * 0.4); ctx.stroke(); } }
+    else { ctx.strokeStyle = th.dot; ctx.shadowColor = th.dot; ctx.shadowBlur = 6; Kit.rr(ctx, x - 8, y - 8, w + 16, h + 16, cs * 0.4); ctx.stroke(); }
+    ctx.restore();
+    // two comets chasing each other round the frame
+    const per = 2 * (w + h + 32), pt = d => { d = ((d % per) + per) % per; const L = w + 16, Hh = h + 16, x0 = x - 8, y0 = y - 8; if (d < L) return [x0 + d, y0]; d -= L; if (d < Hh) return [x0 + L, y0 + d]; d -= Hh; if (d < L) return [x0 + L - d, y0 + Hh]; d -= L; return [x0, y0 + Hh - d]; };
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (let k = 0; k < 2; k++) { const head = (now / 3.2) + k * per / 2, col = th.kind === 'metal' ? '#ffffff' : (th.kind === 'rainbow' ? `hsl(${(hue(now) + k * 180) % 360},100%,70%)` : th.f[k % 2]);
+      for (let i = 0; i < 16; i++) { const [px, py] = pt(head - i * cs * 0.12); ctx.globalAlpha = (1 - i / 16) * 0.9; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(px, py, (5 - i * 0.25) * Math.max(0.7, cs / 48), 0, 7); ctx.fill(); } }
+    ctx.restore();
+    // twinkles on the corners
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; [[X + 10, Y + 10], [X + Wd - 10, Y + 10], [X + 10, Y + Hd - 10], [X + Wd - 10, Y + Hd - 10]].forEach(([tx, ty], i) => { const s = Math.max(0, Math.sin(now / 420 + i * 1.7)); if (s < 0.2) return; star(ctx, tx, ty, cs * 0.22 * s, '#ffffff', s); }); ctx.restore();
+  }
+  function star(ctx, x, y, r, col, a = 1) { ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = col; ctx.translate(x, y); ctx.beginPath(); for (let i = 0; i < 8; i++) { const rr = i % 2 ? r * 0.22 : r, an = i * Math.PI / 4; ctx.lineTo(Math.cos(an) * rr, Math.sin(an) * rr); } ctx.closePath(); ctx.fill(); ctx.restore(); }
+  function inner(ctx, th, x, y, w, h, cs) { const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, th.in[0]); g.addColorStop(1, th.in[1]); ctx.fillStyle = g; Kit.rr(ctx, x - 3, y - 3, w + 6, h + 6, cs * 0.3); ctx.fill(); }
+
+  // ambient particles that float inside the board, different per theme
+  function Ambient() {
+    const P = []; let fx = 'sparkle', bx = 0, by = 0, bw = 1, bh = 1;
+    const spawn = (init) => { const p = { x: bx + Math.random() * bw, y: init ? by + Math.random() * bh : (fx === 'embers' || fx === 'bubbles' ? by + bh + 6 : by - 6), a: Math.random() * 6.28, s: 0.5 + Math.random(), age: 0, life: 4 + Math.random() * 4 }; P.push(p); };
+    return {
+      set(th, x, y, w, h) { if (fx !== th.fx) P.length = 0; fx = th.fx; bx = x; by = y; bw = w; bh = h; while (P.length < 22) spawn(true); },
+      update(dt) { for (const p of P) { p.age += dt; p.a += dt;
+          if (fx === 'snow' || fx === 'petals' || fx === 'leaves') { p.y += dt * 18 * p.s; p.x += Math.sin(p.a) * dt * 12; }
+          else if (fx === 'embers' || fx === 'bubbles') { p.y -= dt * 22 * p.s; p.x += Math.sin(p.a * 1.3) * dt * 10; }
+          else if (fx === 'hearts') { p.y -= dt * 10 * p.s; }
+          else if (fx === 'grid') { p.y += dt * 40 * p.s; }
+        }
+        for (let i = P.length - 1; i >= 0; i--) { const p = P[i]; if (p.age > p.life || p.y < by - 10 || p.y > by + bh + 10) { P.splice(i, 1); spawn(false); } } },
+      draw(ctx, cs, th) { ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        for (const p of P) { const k = Math.sin(Math.min(1, p.age / p.life) * Math.PI), r = cs * 0.07 * p.s; ctx.globalAlpha = 0.55 * k;
+          if (fx === 'snow') { ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.fill(); }
+          else if (fx === 'embers') { ctx.fillStyle = p.s > 1 ? '#ffd060' : '#ff6a1a'; ctx.beginPath(); ctx.arc(p.x, p.y, r * 0.8, 0, 7); ctx.fill(); }
+          else if (fx === 'bubbles') { ctx.strokeStyle = 'rgba(200,240,255,.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(p.x, p.y, r * 1.6, 0, 7); ctx.stroke(); }
+          else if (fx === 'hearts') { ctx.fillStyle = '#ff6aa8'; ctx.save(); ctx.translate(p.x, p.y); const s = r * 1.3; ctx.beginPath(); ctx.moveTo(0, s); ctx.bezierCurveTo(-s * 2, -s * 0.4, -s * 0.6, -s * 1.6, 0, -s * 0.5); ctx.bezierCurveTo(s * 0.6, -s * 1.6, s * 2, -s * 0.4, 0, s); ctx.fill(); ctx.restore(); }
+          else if (fx === 'petals' || fx === 'leaves') { ctx.fillStyle = fx === 'petals' ? '#ffb0d0' : '#8cf21a'; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a); ctx.beginPath(); ctx.ellipse(0, 0, r * 1.4, r * 0.6, 0, 0, 7); ctx.fill(); ctx.restore(); }
+          else if (fx === 'grid') { ctx.fillStyle = th.f[0] || '#00f0ff'; ctx.fillRect(p.x, p.y, 1.5, cs * 0.3); }
+          else if (fx === 'stars') star(ctx, p.x, p.y, r * 1.8, '#ffffff', 0.6 * k * Math.abs(Math.sin(p.a * 2)));
+          else star(ctx, p.x, p.y, r * 1.6, th.dot === 'multi' ? '#ffd23f' : '#fff6c0', 0.6 * k * Math.abs(Math.sin(p.a * 1.5)));
+        } ctx.restore(); },
+    };
+  }
+
+  // lightning bolts for big combos
+  function Bolts() {
+    const B = [];
+    return {
+      add(x1, y1, x2, y2, col) { const pts = [[x1, y1]], n = 9; for (let i = 1; i < n; i++) { const t = i / n, j = Math.hypot(x2 - x1, y2 - y1) * 0.09; pts.push([x1 + (x2 - x1) * t + (Math.random() - 0.5) * j, y1 + (y2 - y1) * t + (Math.random() - 0.5) * j]); } pts.push([x2, y2]); B.push({ pts, col: col || '#bfe8ff', t: 0 }); },
+      update(dt) { for (const b of B) b.t += dt; for (let i = B.length - 1; i >= 0; i--) if (B[i].t > 0.35) B.splice(i, 1); },
+      draw(ctx, cs) { if (!B.length) return; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        for (const b of B) { const a = 1 - b.t / 0.35, flick = Math.random() > 0.25 ? 1 : 0.4; [[cs * 0.22, b.col, 0.35], [cs * 0.07, '#ffffff', 1]].forEach(([lw, cl, al]) => { ctx.globalAlpha = a * al * flick; ctx.strokeStyle = cl; ctx.shadowColor = b.col; ctx.shadowBlur = cs * 0.6; ctx.lineWidth = lw; ctx.beginPath(); b.pts.forEach(([px, py], i) => i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.stroke(); }); }
+        ctx.restore(); },
+    };
+  }
+
+  // glowing stars that fly from a cleared piece up to the goals box
+  function Flyers() {
+    const F = [];
+    return {
+      add(x, y, tx, ty, col) { F.push({ x0: x, y0: y, tx, ty, cx: x + (Math.random() - 0.5) * 160, cy: Math.min(y, ty) - 40 - Math.random() * 60, t: -Math.random() * 0.15, col }); },
+      update(dt, onArrive) { for (const f of F) f.t += dt * 1.6; for (let i = F.length - 1; i >= 0; i--) if (F[i].t >= 1) { onArrive && onArrive(F[i]); F.splice(i, 1); } },
+      draw(ctx, cs) { if (!F.length) return; ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        for (const f of F) { if (f.t < 0) continue; for (let k = 0; k < 6; k++) { const t = Math.max(0, f.t - k * 0.025), u = 1 - t, e = t * t * (3 - 2 * t), px = u * u * f.x0 + 2 * u * e * f.cx + e * e * f.tx, py = u * u * f.y0 + 2 * u * e * f.cy + e * e * f.ty; star(ctx, px, py, cs * (0.2 - k * 0.025), k ? f.col : '#ffffff', 0.9 - k * 0.14); } }
+        ctx.restore(); },
+    };
+  }
+
+  // the board's theme name pops in at the start of a level
+  function Banner() {
+    let txt = '', t = 9, col = '#fff';
+    return {
+      show(th) { txt = '🎨 ' + th.name + ' Board'; t = 0; col = th.kind === 'metal' ? th.f[0] : (th.f[0] || '#fff'); },
+      update(dt) { t += dt; },
+      draw(ctx, x, y, cs) { if (t > 1.8) return; const a = t < 0.25 ? t / 0.25 : t > 1.4 ? (1.8 - t) / 0.4 : 1, s = t < 0.25 ? 0.6 + 0.4 * (t / 0.25) : 1; ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(s, s); ctx.font = `900 ${Math.max(14, cs * 0.42)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = cs * 0.14; ctx.strokeStyle = 'rgba(20,0,40,.9)'; ctx.strokeText(txt, 0, 0); ctx.shadowColor = col; ctx.shadowBlur = cs * 0.5; ctx.fillStyle = col; ctx.fillText(txt, 0, 0); ctx.restore(); },
+    };
+  }
+  return { THEMES: T, theme, frame, inner, star, Ambient, Bolts, Flyers, Banner };
+})();
+
 </script>
 <script>
 (() => {
@@ -746,6 +874,11 @@ const Kit = {
   let D, grid, movesLeft = 0, score = 0, collected = [], cratesLeft = 0, phase = 'idle', phaseT = 0;
   let won = false, lost = false, paused = true, toolsUsed = 0, bonusLeft = 0, hammerMode = false, idleT = 0, hint = null, nextId = 1, rnd = Math.random, chainCount = 0;
   const parts = [], floats = [], beams = [], rings = [], flyers = [];
+  let TH = BoardFX.theme(1, 3); const AMB = BoardFX.Ambient(), BOLT = BoardFX.Bolts(), FLY = BoardFX.Flyers(), BAN = BoardFX.Banner();
+  const CHEER = [['GREAT!', 'NICE ONE!', 'GROOVY!', 'SWEET!', 'LIT!', 'YEAH!'], ['AWESOME!', 'ON FIRE!', 'BOOM BOOM!', 'DANCE!', 'SOLID BROOOO!', 'SHIOK!'], ['PARTY!', 'MEGA PARTY!', 'VERA MAARI!', 'DISCO KING!', 'UNSTOPPABLE!', 'LEGENDARY!']];
+  const cheer = t => CHEER[t][Math.random() * CHEER[t].length | 0];
+  function goalXY() { const g = document.getElementById('goals'), cv = ctx.canvas; if (!g) return [W / 2, -20]; const a = g.getBoundingClientRect(), b = cv.getBoundingClientRect(); return [a.left + a.width / 2 - b.left, a.top + a.height / 2 - b.top]; }
+  function bigBolts(n) { for (let i = 0; i < n; i++) { const Lw = cs * C, Lh = cs * R, e = Math.random() * 4 | 0; const [x1, y1] = [[ox + Math.random() * Lw, oy], [ox + Lw, oy + Math.random() * Lh], [ox + Math.random() * Lw, oy + Lh], [ox, oy + Math.random() * Lh]][e]; BOLT.add(x1, y1, ox + Lw * (0.2 + Math.random() * 0.6), oy + Lh * (0.2 + Math.random() * 0.6), TH.f[0] || '#bfe8ff'); } }
   let shake = 0, flash = 0, pinHP = 0, pinMax = 0, pinHit = 0, pinSwing = 0, meter = 0, partyT = 0, danceT = 0;
   const pinSparks = [];
 
@@ -816,7 +949,7 @@ const Kit = {
       if (p.ice) { breakIce(r, c); continue; }
       if (p.gift) { openGift(r, c); continue; }
       p.dying = 0.0001; score += 15 * (partyT > 0 ? 2 : 1); hitPinata(cx(c), cy(r), p.sp ? 3 : 1);
-      if (!p.sp && collected[p.c] != null) collected[p.c]++;
+      if (!p.sp && collected[p.c] != null) { collected[p.c]++; if (Math.random() < 0.5) { const [tx, ty] = goalXY(); FLY.add(cx(c), cy(r), tx, ty, COL[p.c].c); } }
       for (let i = 0; i < 6; i++) burst(cx(c), cy(r), p.sp ? '#ffffff' : COL[p.c].c);
       if (p.sp && fromSpecial !== false) triggerSpecial(p.sp, r, c, q);
     }
@@ -860,7 +993,8 @@ const Kit = {
       destroy(g);
       K.tone(K.PENT[Math.min(11, g.length)], 0.15, { type: 'triangle', vol: 0.1 }); K.noise(0.1, 0.08, 3000);
     }
-    if (g.length >= 6) addFloat(g.length >= 10 ? 'PARTY!' : g.length >= 8 ? 'AWESOME!' : 'GREAT!', W / 2, oy + cs * R * 0.4, '#fff3a6', cs * 0.7);
+    if (g.length >= 6) addFloat(cheer(g.length >= 10 ? 2 : g.length >= 8 ? 1 : 0), W / 2, oy + cs * R * 0.4, ['#fff3a6', '#7dffea', '#ffb0f0', '#b8ff6a'][Math.random() * 4 | 0], cs * (g.length >= 10 ? 0.85 : 0.7));
+    if (g.length >= 8) { bigBolts(g.length >= 10 ? 4 : 2); shake = Math.max(shake, 0.5); }
     pumpMeter(g.length);
     if (bg) { bg.burst(canvas.getBoundingClientRect().left + cx(c), canvas.getBoundingClientRect().top + cy(r), COL[p.c].c, 6 + g.length * 2); if (g.length >= 5) bg.pulse(null, null, 0.8 + g.length * 0.08, COL[p.c].c); }
     K.buzz(g.length >= 5 ? [10, 20, 10] : 8);
@@ -1088,7 +1222,7 @@ const Kit = {
   function PartyBG(cv) {
     const c = cv.getContext('2d'); let W = 0, H = 0, D2 = 1; const conf = [], dots = []; let flashA = 0, flashCol = '#ffffff', beatT = 0, beat = 0;
     const PAL = ['#ff2bd6', '#00e5ff', '#ffd23f', '#7dff6a', '#ff8a1f', '#8a5cff'];
-    const VEN = [['#0d0424', '#26084f', '#3a0a4e'], ['#021a3a', '#06408a', '#0a6aa8'], ['#2a0a0a', '#7a1f3a', '#c2502a'], ['#03241f', '#0a5a4a', '#1a8a6a'], ['#24021f', '#6a0a5a', '#b02a8a'], ['#0a0a1a', '#1a1a3a', '#3a2a6a']]; let ven = 0;
+    const VEN = [['#0d0424', '#26084f', '#3a0a4e'], ['#021a3a', '#06408a', '#0a6aa8'], ['#2a0a0a', '#7a1f3a', '#c2502a'], ['#03241f', '#0a5a4a', '#1a8a6a'], ['#24021f', '#6a0a5a', '#b02a8a'], ['#0a0a1a', '#1a1a3a', '#3a2a6a'], ['#1a0a00', '#6a2a00', '#d0700a'], ['#001a1a', '#004a5a', '#00a0b0'], ['#1a001a', '#4a0060', '#ff2bd6'], ['#0a1a00', '#2a5a00', '#8cc81a'], ['#200010', '#5a0030', '#e0306a'], ['#000a20', '#102a6a', '#6a5aff']]; let ven = 0;
     for (let i = 0; i < 46; i++) dots.push({ a: Math.random() * 6.28, b: Math.random() * 6.28, sp: 0.15 + Math.random() * 0.25, col: PAL[i % 6] });
     const tiles = Array.from({ length: 48 }, () => Math.floor(Math.random() * 6));
     function size() { D2 = Math.min(window.devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight; cv.width = W * D2; cv.height = H * D2; c.setTransform(D2, 0, 0, D2, 0, 0); }
@@ -1157,16 +1291,15 @@ const Kit = {
     ctx.save();
     if (shake > 0) ctx.translate((Math.random() - 0.5) * shake * cs * 0.2, (Math.random() - 0.5) * shake * cs * 0.2);
     const hue = (now / 25) % 360;
-    ctx.fillStyle = 'rgba(12,4,34,0.72)'; Kit.rr(ctx, ox - 12, oy - 12, cs * C + 24, cs * R + 24, cs * 0.45); ctx.fill();
-    ctx.save(); ctx.shadowColor = `hsl(${hue},100%,60%)`; ctx.shadowBlur = cs * 0.7; ctx.strokeStyle = `hsl(${hue},100%,65%)`; ctx.lineWidth = 3.5; Kit.rr(ctx, ox - 12, oy - 12, cs * C + 24, cs * R + 24, cs * 0.45); ctx.stroke();
-    ctx.shadowColor = `hsl(${(hue + 180) % 360},100%,60%)`; ctx.strokeStyle = `hsla(${(hue + 180) % 360},100%,70%,.7)`; ctx.lineWidth = 1.5; Kit.rr(ctx, ox - 6, oy - 6, cs * C + 12, cs * R + 12, cs * 0.35); ctx.stroke(); ctx.restore();
+    BoardFX.frame(ctx, TH, ox, oy, cs * C, cs * R, cs, now); BoardFX.inner(ctx, TH, ox, oy, cs * C, cs * R, cs);
     if (partyT > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.shadowColor = `hsl(${(now / 3) % 360},100%,60%)`; ctx.shadowBlur = cs * 1.4; ctx.strokeStyle = `hsl(${(now / 3) % 360},100%,70%)`; ctx.lineWidth = 7; Kit.rr(ctx, ox - 14, oy - 14, cs * C + 28, cs * R + 28, cs * 0.5); ctx.stroke(); ctx.restore(); }
     { // PARTY meter across the top of the board
       const mw = cs * C * 0.7, mx = W / 2 - mw / 2, my = oy - 10 - 7; ctx.fillStyle = 'rgba(255,255,255,.12)'; Kit.rr(ctx, mx, my, mw, 7, 3.5); ctx.fill();
       const k = partyT > 0 ? 1 : meter / 100; if (k > 0) { const g = ctx.createLinearGradient(mx, 0, mx + mw, 0); g.addColorStop(0, '#00e5ff'); g.addColorStop(0.5, '#ff2bd6'); g.addColorStop(1, '#ffd23f'); ctx.fillStyle = g; ctx.shadowColor = '#ff2bd6'; ctx.shadowBlur = k >= 0.8 ? 12 : 4; Kit.rr(ctx, mx, my, mw * k, 7, 3.5); ctx.fill(); ctx.shadowBlur = 0; }
       ctx.font = `900 ${Math.max(9, cs * 0.2)}px system-ui`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillStyle = partyT > 0 ? '#ffd23f' : '#bfa8ff'; ctx.fillText(partyT > 0 ? `PARTY ×2 (${partyT})` : 'PARTY', mx - 6, my + 3.5); }
     if (D.pinata) drawPinata(now);
-    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) { ctx.fillStyle = (r + c) % 2 ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.08)'; Kit.rr(ctx, ox + c * cs + 2, oy + r * cs + 2, cs - 4, cs - 4, cs * 0.2); ctx.fill(); }
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) { ctx.fillStyle = TH.tile[(r + c) % 2]; Kit.rr(ctx, ox + c * cs + 2, oy + r * cs + 2, cs - 4, cs - 4, cs * 0.2); ctx.fill(); }
+    AMB.set(TH, ox, oy, cs * C, cs * R); AMB.draw(ctx, cs, TH);
     const hl = new Set(); if (hint) hint.forEach(([r, c]) => hl.add(r * C + c));
     ctx.save(); ctx.beginPath(); ctx.rect(ox - 6, oy - 4, cs * C + 12, cs * R + 10); ctx.clip();
     for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
@@ -1194,6 +1327,7 @@ const Kit = {
     }
     for (const g of rings) { const p = g.t / 0.45; if (p >= 1) continue; ctx.save(); ctx.globalAlpha = 1 - p; ctx.strokeStyle = g.col; ctx.lineWidth = cs * 0.3 * (1 - p); ctx.beginPath(); ctx.arc(g.x, g.y, g.max * (1 - Math.pow(1 - p, 3)), 0, 7); ctx.stroke(); ctx.restore(); }
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (const q of parts) { ctx.globalAlpha = Math.max(0, 1 - q.age / q.life); ctx.fillStyle = q.col; ctx.beginPath(); ctx.arc(q.x, q.y, q.r * 1.2, 0, 7); ctx.fill(); } ctx.restore();
+    BOLT.draw(ctx, cs); FLY.draw(ctx, cs); BAN.draw(ctx, ox + cs * C / 2, oy + cs * R * 0.5, cs);
     ctx.globalAlpha = 1; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     for (const f of floats) { ctx.save(); ctx.globalAlpha = Math.max(0, 1 - Math.max(0, f.age - 0.55) / 0.55); ctx.translate(f.x, f.y - f.age * cs * 0.6); const sc = 0.5 + Math.min(1, f.age / 0.12) * 0.5; ctx.scale(sc, sc);
       ctx.font = `italic 900 ${f.size}px system-ui,sans-serif`; ctx.lineJoin = 'round'; ctx.lineWidth = f.size * 0.2; ctx.strokeStyle = '#2a0a5e'; ctx.strokeText(f.text, 0, 0); ctx.shadowColor = '#ff2bd6'; ctx.shadowBlur = f.size * 0.5; ctx.fillStyle = f.color; ctx.fillText(f.text, 0, 0); ctx.restore(); }
@@ -1204,6 +1338,7 @@ const Kit = {
   // ================= Update =================
   let bg = null;
   function update(dt) {
+    AMB.update(dt); BOLT.update(dt); BAN.update(dt); FLY.update(dt, () => { const g = document.getElementById('goals'); if (g) { g.style.transform = 'scale(1.08)'; clearTimeout(g._pt); g._pt = setTimeout(() => g.style.transform = '', 120); } });
     shake = Math.max(0, shake - dt * 2.5); flash = Math.max(0, flash - dt); pinHit = Math.max(0, pinHit - dt); pinSwing = Math.max(0, pinSwing - dt * 0.8); danceT = Math.max(0, danceT - dt * 0.6);
     for (const q of pinSparks) q.t += dt; for (let i = pinSparks.length - 1; i >= 0; i--) if (pinSparks[i].t > 0.35) pinSparks.splice(i, 1);
     if (!grid) return;
@@ -1298,11 +1433,12 @@ const Kit = {
 
   // ================= Level start / buttons =================
   function startLevel() {
+    TH = BoardFX.theme(S.level, 3); setTimeout(() => BAN.show(TH), 350);
     D = levelDef(S.level); rnd = Kit.rng(D.seed + Math.floor(Math.random() * 1000));
     { const pal = D.pal; PSTYLE = pal.style; COL = pal.cols || (() => { const r = Kit.rng(S.level * 13 + 1), all = PALS.filter(p => p.cols).map(p => p.cols); return Array.from({ length: 6 }, (_, i) => all[Math.floor(r() * all.length)][i]); })();
       if (S.level > 1 && (S.level - 1) % 10 === 0) setTimeout(() => K.toast('New colours: ' + pal.name + ' 🎨'), 900); }
     pinMax = pinHP = D.pinata; meter = 0; partyT = 0; danceT = 0; pinSparks.length = 0; resize();
-    if (bg && bg.setVenue) { const v = S.level - 1; if (bg._v !== undefined && bg._v !== v) setTimeout(() => K.toast('New party: ' + ['Disco Night', 'Underwater Rave', 'Beach Sunset', 'Jungle Jam', 'Pink Palace', 'Space Disco'][v % 6] + ' ✨'), 500); bg._v = v; bg.setVenue(v); }
+    if (bg && bg.setVenue) { const v = S.level - 1; if (bg._v !== undefined && bg._v !== v) setTimeout(() => K.toast('New party: ' + ['Disco Night', 'Underwater Rave', 'Beach Sunset', 'Jungle Jam', 'Pink Palace', 'Space Disco', 'Golden Hour', 'Lagoon Lights', 'Neon Club', 'Lime Fest', 'Cherry Bash', 'Midnight Blue'][v % 12] + ' ✨'), 500); bg._v = v; bg.setVenue(v); }
     collected = Array(6).fill(0);
     movesLeft = D.moves; score = 0; won = false; lost = false; toolsUsed = 0; bonusLeft = 0; hammerMode = false; hint = null; idleT = 0; movesLeftAtWin = 0;
     parts.length = 0; floats.length = 0; beams.length = 0; rings.length = 0; flyers.length = 0;
