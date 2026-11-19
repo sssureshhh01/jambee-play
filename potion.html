@@ -883,6 +883,39 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
   let anim = null, pending = null, hint = null;
   let stuckShown = false;
   // thrill: combo streaks, a lucky potion, a speed bonus and boss brews
+  // ===== living potions (element reactions), Mystic the witch cat, frozen bonus flask, tilt & shake sloshing =====
+  const RX = []; let frostA = 0, warmA = 0, darkA = 0, tiltT = 0, tiltS = 0, order = [], cat = { jump: 0, blink: 0, talk: 0, said: '' }, frozeTip = false;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  function ELEM(c) { const C = COLORS[c] || {}; if (C.fx) return { lava: 'fire', electric: 'bolt', frost: 'ice', toxic: 'nature', glow: 'nature', galaxy: 'star', galaxy2: 'shadow', gold: 'gold', sparkle: 'heart', rainbow: 'star', fizz: 'bubble' }[C.fx] || 'star';
+    const [r, g, b] = hexRGB(C.c || '#ffffff'), mx = Math.max(r, g, b), mn = Math.min(r, g, b); if (mx - mn < 45) return 'bubble';
+    let h = mx === r ? ((g - b) / (mx - mn)) * 60 : mx === g ? (2 + (b - r) / (mx - mn)) * 60 : (4 + (r - g) / (mx - mn)) * 60; h = (h + 360) % 360;
+    if (h < 45 && mx < 190) return 'bubble'; if (h < 45 || h >= 345) return 'fire'; if (h < 70) return 'bolt'; if (h < 165) return 'nature'; if (h < 250) return 'ice'; if (h < 295) return 'shadow'; return 'heart'; }
+  const ELEM_NAME = { fire: '🔥 FIRE BREW!', ice: '❄️ ICE BREW!', bolt: '⚡ THUNDER BREW!', nature: '🌿 NATURE BREW!', shadow: '🌑 SHADOW BREW!', heart: '💖 LOVE BREW!', star: '✨ STAR BREW!', gold: '💰 GOLD BREW!', bubble: '🫧 FIZZY BREW!' };
+  function onBrew(i, c) { const p = pos[i]; if (!p) return; const e = ELEM(c), col = COLORS[c], x = p.x, y = p.y - tw * 0.2, N = 34;
+    for (let k = 0; k < N; k++) { const a = rnd(0, Math.PI * 2), sp = rnd(0.6, 2.4) * tw;
+      if (e === 'fire') RX.push({ k: 'flame', x: x + rnd(-0.3, 0.3) * tw, y, vx: rnd(-0.6, 0.6) * tw, vy: -rnd(2, 4.5) * tw, life: rnd(0.6, 1.1), s: rnd(0.18, 0.34) * tw, age: 0, c: k % 3 ? '#ff8a20' : '#ffd040' });
+      else if (e === 'ice') RX.push({ k: 'snow', x, y: y + tw * 0.4, vx: Math.cos(a) * sp * 1.4, vy: Math.sin(a) * sp * 1.4, life: rnd(0.9, 1.5), s: rnd(0.1, 0.22) * tw, age: 0, c: '#e8f7ff', r: rnd(0, 6) });
+      else if (e === 'nature') RX.push({ k: 'leaf', x: x + rnd(-0.4, 0.4) * tw, y: y + tw * 0.3, vx: Math.cos(a) * sp, vy: -rnd(1.5, 3.5) * tw, life: rnd(1, 1.6), s: rnd(0.14, 0.26) * tw, age: 0, c: k % 2 ? '#5fd35a' : '#b6f05a', r: rnd(0, 6) });
+      else if (e === 'shadow') RX.push({ k: 'smoke', x: x + rnd(-0.3, 0.3) * tw, y: y + tw * 0.2, vx: Math.cos(a) * sp * 0.6, vy: -rnd(0.5, 1.6) * tw, life: rnd(1, 1.6), s: rnd(0.3, 0.6) * tw, age: 0, c: k % 2 ? '#3a1a5a' : '#140820' });
+      else if (e === 'heart') RX.push({ k: 'heart', x: x + rnd(-0.4, 0.4) * tw, y, vx: rnd(-0.5, 0.5) * tw, vy: -rnd(1.2, 2.6) * tw, life: rnd(1, 1.5), s: rnd(0.14, 0.26) * tw, age: 0, c: k % 2 ? '#ff5fa8' : '#ffb2d8' });
+      else if (e === 'gold') RX.push({ k: 'coin', x, y, vx: Math.cos(a) * sp * 1.2, vy: -rnd(2, 4) * tw, g: 7 * tw, life: rnd(0.9, 1.3), s: rnd(0.14, 0.2) * tw, age: 0, c: '#ffd23f', r: rnd(0, 6) });
+      else if (e === 'bubble') RX.push({ k: 'bubble', x: x + rnd(-0.35, 0.35) * tw, y: y + tw * 0.3, vx: rnd(-0.3, 0.3) * tw, vy: -rnd(1, 2.5) * tw, life: rnd(0.9, 1.5), s: rnd(0.08, 0.2) * tw, age: 0, c: col.hi });
+      else RX.push({ k: 'star', x, y: y + tw * 0.3, vx: Math.cos(a) * sp * 1.3, vy: Math.sin(a) * sp * 1.3, life: rnd(0.7, 1.2), s: rnd(0.1, 0.22) * tw, age: 0, c: k % 2 ? col.hi : '#ffffff', r: rnd(0, 6) }); }
+    if (e === 'fire') { warmA = 0.45; noise(0.5, 0.06, 900); }
+    if (e === 'ice') { frostA = 1; tone(1568, 0.25, { type: 'sine', vol: 0.05 }); tone(2093, 0.3, { type: 'sine', vol: 0.04, delay: 0.08 }); }
+    if (e === 'bolt') { for (let k = 0; k < 3; k++) addBolt(x + rnd(-1, 1) * W * 0.3, 0, x, y + tw * 0.3, '#fff6a0'); flashA = Math.max(flashA, 0.45); noise(0.25, 0.08, 3000); }
+    if (e === 'shadow') { darkA = 0.5; tone(110, 0.5, { type: 'sawtooth', vol: 0.03 }); }
+    bigFloat(ELEM_NAME[e], x, Math.max(tw * 1.2, p.y - tw * 2.1), col.hi);
+    // Mystic's order
+    const it = order.find(o => !o.done && o.c === c);
+    if (it) { it.done = true; bonusCoins += 10; bonusNotes.push('mystic'); cat.jump = 1; cat.talk = 2.2; cat.said = order.every(o => o.done) ? 'Purrfect! 😻' : 'Meow! One more!';
+      if (order.every(o => o.done)) { bonusCoins += 15; bigFloat('😺 MYSTIC IS HAPPY!  +' + (10 * order.length + 15) + '🪙', W / 2, H * 0.24, '#d8b2ff'); } }
+    // the first potion melts the frozen flask
+    tubeFx.forEach((f, k) => { if (f.frozen && !f.melt) { f.melt = 1; tone(660, 0.4, { type: 'triangle', vol: 0.05 }); for (let q = 0; q < 26; q++) RX.push({ k: 'smoke', x: pos[k].x + rnd(-0.4, 0.4) * tw, y: pos[k].y + rnd(0, 1) * th, vx: rnd(-0.3, 0.3) * tw, vy: -rnd(0.6, 1.4) * tw, life: rnd(0.8, 1.3), s: rnd(0.2, 0.4) * tw, age: 0, c: '#e8f4ff' }); setTimeout(() => toast('🔥 The frozen flask melted — use it!'), 300); } });
+  }
+  const frozenT = i => !!(tubeFx[i] && tubeFx[i].frozen);
+  window.addEventListener('deviceorientation', e => { if (e.gamma != null) tiltT = Math.max(-1, Math.min(1, e.gamma / 40)) * 0.38; });
+  window.addEventListener('devicemotion', e => { const a = e.acceleration || {}; const m = Math.hypot(a.x || 0, a.y || 0, a.z || 0); if (m > 14) { tubeFx.forEach(f => f.wob = 1); } });
   let luckyC = -1, combo = 0, lastDoneMove = -9, prevDone = -1, bonusCoins = 0, bonusNotes = [], playT = 0, speedGoal = 60, boss = false, bossT = 3, flashA = 0;
   const bolts = [], shocks = [];
   const PRAISE = ['Brewed!', 'Magic!', 'Bubbly!', 'Perfect mix!', 'Wizard!', 'Shiok!', 'Semma!', 'Alchemist!', 'Sparkly!', 'Potion pro!', 'Solid broooo!', 'Vera maari!'];
@@ -929,7 +962,7 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
   const top = i => tubes[i][tubes[i].length - 1];
   function runLen(i) { const t = tubes[i]; if (!t.length) return 0; let r = 1; while (r < t.length && t[t.length - 1 - r] === t[t.length - 1]) r++; return r; }
   const isDone = i => tubes[i].length === cap && runLen(i) === cap;
-  const canPour = (s, t) => canPourRaw(tubes, s, t, cap) && !isDone(s);
+  const canPour = (s, t) => canPourRaw(tubes, s, t, cap) && !isDone(s) && !frozenT(s) && !frozenT(t);
   function anyMove() { for (let s = 0; s < tubes.length; s++) for (let t = 0; t < tubes.length; t++) if (canPour(s, t) && !(runLen(s) === tubes[s].length && !tubes[t].length)) return true; return false; }
 
   function startLevel(m) {
@@ -947,8 +980,12 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
     if (luckyC >= 0 && S.level <= 6) setTimeout(() => toast('🍀 Finish the sparkly lucky potion for bonus coins!'), 2400);
     if (boss) setTimeout(() => toast('⚡ BOSS BREW! Double coins this level ⚡'), 900);
     tubes = L.tubes.map(t => t.slice()); hidden = L.hidden.map(h => h.slice());
+    const addFrozen = mode === 'level' && S.level >= 4 && S.level % 3 === 1; if (addFrozen) { tubes.push([]); hidden.push([]); }
+    { const present = [...new Set(L.tubes.flat())].sort(() => Math.random() - 0.5); order = mode === 'level' && S.level >= 2 ? present.slice(0, S.level < 8 ? 1 : 2).map(c => ({ c, done: false })) : []; cat.talk = order.length ? 3 : 0; cat.said = order.length ? 'Brew me ' + (order.length > 1 ? 'these' : 'this') + ', please!' : ''; }
+    RX.length = 0; frostA = warmA = darkA = 0;
     moves = 0; undoFree = 5; extraUsed = false; history = []; sel = null; won = false; winPending = 0; anim = null; pending = null; hint = null; stuckShown = false;
     tubeFx.length = 0; tubes.forEach(() => tubeFx.push({ lift: 0, shake: 0, doneT: 0, wasDone: false }));
+    if (addFrozen) { tubeFx[tubeFx.length - 1].frozen = 1; setTimeout(() => toast('🧊 A frozen bonus flask! Finish any potion to melt it.'), 1200); }
     confetti.length = 0; floats.length = 0; sparks.length = 0;
     speedGoal = Math.max(30, par * 5 + 10);
     layoutTubes(); syncHud(); if (typeof IB !== 'undefined' && IB) { const was = IB._scene, ns = bgOpts().scene; IB.setTheme(bgOpts()); if (was && ns !== was) setTimeout(() => toast('New world: ' + IBG_SCENES.title(ns) + ' ✨'), 500); IB._scene = ns; }
@@ -982,7 +1019,7 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
         flashA = Math.max(flashA, 0.12 * combo); sfx.star(Math.min(2, combo - 1)); }
       else bigFloat(PRAISE[Math.floor(Math.random() * PRAISE.length)], pos[t].x, pos[t].y - tw * 1.3, COLORS[anim.c].hi);
       if (anim.c === luckyC) { luckyC = -2; bonusCoins += 15; bonusNotes.push('lucky'); bigFloat('🍀 LUCKY! +15🪙', W / 2, H * 0.3, '#ffe36b'); for (let k = 0; k < 40; k++) sparkle(pos[t].x + (Math.random() - 0.5) * tw * 2, pos[t].y + Math.random() * th, k % 2 ? '#ffe36b' : '#ffffff'); }
-      prevDone = t;
+      prevDone = t; onBrew(t, anim.c);
     }
   }
   function checkEnd() {
@@ -993,6 +1030,7 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
   function tapTube(i) {
     if (won) return;
     if (anim && anim.phase !== 'back') return;
+    if (frozenT(i)) { tubeFx[i].shake = 0.35; sfx.invalid(); if (!frozeTip) { frozeTip = true; toast('🧊 Frozen! Finish any potion to melt it.'); } return; }
     if (sel === null) {
       if (tubes[i].length && !isDone(i) && !(anim && (anim.s === i || anim.t === i))) { sel = i; sfx.select(); buzz(6); }
       else { tubeFx[i].shake = 0.3; }
@@ -1270,11 +1308,13 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
     // liquid
     ctx.save(); flaskPath(w, h, gt); ctx.closePath(); ctx.clip();
     let acc = 0; const iw = (w - gt * 2) * (SHAPE === 'bulb' || SHAPE === 'cone' ? 1.35 : 1), bottom = h - gt;
+    { const tot = segs.reduce((a, z) => a + z.amt, 0), la = ang ? 0 : Math.max(-0.42, Math.min(0.42, -tiltS + Math.sin(now / 110 + i) * (fx.wob || 0) * 0.16)); if (tot > 0 && Math.abs(la) > 0.002) { const pv = bottom - tot * uh / 2; ctx.translate(0, pv); ctx.rotate(la); ctx.translate(0, -pv); } }
+    const fw = iw * 1.9;
     segs.forEach((sg, si) => {
       if (sg.amt <= 0.001) return;
       const y1 = bottom - acc * uh, y0 = bottom - (acc + sg.amt) * uh;
       if (sg.hid) {
-        ctx.fillStyle = '#2c2148'; ctx.fillRect(-iw / 2, y0, iw, y1 - y0 + 0.5);
+        ctx.fillStyle = '#2c2148'; ctx.fillRect(-fw / 2, y0, fw, y1 - y0 + 0.5);
         ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(-iw / 2, y0, iw * 0.3, y1 - y0);
         ctx.fillStyle = 'rgba(220,200,255,0.7)'; ctx.font = `900 ${uh * 0.55}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         for (let u = 0; u < Math.round(sg.amt); u++) ctx.fillText('?', 0, y1 - (u + 0.5) * uh);
@@ -1287,10 +1327,10 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
         const isTop = si === segs.length - 1 || segs.slice(si + 1).every(z => z.amt <= 0.001);
         if (isTop) { // sloshing surface
           const amp = uh * (0.05 + Math.min(1, fx.wob || 0) * 0.22), k = 7 / iw;
-          ctx.beginPath(); ctx.moveTo(-iw / 2, y1 + 0.5);
-          for (let xx = -iw / 2; xx <= iw / 2 + 0.1; xx += iw / 12) ctx.lineTo(xx, y0 + Math.sin(xx * k + now / 260 + i * 1.7) * amp + Math.sin(xx * k * 1.9 - now / 190) * amp * 0.4);
-          ctx.lineTo(iw / 2, y1 + 0.5); ctx.closePath(); ctx.fill();
-        } else ctx.fillRect(-iw / 2, y0, iw, y1 - y0 + 0.5);
+          ctx.beginPath(); ctx.moveTo(-fw / 2, y1 + 0.5);
+          for (let xx = -fw / 2; xx <= fw / 2 + 0.1; xx += fw / 20) ctx.lineTo(xx, y0 + Math.sin(xx * k + now / 260 + i * 1.7) * amp + Math.sin(xx * k * 1.9 - now / 190) * amp * 0.4);
+          ctx.lineTo(fw / 2, y1 + 0.5); ctx.closePath(); ctx.fill();
+        } else ctx.fillRect(-fw / 2, y0, fw, y1 - y0 + 0.5);
         // soft inner glow from below
         const gl = ctx.createLinearGradient(0, y1, 0, y0); gl.addColorStop(0, 'rgba(0,0,0,0.12)'); gl.addColorStop(0.6, 'rgba(255,255,255,0)'); gl.addColorStop(1, 'rgba(255,255,255,0.12)');
         ctx.fillStyle = gl; ctx.fillRect(-iw / 2, y0, iw, y1 - y0);
@@ -1356,6 +1396,12 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
     { const rg = ctx.createLinearGradient(-w * 0.62, 0, w * 0.62, 0); rg.addColorStop(0, ST.d); rg.addColorStop(0.35, ST.l); rg.addColorStop(0.65, ST.c); rg.addColorStop(1, ST.d);
       ctx.fillStyle = skinColor('rim', now); rr(-w * 0.62, -w * 0.1, w * 1.24, w * 0.16, w * 0.08); ctx.fill();
       ctx.fillStyle = rg; rr(-w * 0.58, w * 0.04, w * 1.16, w * 0.1, w * 0.05); ctx.fill(); ctx.fillStyle = 'rgba(255,255,255,0.5)'; rr(-w * 0.5, -w * 0.08, w * 0.7, w * 0.035, w * 0.02); ctx.fill(); }
+    if (fx.frozen) { const a = fx.melt ? fx.melt : 1; ctx.save(); ctx.globalAlpha = alpha * a;
+      const ig = ctx.createLinearGradient(-w, 0, w, h); ig.addColorStop(0, 'rgba(220,245,255,0.85)'); ig.addColorStop(0.5, 'rgba(150,210,255,0.6)'); ig.addColorStop(1, 'rgba(200,235,255,0.85)');
+      ctx.fillStyle = ig; rr(-w * 0.78, -w * 0.35, w * 1.56, h + w * 0.5, w * 0.22); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = Math.max(1.5, w * 0.05); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-w * 0.5, h * 0.2); ctx.lineTo(-w * 0.1, h * 0.38); ctx.lineTo(-w * 0.3, h * 0.6); ctx.moveTo(w * 0.45, h * 0.1); ctx.lineTo(w * 0.15, h * 0.3); ctx.lineTo(w * 0.35, h * 0.5); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; rr(-w * 0.62, -w * 0.25, w * 0.18, h * 0.7, w * 0.08); ctx.fill();
+      ctx.font = `${w * 0.55}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🧊', 0, h * 0.45); ctx.restore(); }
     // cork on completed flasks
     if (done && fx.doneT > 0) {
       const p = Math.min(1, fx.doneT / 0.35), drop = (1 - p) * -w * 1.2;
@@ -1495,6 +1541,36 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
       else ctx.font = `900 ${f.size}px system-ui,sans-serif`;
       ctx.shadowColor = f.color; ctx.shadowBlur = 12; ctx.fillStyle = f.color; ctx.fillText(f.text, 0, 0); ctx.restore();
     }
+    // living-potion reactions
+    for (const r of RX) { const u = r.age / r.life, a = Math.max(0, 1 - u); ctx.save(); ctx.globalAlpha = a;
+      if (r.k === 'flame') { ctx.globalCompositeOperation = 'lighter'; const g = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.s * (1.2 - u * 0.5)); g.addColorStop(0, '#fff3c0'); g.addColorStop(0.4, r.c); g.addColorStop(1, 'rgba(255,60,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(r.x, r.y, r.s * (1.2 - u * 0.5), 0, 7); ctx.fill(); }
+      else if (r.k === 'snow') { ctx.translate(r.x, r.y); ctx.rotate(r.r); ctx.strokeStyle = r.c; ctx.lineWidth = Math.max(1, r.s * 0.18); ctx.beginPath(); for (let j = 0; j < 3; j++) { const q = j * Math.PI / 3; ctx.moveTo(-Math.cos(q) * r.s, -Math.sin(q) * r.s); ctx.lineTo(Math.cos(q) * r.s, Math.sin(q) * r.s); } ctx.stroke(); }
+      else if (r.k === 'leaf') { ctx.translate(r.x, r.y); ctx.rotate(r.r); ctx.fillStyle = r.c; ctx.beginPath(); ctx.ellipse(0, 0, r.s, r.s * 0.45, 0, 0, 7); ctx.fill(); ctx.strokeStyle = 'rgba(30,80,20,0.6)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(-r.s, 0); ctx.lineTo(r.s, 0); ctx.stroke(); }
+      else if (r.k === 'smoke') { ctx.globalAlpha = a * 0.55; const rad = r.s * (1 + u * 1.4), g = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, rad); g.addColorStop(0, r.c); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(r.x, r.y, rad, 0, 7); ctx.fill(); }
+      else if (r.k === 'heart') { ctx.translate(r.x, r.y); ctx.fillStyle = r.c; const z = r.s; ctx.beginPath(); ctx.moveTo(0, z * 0.35); ctx.bezierCurveTo(-z, -z * 0.3, -z * 0.45, -z, 0, -z * 0.45); ctx.bezierCurveTo(z * 0.45, -z, z, -z * 0.3, 0, z * 0.35); ctx.fill(); }
+      else if (r.k === 'coin') { ctx.translate(r.x, r.y); ctx.scale(Math.abs(Math.cos(r.r)), 1); ctx.fillStyle = r.c; ctx.beginPath(); ctx.arc(0, 0, r.s, 0, 7); ctx.fill(); ctx.fillStyle = '#fff2a8'; ctx.beginPath(); ctx.arc(-r.s * 0.25, -r.s * 0.25, r.s * 0.35, 0, 7); ctx.fill(); }
+      else if (r.k === 'bubble') { ctx.strokeStyle = r.c; ctx.lineWidth = Math.max(1, r.s * 0.15); ctx.beginPath(); ctx.arc(r.x, r.y, r.s, 0, 7); ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(r.x - r.s * 0.35, r.y - r.s * 0.35, r.s * 0.25, 0, 7); ctx.fill(); }
+      else { ctx.globalCompositeOperation = 'lighter'; ctx.translate(r.x, r.y); ctx.rotate(r.r); ctx.fillStyle = r.c; ctx.beginPath(); for (let j = 0; j < 10; j++) { const q = j * Math.PI / 5, rr2 = j % 2 ? r.s * 0.4 : r.s; ctx.lineTo(Math.cos(q) * rr2, Math.sin(q) * rr2); } ctx.fill(); }
+      ctx.restore(); }
+    // screen washes: frost creeping in from the edges, fire warmth, shadow
+    const wash = (a, inner, outer) => { if (a <= 0.01) return; const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.25, W / 2, H / 2, Math.max(W, H) * 0.75); g.addColorStop(0, inner); g.addColorStop(1, outer); ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.restore(); };
+    wash(frostA * 0.9, 'rgba(200,240,255,0)', 'rgba(215,245,255,0.85)'); wash(warmA, 'rgba(255,120,30,0)', 'rgba(255,90,20,0.6)'); wash(darkA, 'rgba(20,0,40,0)', 'rgba(10,0,25,0.85)');
+    if (frostA > 0.05) { ctx.save(); ctx.globalAlpha = frostA * 0.7; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.2; for (let k = 0; k < 14; k++) { const ex = k % 2 ? 0 : W, ey = (k * 0.137 % 1) * H, L2 = tw * (0.8 + (k % 3) * 0.4) * frostA; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex + (ex ? -1 : 1) * L2, ey + L2 * 0.3); ctx.moveTo(ex + (ex ? -1 : 1) * L2 * 0.5, ey + L2 * 0.15); ctx.lineTo(ex + (ex ? -1 : 1) * L2 * 0.7, ey - L2 * 0.25); ctx.stroke(); } ctx.restore(); }
+    // Mystic the witch cat, sitting on the top shelf with her order
+    if (order.length && pos.length) { const sz = Math.min(tw * 0.9, 46), top0 = rowsY[0] - sz * 1.15, cx = sz * 1.1, cy = top0 > sz * 1.05 ? top0 : Math.min(H - sz * 0.6, rowsY[rowsY.length - 1] + th + sz * 1.2) ;
+      if (cy > sz * 0.9 && cy < H - sz * 0.3) { const jy = -Math.sin(Math.min(1, cat.jump) * Math.PI) * sz * 0.5, t0 = now / 1000; ctx.save(); ctx.translate(cx, cy + jy);
+        ctx.strokeStyle = '#141020'; ctx.lineWidth = sz * 0.12; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(sz * 0.32, sz * 0.25); ctx.quadraticCurveTo(sz * 0.85 + Math.sin(t0 * 2) * sz * 0.15, sz * 0.1, sz * 0.7, -sz * 0.35 + Math.sin(t0 * 2.4) * sz * 0.1); ctx.stroke();
+        ctx.fillStyle = '#1a1428'; ctx.beginPath(); ctx.ellipse(0, sz * 0.18, sz * 0.4, sz * 0.32, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(0, -sz * 0.2, sz * 0.3, 0, 7); ctx.fill();
+        [-1, 1].forEach(sd => { ctx.beginPath(); ctx.moveTo(sd * sz * 0.26, -sz * 0.3); ctx.lineTo(sd * sz * 0.2, -sz * 0.56); ctx.lineTo(sd * sz * 0.06, -sz * 0.42); ctx.fill(); });
+        ctx.fillStyle = '#6a3fc8'; ctx.beginPath(); ctx.ellipse(0, -sz * 0.44, sz * 0.42, sz * 0.08, -0.1, 0, 7); ctx.fill(); ctx.beginPath(); ctx.moveTo(-sz * 0.22, -sz * 0.46); ctx.quadraticCurveTo(-sz * 0.05, -sz * 0.95, sz * 0.32 + Math.sin(t0 * 1.5) * sz * 0.06, -sz * 1.0); ctx.quadraticCurveTo(sz * 0.08, -sz * 0.8, sz * 0.22, -sz * 0.46); ctx.fill(); ctx.fillStyle = '#ffd23f'; ctx.fillRect(-sz * 0.2, -sz * 0.53, sz * 0.4, sz * 0.06);
+        const op = cat.blink > 0 ? 0.15 : 1; ctx.fillStyle = cat.jump > 0 ? '#ffd23f' : '#9dff6a'; [-1, 1].forEach(sd => { ctx.beginPath(); ctx.ellipse(sd * sz * 0.12, -sz * 0.2, sz * 0.07, sz * 0.09 * op, 0, 0, 7); ctx.fill(); }); ctx.fillStyle = '#ff8ac0'; ctx.beginPath(); ctx.arc(0, -sz * 0.1, sz * 0.03, 0, 7); ctx.fill();
+        ctx.restore();
+        // speech bubble: the order, each potion ticked when brewed
+        const bx = cx + sz * 0.6, by = cy - sz * 1.0, n = order.length, bw = sz * (0.5 + n * 0.62), bh = sz * 0.8; ctx.save(); ctx.fillStyle = 'rgba(255,255,255,0.95)'; rr(bx, by, bw, bh, sz * 0.25); ctx.fill(); ctx.beginPath(); ctx.moveTo(bx + sz * 0.15, by + bh - 1); ctx.lineTo(bx - sz * 0.05, by + bh + sz * 0.22); ctx.lineTo(bx + sz * 0.4, by + bh - 1); ctx.fill();
+        order.forEach((o, k) => { const fx2 = bx + sz * 0.4 + k * sz * 0.62, fy = by + bh * 0.5, C = COLORS[o.c]; ctx.fillStyle = C.c; rr(fx2 - sz * 0.13, fy - sz * 0.2, sz * 0.26, sz * 0.42, sz * 0.1); ctx.fill(); ctx.fillStyle = C.hi; rr(fx2 - sz * 0.1, fy - sz * 0.17, sz * 0.07, sz * 0.3, sz * 0.03); ctx.fill(); ctx.fillStyle = '#8a5a32'; rr(fx2 - sz * 0.08, fy - sz * 0.3, sz * 0.16, sz * 0.12, sz * 0.03); ctx.fill();
+          if (o.done) { ctx.strokeStyle = '#22c55e'; ctx.lineWidth = sz * 0.1; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(fx2 - sz * 0.15, fy); ctx.lineTo(fx2 - sz * 0.02, fy + sz * 0.13); ctx.lineTo(fx2 + sz * 0.2, fy - sz * 0.15); ctx.stroke(); } });
+        if (cat.talk > 0 && cat.said) { ctx.font = `800 ${Math.max(11, sz * 0.3)}px system-ui,sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; const tw2 = ctx.measureText(cat.said).width + sz * 0.4; ctx.globalAlpha = Math.min(1, cat.talk * 2); ctx.fillStyle = '#2a1745'; rr(bx + bw + sz * 0.12, by + bh * 0.1, tw2, bh * 0.8, sz * 0.2); ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.fillText(cat.said, bx + bw + sz * 0.32, by + bh * 0.5); }
+        ctx.restore(); } }
     // confetti
     for (const c of confetti) {
       ctx.save(); ctx.globalAlpha = Math.max(0, 1 - Math.max(0, c.age - c.life + 0.6) / 0.6); ctx.translate(c.x, c.y); ctx.rotate(c.rot);
@@ -1536,7 +1612,11 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
     if (!won && tubes.length && !document.querySelector('.overlay.show')) { const was = Math.floor(playT); playT += dt; if (Math.floor(playT) !== was) { const m = $('moves'); if (m) m.textContent = movesTxt(); } }
     for (const b of bolts) b.t += dt; for (let k = bolts.length - 1; k >= 0; k--) if (bolts[k].t > 0.4) bolts.splice(k, 1);
     for (const q of shocks) q.t += dt; for (let k = shocks.length - 1; k >= 0; k--) if (shocks[k].t > 0.55) shocks.splice(k, 1);
-    flashA = Math.max(0, flashA - dt * 1.5);
+    flashA = Math.max(0, flashA - dt * 1.5); frostA = Math.max(0, frostA - dt * 0.7); warmA = Math.max(0, warmA - dt * 0.8); darkA = Math.max(0, darkA - dt * 0.6);
+    tiltS += (tiltT - tiltS) * Math.min(1, dt * 6); cat.jump = Math.max(0, cat.jump - dt * 1.6); cat.talk = Math.max(0, cat.talk - dt); cat.blink -= dt; if (cat.blink < -3.2) cat.blink = 0.15;
+    tubeFx.forEach(f => { if (f.melt) { f.melt = Math.max(0, f.melt - dt * 0.9); if (!f.melt) f.frozen = 0; } });
+    for (const r of RX) { r.age += dt; r.x += r.vx * dt; r.y += r.vy * dt; if (r.g) r.vy += r.g * dt; if (r.k === 'snow' || r.k === 'star') { r.vx *= 0.96; r.vy *= 0.96; } if (r.k === 'leaf') r.vx += Math.sin(r.age * 6 + r.r) * tw * 3 * dt; if (r.k === 'flame') r.vx *= 0.97; if (r.r !== undefined) r.r += dt * 4; }
+    for (let k = RX.length - 1; k >= 0; k--) if (RX[k].age > RX[k].life) RX.splice(k, 1);
     if (boss && !won && pos.length) { bossT -= dt; if (bossT <= 0) { bossT = 2.5 + Math.random() * 3.5; const k = Math.floor(Math.random() * pos.length), p = pos[k]; addBolt(p.x + (Math.random() - 0.5) * W * 0.6, 0, p.x, p.y - tw * 0.2, '#c8b0ff'); addBolt(p.x + (Math.random() - 0.5) * W * 0.4, 0, p.x, p.y - tw * 0.2, '#ffffff'); flashA = 0.3; tubeFx[k].wob = 1; tubeFx[k].shake = 0.25; noise(0.4, 0.12, 300); } }
     for (const d of drops) { d.age += dt; d.vy += tw * 14 * dt; d.x += d.vx * dt; d.y += d.vy * dt; if (d.y > d.floor && d.vy > 0) d.age = 9; }
     for (let k = drops.length - 1; k >= 0; k--) if (drops[k].age > 0.7) drops.splice(k, 1);
@@ -1616,7 +1696,7 @@ if (typeof module !== 'undefined') module.exports = { mulberry32, levelParams, p
   resize(); syncHud();
   setTimeout(maybeDaily, 600);
   requestAnimationFrame(frame);
-  window.__pp = { S, get tubes() { return tubes; }, tapTube, get anim() { return anim; }, solveFromHere, startLevel };
+  window.__pp = { S, onBrew: (i, c) => onBrew(i, c), get pos() { return pos; }, get tubes() { return tubes; }, tapTube, get anim() { return anim; }, solveFromHere, startLevel };
 })();
 
 </script>
